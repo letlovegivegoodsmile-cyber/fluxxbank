@@ -760,10 +760,21 @@
         const { error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm || "Customer" } } });
         if(error) throw error;
         err.style.color = "var(--ok)";
-        err.textContent = "\u2705 Account created! Confirm the email we sent you, then log in.";
+        err.textContent = "\u2705 Account created! Confirm the email, then wait for admin activation \u2014 usually minutes.\uD83D\uDE80";
       } else {
         const { error } = await sb.auth.signInWithPassword({ email: em, password: pw });
         if(error) throw error;
+        // APPROVAL GATE: check account status before allowing access
+        const { data: u } = await sb.auth.getUser();
+        const { data: prof } = await sb.from("profiles").select("status").eq("id", u.user.id).single();
+        if(prof && prof.status === "Pending"){
+          await sb.auth.signOut();
+          throw new Error("\u23F3 Account awaiting approval \u2014 an admin must activate it first. Usually takes minutes!");
+        }
+        if(prof && prof.status === "Frozen"){
+          await sb.auth.signOut();
+          throw new Error("\uD83E\uDD76 This account is frozen. Contact Fluxxbank support.");
+        }
         closeModal();
         await refreshAuthUI();
         document.getElementById("dashboard").scrollIntoView({behavior:"smooth"});

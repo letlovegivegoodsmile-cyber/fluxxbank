@@ -184,7 +184,7 @@
     <div class="view" id="view-cust">
       <div class="panel">
         <div class="panel-head">
-          <h3>Customer accounts</h3>
+          <h3>Customer accounts</h3> <span class="pill p-warn" id="custPending">0 awaiting approval</span>
           <div class="searchbar">
             <input type="text" id="custSearch" placeholder="Search name, email, ID…" oninput="renderCustomers()">
             <select id="custFilter" onchange="renderCustomers()">
@@ -346,6 +346,9 @@ function renderCustomers(){
   const rows = db.customers.filter(c =>
     (!f || c.status===f) &&
     (c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.id.toLowerCase().includes(q)));
+  const pend = db.customers.filter(c=>c.status==="Pending").length;
+  const pendEl = document.getElementById("custPending");
+  if(pendEl){ pendEl.textContent = pend + " awaiting approval"; pendEl.style.display = pend ? "inline-block" : "none"; }
   document.getElementById("custBody").innerHTML = rows.length ? rows.map((c)=>{
     const i = db.customers.indexOf(c);
     return `<tr>
@@ -355,10 +358,14 @@ function renderCustomers(){
       <td class="mono"><b>${eur(c.bal)}</b></td>
       <td><span class="pill p-info">${c.plan}</span></td>
       <td>${statusPill(c.status)}</td>
-      <td>${c.status==="Frozen"
-          ? `<button class="btn sm ok" onclick="setStatus(${i},'Active')">Unfreeze</button>`
-          : `<button class="btn sm ghost" onclick="setStatus(${i},'Frozen')">Freeze</button>`}
-          <button class="btn sm bad" onclick="delCustomer(${i})" style="margin-left:6px">Delete</button></td>
+      <td>${c.status==="Pending"
+          ? `<button class="btn sm ok" onclick="approveCustomer(${i})">\u2714 Approve</button>
+             <button class="btn sm bad" onclick="rejectCustomer(${i})" style="margin-left:6px">Reject</button>`
+          : c.status==="Frozen"
+          ? `<button class="btn sm ok" onclick="setStatus(${i},'Active')">Unfreeze</button>
+             <button class="btn sm bad" onclick="delCustomer(${i})" style="margin-left:6px">Delete</button>`
+          : `<button class="btn sm ghost" onclick="setStatus(${i},'Frozen')">Freeze</button>
+             <button class="btn sm bad" onclick="delCustomer(${i})" style="margin-left:6px">Delete</button>`}</td>
     </tr>`;
   }).join("") : '<tr><td colspan="6" class="empty">No customers found.</td></tr>';
 }
@@ -370,6 +377,25 @@ async function setStatus(i, s){
   }
   c.status = s; save(); renderCustomers(); renderKpis();
   toast(c.name + " account " + s.toLowerCase() + " ✔");
+}
+async function approveCustomer(i){
+  const c = db.customers[i];
+  if(liveMode){
+    const { error } = await sb.from("profiles").update({ status: "Active" }).eq("id", c.uid);
+    if(error){ toast("Approve failed: " + error.message); return; }
+  }
+  c.status = "Active"; save(); renderCustomers(); renderKpis();
+  toast("\u2705 " + c.name + " approved \u2014 they can now log in!");
+}
+async function rejectCustomer(i){
+  const c = db.customers[i];
+  if(!confirm("Reject and delete " + c.name + "'s account?")) return;
+  if(liveMode){
+    const { error } = await sb.from("profiles").delete().eq("id", c.uid);
+    if(error){ toast("Reject failed: " + error.message); return; }
+  }
+  db.customers.splice(i,1); save(); renderCustomers(); renderKpis();
+  toast("\u274C " + c.name + " rejected and removed");
 }
 async function delCustomer(i){
   const c = db.customers[i];
@@ -481,6 +507,10 @@ async function boot(){
   setTimeout(drawChart, 60); tick(); setInterval(tick, 1000);
   await loadAll();
   renderKpis(); renderCustomers(); renderTx(); renderAppr();
+  // live refresh: new signups appear automatically every 20 seconds
+  setInterval(async ()=>{
+    if(liveMode){ await loadAll(); renderKpis(); renderCustomers(); renderTx(); renderAppr(); }
+  }, 20000);
 }
 if(sessionStorage.getItem(AUTH)==="1") boot();
 window.addEventListener("resize", ()=>{ if(document.getElementById("app").classList.contains("on")) drawChart(); });
