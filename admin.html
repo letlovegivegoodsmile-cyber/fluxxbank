@@ -111,6 +111,35 @@
   .view{display:none}
   .view.on{display:block}
 
+
+  /* ---------- PRINTABLE RECEIPT ---------- */
+  #receiptWrap{position:fixed;inset:0;z-index:300;display:none;place-items:center;background:rgba(5,7,15,.78)}
+  #receiptWrap.on{display:grid}
+  #receipt{background:#fff;color:#141824;width:min(430px,92vw);border-radius:16px;padding:34px 32px 26px;font-size:.9rem;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .r-logo{font-weight:800;font-size:1.35rem;color:#1a2b6d;display:flex;align-items:center;gap:8px}
+  .r-logo .bolt{width:26px;height:26px;border-radius:7px;display:inline-grid;place-items:center;background:#4f7cff;color:#fff;font-size:.9rem}
+  .r-sub{color:#8a90a3;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+  .r-rule{border:none;border-top:2px dashed #d8dbe6;margin:18px 0}
+  .r-table{width:100%;border-collapse:collapse}
+  .r-table td{padding:7px 0;vertical-align:top}
+  .r-table td:first-child{color:#8a90a3;width:42%}
+  .r-table td:last-child{font-weight:600;text-align:right}
+  .r-total{text-align:center;margin:18px 0 6px}
+  .r-total small{display:block;color:#8a90a3;letter-spacing:2px;font-size:.7rem}
+  .r-total b{font-size:1.7rem;color:#141824}
+  .r-bar{height:42px;margin:16px 0 10px;background:repeating-linear-gradient(90deg,#141824 0 2px,transparent 2px 5px,#141824 5px 6px,transparent 6px 11px)}
+  .r-foot{text-align:center;color:#8a90a3;font-size:.72rem;line-height:1.6}
+  .r-actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
+  .r-actions button{padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;border:none}
+  .r-print{background:#4f7cff;color:#fff}
+  .r-close{background:#eef0f6;color:#141824}
+  @media print{
+    body *{visibility:hidden}
+    #receiptWrap,#receiptWrap *{visibility:visible}
+    #receiptWrap{position:absolute;inset:0;display:grid;background:#fff;padding:20px}
+    .r-actions{display:none}
+  }
+
   @media(max-width:1000px){
     #app.on{grid-template-columns:1fr}
     aside{display:none}
@@ -119,6 +148,7 @@
     main{padding:18px}
   }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -240,6 +270,30 @@
   </main>
 </div>
 
+<!-- PRINTABLE RECEIPT -->
+<div id="receiptWrap" onclick="if(event.target===this)closeReceipt()">
+  <div id="receipt">
+    <div class="r-logo"><span class="bolt">⚡</span> FLUXXBANK</div>
+    <div class="r-sub">Official Transaction Receipt</div>
+    <hr class="r-rule">
+    <table class="r-table">
+      <tr><td>Date</td><td id="rDate">–</td></tr>
+      <tr><td>From</td><td id="rFrom">–</td></tr>
+      <tr><td>To / Description</td><td id="rTo">–</td></tr>
+      <tr><td>Status</td><td id="rNote">–</td></tr>
+      <tr><td>Reference</td><td id="rRef">–</td></tr>
+    </table>
+    <hr class="r-rule">
+    <div class="r-total"><small>Amount</small><b id="rAmt">–</b></div>
+    <div class="r-bar"></div>
+    <div class="r-foot">Fluxxbank AG · fluxxbank.netlify.app<br>Thank you for banking in motion ⚡</div>
+    <div class="r-actions">
+      <button class="r-print" onclick="window.print()">🖨️ Print receipt</button>
+      <button class="r-close" onclick="closeReceipt()">Close</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -313,6 +367,7 @@ async function loadAll(){
     db.customers = (r1.data||[]).map((p,i)=>({uid:p.id, id:"FX-"+String(p.id).replace(/-/g,"").slice(0,8).toUpperCase(),
       name:p.name, email:p.email, bal:Number(p.balance), plan:p.plan, status:p.status, color:PALETTE[i%PALETTE.length]}));
     db.txs = (r2.data||[]).map(x=>({uid:x.id, id:"TX-"+x.id, who:x.description,
+      acct:((db.customers.find(c=>c.uid===x.user_id)||{}).name||"Customer"),
       desc:new Date(x.created_at).toLocaleDateString("en-IE",{day:"numeric",month:"short"}), amt:Number(x.amount), status:x.status}));
     db.approvals = (r3.data||[]).map(x=>({uid:x.id, id:"AP-"+x.id, name:x.customer_name, type:x.type, detail:x.detail, amount:x.amount?Number(x.amount):null}));
     liveMode = true;
@@ -362,9 +417,15 @@ function renderCustomers(){
           ? `<button class="btn sm ok" onclick="approveCustomer(${i})">\u2714 Approve</button>
              <button class="btn sm bad" onclick="rejectCustomer(${i})" style="margin-left:6px">Reject</button>`
           : c.status==="Frozen"
-          ? `<button class="btn sm ok" onclick="setStatus(${i},'Active')">Unfreeze</button>
+          ? `<button class="btn sm ok" onclick="addFunds(${i})">\u002B \u20AC</button>
+             <button class="btn sm ok" onclick="setStatus(${i},'Active')">Unfreeze</button>
+             <button class="btn sm ghost" onclick="editCustomer(${i})" style="margin-left:6px" title="Rename">\u270F\uFE0F</button>
+             <button class="btn sm ghost" onclick="viewHistory(${i})" title="Transaction history">\uD83D\uDCCB</button>
              <button class="btn sm bad" onclick="delCustomer(${i})" style="margin-left:6px">Delete</button>`
-          : `<button class="btn sm ghost" onclick="setStatus(${i},'Frozen')">Freeze</button>
+          : `<button class="btn sm ok" onclick="addFunds(${i})">\u002B \u20AC</button>
+             <button class="btn sm ghost" onclick="setStatus(${i},'Frozen')">Freeze</button>
+             <button class="btn sm ghost" onclick="editCustomer(${i})" style="margin-left:6px" title="Rename">\u270F\uFE0F</button>
+             <button class="btn sm ghost" onclick="viewHistory(${i})" title="Transaction history">\uD83D\uDCCB</button>
              <button class="btn sm bad" onclick="delCustomer(${i})" style="margin-left:6px">Delete</button>`}</td>
     </tr>`;
   }).join("") : '<tr><td colspan="6" class="empty">No customers found.</td></tr>';
@@ -397,6 +458,77 @@ async function rejectCustomer(i){
   db.customers.splice(i,1); save(); renderCustomers(); renderKpis();
   toast("\u274C " + c.name + " rejected and removed");
 }
+/* ------- ADMIN: credit / deduct funds ------- */
+function addFunds(i){
+  const c = db.customers[i];
+  const input = prompt("Amount for " + c.name + " (EUR). Use a minus to deduct, e.g. -50:", "100");
+  if(input === null) return;
+  const amt = parseFloat(input);
+  if(isNaN(amt) || amt === 0){ toast("Invalid amount"); return; }
+  if(liveMode){
+    sb.from("profiles").select("balance").eq("id", c.uid).single().then(async ({ data, error }) => {
+      if(error){ toast("Failed: " + error.message); return; }
+      const newBal = Number(data.balance) + amt;
+      const { error: uerr } = await sb.from("profiles").update({ balance: newBal }).eq("id", c.uid);
+      if(uerr){ toast("Failed: " + uerr.message); return; }
+      await sb.from("transactions").insert({ user_id: c.uid, description: "Admin adjustment \u00B7 Fluxxbank HQ", amount: amt, status: "Completed" });
+      c.bal = newBal; save(); renderCustomers(); renderKpis();
+      toast((amt > 0 ? "\u2795 Credited " : "\u2212 Deducted ") + eur(Math.abs(amt)) + " \u2192 " + c.name);
+    });
+  } else {
+    c.bal = (+c.bal || 0) + amt; save(); renderCustomers(); renderKpis();
+    toast((amt > 0 ? "\u2795 Credited " : "\u2212 Deducted ") + eur(Math.abs(amt)) + " \u2192 " + c.name + " (demo)");
+  }
+}
+/* ------- ADMIN: rename customer ------- */
+async function editCustomer(i){
+  const c = db.customers[i];
+  const nn = prompt("New name for " + c.name + ":", c.name);
+  if(nn === null) return;
+  const name = nn.trim();
+  if(!name) return;
+  if(liveMode){
+    const { error } = await sb.from("profiles").update({ name: name }).eq("id", c.uid);
+    if(error){ toast("Failed: " + error.message); return; }
+  }
+  c.name = name; save(); renderCustomers();
+  toast("\u270F\uFE0F Renamed to " + name);
+}
+/* ------- ADMIN: view one customer's full history ------- */
+async function viewHistory(i){
+  const c = db.customers[i];
+  if(liveMode){
+    const { data } = await sb.from("transactions").select("*").eq("user_id", c.uid).order("created_at",{ascending:false});
+    if(data){
+      data.forEach(x => {
+        const t = { uid:x.id, id:"TX-"+x.id, who:x.description,
+          desc:new Date(x.created_at).toLocaleDateString("en-IE",{day:"numeric",month:"short"}),
+          amt:Number(x.amount), status:x.status };
+        const k = db.txs.findIndex(y => String(y.uid) === String(t.uid));
+        if(k >= 0) db.txs[k] = t; else db.txs.unshift(t);
+      });
+    }
+  }
+  document.getElementById("txSearch").value = c.name;
+  document.getElementById("txFilter").value = "";
+  const btns = document.querySelectorAll(".side-btn");
+  if(btns[2]) btns[2].click();
+  renderTx();
+  toast("\uD83D\uDCCB History of " + c.name);
+}
+/* ------- ADMIN: printable receipts ------- */
+function printTx(uid){
+  const t = db.txs.find(x=>String(x.uid)===String(uid));
+  if(!t) return;
+  document.getElementById("rDate").textContent = t.desc + " \u00B7 " + new Date().toLocaleTimeString("en-IE",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("rFrom").innerHTML = (t.acct || "Customer") + '<br><span style="font-weight:400;color:#8a90a3;font-size:.78rem">Fluxx Everyday Account</span>';
+  document.getElementById("rTo").textContent = t.who;
+  document.getElementById("rNote").textContent = t.status;
+  document.getElementById("rRef").textContent = t.id;
+  document.getElementById("rAmt").textContent = (t.amt >= 0 ? "+" : "\u2212") + eur(t.amt);
+  document.getElementById("receiptWrap").classList.add("on");
+}
+function closeReceipt(){ document.getElementById("receiptWrap").classList.remove("on"); }
 async function delCustomer(i){
   const c = db.customers[i];
   if(!confirm("Delete " + c.name + "? This cannot be undone.")) return;
@@ -418,7 +550,7 @@ function renderTx(){
     <td>${t.who}</td>
     <td class="mono"><b style="color:${t.amt>=0?"var(--ok)":"var(--txt)"}">${t.amt>=0?"+":"−"}${eur(t.amt)}</b></td>
     <td>${statusPill(t.status)}</td>
-    <td>${t.status==="Flagged" ? `<button class="btn sm ok" onclick="resolveTx('${t.uid}')">Clear flag</button>` : ""}</td>
+    <td>${t.status==="Flagged" ? `<button class="btn sm ok" onclick="resolveTx('${t.uid}')">Clear flag</button>` : ""} <button class="btn sm ghost" onclick="printTx('${t.uid}')" title="Print receipt">\uD83E\uDDFE</button></td>
   </tr>`).join("") : '<tr><td colspan="5" class="empty">No transactions found.</td></tr>';
 }
 async function resolveTx(uid){
