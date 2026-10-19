@@ -719,13 +719,13 @@
   const bg = document.getElementById("modalBg");
   function openModal(){ bg.classList.add("show"); }
   function closeModal(){ bg.classList.remove("show"); }
-  /* ------- REAL AUTH (Supabase) ------- */
-  https://jthmxuecjbyvltvjfhyj.supabase.co
-  sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L
-  let sb = null;
-  if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
+  const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+
+let sb = null;
+if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
   let authMode = "login";
   const eur2 = n => "\u20AC" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
