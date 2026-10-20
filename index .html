@@ -719,23 +719,9 @@
   const bg = document.getElementById("modalBg");
   function openModal(){ bg.classList.add("show"); }
   function closeModal(){ bg.classList.remove("show"); }
-  /* ------- REAL AUTH (Supabase) ------- */
-  https://jthmxuecjbyvltvjfhy.supabase.co/
-  sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L
-  let sb = null;
-  if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-  let authMode = "login";
-  const eur2 = n => "\u20AC" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
-
-  function switchAuthMode(e){
-    e.preventDefault();
-    authMode = authMode === "login" ? "signup" : "login";
-    const sign = authMode === "signup";
-    document.getElementById("authName").style.display = sign ? "block" : "none";
-    document.getElementById("authTitle").textContent = sign ? "Create your account \u26A1" : "Welcome back \u26A1";
-    document.getElementById("authSub").textContent = sign ? "Join 2.4 million people banking in motion. Free forever." : "Log in to your Fluxxbank account.";
+  const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+  in to your Fluxxbank account.";
     document.getElementById("authBtn").textContent = sign ? "Create account" : "Log in";
     document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in \u2192" : "New here? Create a free account \u2192";
     document.getElementById("authErr").textContent = "";
