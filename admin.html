@@ -1,210 +1,940 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Fluxxbank — the digital bank that's always in motion. Free accounts, instant FluxxPay, 5.0 rated.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://fluxxbank.netlify.app/">
-<meta property="og:title" content="Fluxxbank — Banking in Motion">
-<meta property="og:description" content="Free accounts, instant payments, smart savings. Rated 5.0 by 310,000+ customers.">
-<meta property="og:image" content="https://fluxxbank.netlify.app/og-cover.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Fluxxbank — Banking in Motion">
-<meta name="twitter:image" content="https://fluxxbank.netlify.app/og-cover.png">
-<meta name="theme-color" content="#0b1020">
-<link rel="icon" type="image/png" href="favicon.png">
-<title>Fluxxbank Admin Console</title>
-<style>
-  :root{
-    --ink:#0b1020; --ink2:#111a36; --card:#151f42; --line:rgba(255,255,255,.08);
-    --accent:#4f7cff; --accent2:#22d3ee; --gold:#f5c451; --ok:#34d399; --bad:#f87171; --warn:#fbbf24;
-    --txt:#eef1fb; --mut:#8f9bc0;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}
-  body{background:var(--ink);color:var(--txt)}
-  button{font:inherit;cursor:pointer;border:none}
-  input,select{background:#0c1226;border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--txt);font-size:.88rem;outline:none}
-  input:focus,select:focus{border-color:var(--accent)}
-  ::-webkit-scrollbar{width:8px;height:8px} ::-webkit-scrollbar-thumb{background:#263058;border-radius:99px}
-  #loginScreen{position:fixed;inset:0;z-index:100;display:grid;place-items:center;
-      background:radial-gradient(700px 400px at 70% 20%,rgba(79,124,255,.2),transparent 60%),var(--ink)}
-  .login-box{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:40px;width:min(400px,92vw);text-align:center}
-  .mark{width:54px;height:54px;border-radius:14px;margin:0 auto 18px;display:grid;place-items:center;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 30px rgba(79,124,255,.5)}
-  .mark svg{width:28px;height:28px}
-  .login-box h1{font-size:1.4rem;margin-bottom:4px}
-  .login-box .sub{color:var(--mut);font-size:.85rem;margin-bottom:26px}
-  .login-box input{width:100%;margin-bottom:12px;padding:13px 16px}
-  .btn{background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;font-weight:600;border-radius:11px;
-      padding:12px 20px;box-shadow:0 6px 18px rgba(79,124,255,.35);transition:transform .15s}
-  .btn:hover{transform:translateY(-2px)}
-  .btn.full{width:100%}
-  .btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--txt)}
-  .btn.ok{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 4px 14px rgba(16,185,129,.3)}
-  .btn.bad{background:linear-gradient(135deg,#ef4444,#b91c1c);box-shadow:0 4px 14px rgba(239,68,68,.3)}
-  .btn.sm{padding:6px 12px;font-size:.78rem;border-radius:8px}
-  .hint{margin-top:18px;font-size:.78rem;color:var(--mut);background:rgba(79,124,255,.07);border:1px dashed rgba(79,124,255,.3);
-      border-radius:10px;padding:10px}
-  .login-err{color:var(--bad);font-size:.83rem;min-height:18px;margin-bottom:10px}
-  #app{display:none;min-height:100vh}
-  #app.on{display:grid;grid-template-columns:230px 1fr}
-  aside{background:var(--ink2);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
-  aside .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;padding:0 10px 20px}
-  .side-btn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:none;color:var(--mut);
-      padding:12px 14px;border-radius:11px;font-size:.92rem;font-weight:500;transition:all .15s}
-  .side-btn:hover{color:var(--txt);background:rgba(255,255,255,.04)}
-  .side-btn.on{background:linear-gradient(135deg,rgba(79,124,255,.25),rgba(34,211,238,.12));color:#fff;border-left:3px solid var(--accent2)}
-  aside .bottom{margin-top:auto;padding:0 10px}
-  .admin-chip{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
-  .admin-chip .av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#e8a020);display:grid;place-items:center;font-weight:800;color:#241a02}
-  .admin-chip small{color:var(--mut);display:block;font-size:.72rem}
-  main{padding:26px 30px}
-  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:14px;flex-wrap:wrap}
-  .topbar h2{font-size:1.35rem}
-  .topbar .live{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--mut)}
-  .pulse{width:9px;height:9px;border-radius:50%;background:var(--ok);animation:p 1.6s infinite}
-  @keyframes p{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
-  .kpi small{color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:1px}
-  .kpi b{font-size:1.55rem;display:block;margin-top:8px}
-  .kpi .delta{font-size:.78rem;margin-top:6px;display:block}
-  .up{color:var(--ok)} .dn{color:var(--bad)}
-  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px}
-  .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap}
-  .panel-head h3{font-size:1.02rem}
-  .two{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}
-  table{width:100%;border-collapse:collapse;font-size:.87rem}
-  th{text-align:left;color:var(--mut);font-size:.72rem;text-transform:uppercase;letter-spacing:1px;padding:10px 12px;border-bottom:1px solid var(--line)}
-  td{padding:12px;border-bottom:1px solid var(--line);vertical-align:middle}
-  tr:last-child td{border-bottom:none}
-  tbody tr{transition:background .15s}
-  tbody tr:hover{background:rgba(255,255,255,.025)}
-  .cust{display:flex;align-items:center;gap:10px}
-  .cust .av{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:.78rem;color:#fff}
-  .cust small{display:block;color:var(--mut);font-size:.75rem}
-  .pill{display:inline-block;padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.4px}
-  .p-ok{background:rgba(52,211,153,.14);color:var(--ok)}
-  .p-warn{background:rgba(251,191,36,.14);color:var(--warn)}
-  .p-bad{background:rgba(248,113,113,.14);color:var(--bad)}
-  .p-info{background:rgba(79,124,255,.14);color:var(--accent)}
-  .mono{font-variant-numeric:tabular-nums}
-  canvas{width:100%;height:240px}
-  .feed-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:.86rem}
-  .feed-item:last-child{border:none}
-  .feed-item .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:rgba(79,124,255,.14);flex:0 0 auto}
-  .feed-item small{color:var(--mut);display:block;font-size:.75rem}
-  .searchbar{display:flex;gap:10px;flex-wrap:wrap}
-  .empty{color:var(--mut);text-align:center;padding:30px;font-size:.9rem}
-  #toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent2);
-      border-radius:12px;padding:14px 20px;font-size:.88rem;z-index:200;opacity:0;transform:translateY(12px);transition:all .3s;box-shadow:0 12px 40px rgba(0,0,0,.5)}
-  #toast.show{opacity:1;transform:translateY(0)}
-  .view{display:none}
-  .view.on{display:block}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>FluxxBank Admin Console</title>
+
+  <style>
+    :root {
+      --bg: #080e1c;
+      --panel: #101a2e;
+      --panel2: #15223b;
+      --border: #263653;
+      --text: #edf3ff;
+      --muted: #98a8c2;
+      --orange: #f58220;
+      --green: #32c997;
+      --red: #ff7070;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    button, input { font: inherit; }
+
+    button { cursor: pointer; }
+
+    .hidden { display: none !important; }
+
+    #loginScreen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background:
+        radial-gradient(ellipse at top, #192c4c 0%, var(--bg) 65%);
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 410px;
+      padding: 32px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 20px 70px #0005;
+    }
+
+    .brand {
+      color: var(--orange);
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: .3px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 9px 0 25px;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      font-size: 13px;
+      color: #c8d5e9;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #091222;
+      color: white;
+      outline: none;
+    }
+
+    input:focus { border-color: var(--orange); }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 15px;
+      font-weight: 700;
+      background: var(--orange);
+      color: #111827;
+    }
+
+    .btn:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .full { width: 100%; margin-top: 20px; }
+
+    .secondary {
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .small { padding: 7px 10px; font-size: 12px; }
+
+    .error {
+      color: var(--red);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .success { color: var(--green); }
+
+    #app { min-height: 100vh; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 235px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #0b1425;
+      border-right: 1px solid var(--border);
+      padding: 25px 15px;
+    }
+
+    .sidebar .brand {
+      padding: 0 10px 27px;
+      font-size: 22px;
+    }
+
+    .side-label {
+      padding: 12px 10px;
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .side-btn {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+      padding: 12px;
+      text-align: left;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: #b9c7dd;
+    }
+
+    .side-btn:hover,
+    .side-btn.on {
+      background: #172742;
+      border-color: #293d5e;
+      color: white;
+    }
+
+    .side-btn.on { box-shadow: inset 3px 0 var(--orange); }
+
+    .sidebar-note {
+      margin: 28px 10px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    main { min-width: 0; }
+
+    .topbar {
+      min-height: 82px;
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      border-bottom: 1px solid var(--border);
+      background: #0c1526;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .topbar small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+    }
+
+    .content { padding: 28px; }
+
+    .view { display: none; }
+    .view.on { display: block; }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .section-desc {
+      margin: 0 0 23px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 25px;
+    }
+
+    .stat, .panel {
+      min-width: 0;
+      padding: 21px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stat-value {
+      margin-top: 12px;
+      font-size: 30px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .panel h2 {
+      margin: 0 0 17px;
+      font-size: 16px;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    td small {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 8px;
+      border-radius: 6px;
+      background: #26344c;
+      color: #dce7f8;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .status.active {
+      background: #103a32;
+      color: #72e4bb;
+    }
+
+    .status.pending {
+      background: #49341b;
+      color: #ffd18c;
+    }
+
+    .empty {
+      padding: 25px 10px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    #toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 5;
+      max-width: calc(100vw - 40px);
+      padding: 13px 17px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--panel2);
+      color: white;
+      box-shadow: 0 10px 30px #0006;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+
+      .sidebar {
+        padding: 15px;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .sidebar .brand { padding: 4px 5px 14px; }
+
+      .side-label, .sidebar-note { display: none; }
+
+      .side-nav {
+        display: flex;
+        gap: 7px;
+        overflow-x: auto;
+      }
+
+      .side-btn {
+        width: auto;
+        min-width: max-content;
+        margin: 0;
+      }
+
+      .content { padding: 18px 14px; }
+
+      .topbar { padding: 16px; }
+
+      .stats { gap: 10px; }
+
+      .stat, .panel { padding: 15px; }
+
+      .stat-value { font-size: 24px; }
+
+      .login-box { padding: 24px; }
+    }
+  </style>
 </head>
+
 <body>
-<div id="loginScreen">
-  <div class="login-box">
-    <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
-    <h1>Fluxxbank Admin</h1>
-    <div class="sub">Restricted area — authorized staff only</div>
-    <input type="text" id="aUser" placeholder="Username" autocomplete="off">
-    <input type="password" id="aPass" placeholder="Password">
-    <div class="login-err" id="loginErr"></div>
-    <button class="btn full" onclick="tryLogin()">Sign in →</button>
-    <div class="hint">Demo credentials — user: <b>admin</b> · pass: <b>fluxx2026</b></div>
+
+  <!-- ADMIN SIGN-IN -->
+  <section id="loginScreen">
+    <div class="login-box">
+      <div class="brand">FluxxBank</div>
+      <p class="subtitle">
+        Administrator access. Sign in with the authorized
+        administrator account registered in Supabase.
+      </p>
+
+      <form id="loginForm">
+        <label for="aEmail">Administrator email</label>
+        <input
+          type="email"
+          id="aEmail"
+          autocomplete="username"
+          placeholder="Enter your email"
+          required
+        >
+
+        <label for="aPass">Password</label>
+        <input
+          type="password"
+          id="aPass"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+          required
+        >
+
+        <div id="loginErr" class="error" role="alert"></div>
+
+        <button class="btn full" id="loginBtn" type="submit">
+          Sign in
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ADMIN DASHBOARD -->
+  <div id="app" class="hidden">
+    <div class="layout">
+
+      <aside class="sidebar">
+        <div class="brand">FluxxBank</div>
+
+        <div class="side-label">Administration</div>
+
+        <nav class="side-nav" aria-label="Admin navigation">
+          <button class="side-btn on" data-view="dash" type="button">
+            Overview
+          </button>
+          <button class="side-btn" data-view="cust" type="button">
+            Customers
+          </button>
+          <button class="side-btn" data-view="appr" type="button">
+            Approvals
+          </button>
+        </nav>
+
+        <div class="sidebar-note">
+          Restricted administrator area.<br>
+          Access is checked against your Supabase profile.
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div>
+            <h1 id="pageTitle">Overview</h1>
+            <small id="adminIdentity">Administrator</small>
+          </div>
+          <button class="btn secondary" id="logoutBtn" type="button">
+            Sign out
+          </button>
+        </header>
+
+        <div class="content">
+
+          <!-- OVERVIEW -->
+          <section id="view-dash" class="view on">
+            <h2 class="section-title">Overview</h2>
+            <p class="section-desc">
+              Customer account and application status from your database.
+            </p>
+
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-label">Customer profiles</div>
+                <div class="stat-value" id="kCustomers">—</div>
+              </div>
+
+              <div class="stat">
+                <div class="stat-label">Pending applications</div>
+                <div class="stat-value" id="kAppr">—</div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h2>Recent customer profiles</h2>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Status</th>
+                      <th>Role</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentBody">
+                    <tr><td colspan="3">Loading records…</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- CUSTOMERS -->
+          <section id="view-cust" class="view">
+            <h2 class="section-title">Customers</h2>
+            <p class="section-desc">
+              View customer profiles and their current account status.
+            </p>
+
+            <div class="panel">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Customer</th>
+                      <th>Status</th>
+                      <th>Role</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="custBody">
+                    <tr><td colspan="4">Loading records…</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- APPROVALS -->
+          <section id="view-appr" class="view">
+            <h2 class="section-title">Approvals</h2>
+            <p class="section-desc">
+              Review pending customer profiles. Approval changes the
+              profile status in Supabase.
+            </p>
+
+            <div class="panel">
+              <h2>Pending applications</h2>
+              <div id="apprList">
+                <div class="empty">Loading applications…</div>
+              </div>
+            </div>
+          </section>
+
+          <div id="pageErr" class="error" role="alert"></div>
+        </div>
+      </main>
+    </div>
   </div>
-</div>
-<div id="app">
-  <aside>
-    <div class="logo">Fluxxbank Admin</div>
-    <button class="side-btn on" onclick="nav('dash',this)">Overview</button>
-    <button class="side-btn" onclick="nav('cust',this)">Customers</button>
-    <button class="side-btn" onclick="nav('appr',this)">Approvals</button>
-  </aside>
-  <main>
-    <div class="topbar"><h2 id="pageTitle">Overview</h2></div>
-    <div class="view on" id="view-dash">
-      <div class="kpis">
-        <div class="kpi"><small>Total customers</small><b id="kCustomers">–</b></div>
-        <div class="kpi"><small>Pending approvals</small><b id="kAppr">–</b></div>
-      </div>
-    </div>
-    <div class="view" id="view-cust">
-      <div class="panel">
-        <div class="panel-head"><h3>Customer accounts</h3></div>
-        <table>
-          <thead><tr><th>Customer</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="custBody"></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="view" id="view-appr">
-      <div class="panel">
-        <div class="panel-head"><h3>Pending applications</h3></div>
-        <div id="apprList"></div>
-      </div>
-    </div>
-  </main>
-</div>
-<div id="toast"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-const ADMIN_USER = "admin", ADMIN_PASS = "fluxx2026";
-let sb = (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase)
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-function tryLogin(){
-  const u = document.getElementById("aUser").value.trim(), p = document.getElementById("aPass").value;
-  if(u===ADMIN_USER && p===ADMIN_PASS){ sessionStorage.setItem("fluxx_admin","1"); boot(); }
-  else document.getElementById("loginErr").textContent = "Invalid credentials.";
-}
-function logout(){ sessionStorage.removeItem("fluxx_admin"); location.reload(); }
+  <div id="toast" class="hidden" role="status" aria-live="polite"></div>
 
-async function loadAll(){
-  if(!sb) return;
-  const { data } = await sb.from("profiles").select("*").order("created_at",{ascending:false});
-  if(data) window.customers = data;
-}
-function renderCustomers(){
-  const rows = window.customers || [];
-  document.getElementById("custBody").innerHTML = rows.map((c,i)=>`
-    <tr>
-      <td>${c.name}<br><small>${c.email}</small></td>
-      <td>${c.status}</td>
-      <td>${c.status==="Pending" ? `<button class="btn sm ok" onclick="approve(${i})">Approve</button>` : ""}</td>
-    </tr>`).join("") || "<tr><td colspan='3'>No customers</td></tr>";
-}
-async function approve(i){
-  const c = window.customers[i];
-  await sb.from("profiles").update({ status: "Active" }).eq("id", c.id);
-  c.status = "Active";
-  renderCustomers();
-  toast(c.name + " approved");
-}
-function nav(v, btn){
-  document.querySelectorAll(".view").forEach(x=>x.classList.remove("on"));
-  document.getElementById("view-"+v).classList.add("on");
-  document.querySelectorAll(".side-btn").forEach(b=>b.classList.remove("on"));
-  btn.classList.add("on");
-  document.getElementById("pageTitle").textContent = v === "dash" ? "Overview" : v === "cust" ? "Customers" : "Approvals";
-  if(v==="cust") renderCustomers();
-}
-function toast(msg){
-  const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"), 2500);
-}
-async function boot(){
-  document.getElementById("loginScreen").style.display = "none";
-  document.getElementById("app").classList.add("on");
-  await loadAll();
-  renderCustomers();
-}
-if(sessionStorage.getItem("fluxx_admin")==="1") boot();
-</script>
+  <!-- Supabase JavaScript library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    "use strict";
+
+    // Replace the URL only if your Supabase dashboard shows a different one.
+    const SUPABASE_URL =
+      "https://jthmxuecjbyvltvjfhyj.supabase.co";
+
+    // Paste your actual sb_publishable_ key here.
+    // Never use a sb_secret_ or service_role key in browser code.
+    const SUPABASE_KEY =
+      "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+
+    let sb = null;
+    let customers = [];
+    let toastTimer = null;
+
+    const $ = id => document.getElementById(id);
+
+    function showLoginError(message) {
+      $("loginErr").textContent = message || "";
+    }
+
+    function showPageError(message) {
+      $("pageErr").textContent = message || "";
+    }
+
+    function toast(message) {
+      const element = $("toast");
+      element.textContent = message;
+      element.classList.remove("hidden");
+
+      if (toastTimer) clearTimeout(toastTimer);
+
+      toastTimer = setTimeout(() => {
+        element.classList.add("hidden");
+      }, 3500);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[character]);
+    }
+
+    function isPending(status) {
+      return String(status ?? "").toLowerCase().includes("pending");
+    }
+
+    function statusClass(status) {
+      const value = String(status ?? "").toLowerCase();
+
+      if (value === "active") return "status active";
+      if (value.includes("pending")) return "status pending";
+
+      return "status";
+    }
+
+    function statusBadge(status) {
+      return `<span class="${statusClass(status)}">${
+        escapeHtml(status || "Unknown")
+      }</span>`;
+    }
+
+    async function tryLogin(event) {
+      event.preventDefault();
+
+      showLoginError("");
+
+      const email = $("aEmail").value.trim();
+      const password = $("aPass").value;
+      const button = $("loginBtn");
+
+      if (!email || !password) {
+        showLoginError("Enter your email and password.");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Signing in…";
+
+      try {
+        const { data, error } = await sb.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        await boot(data.user);
+      } catch (error) {
+        showLoginError(
+          error.message || "Sign-in failed. Check your details and try again."
+        );
+      } finally {
+        button.disabled = false;
+        button.textContent = "Sign in";
+      }
+    }
+
+    async function boot(user) {
+      $("app").classList.add("hidden");
+      $("loginScreen").classList.remove("hidden");
+      showLoginError("");
+      showPageError("");
+
+      try {
+        if (!user) {
+          const { data, error } = await sb.auth.getUser();
+          if (error) throw error;
+          user = data.user;
+        }
+
+        if (!user) {
+          throw new Error("Please sign in to continue.");
+        }
+
+        // Verify administrator status from the database.
+        const { data: profile, error: profileError } = await sb
+          .from("profiles")
+          .select("id, name, email, role, status")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (profileError) throw profileError;
+
+        if (
+          !profile ||
+          String(profile.role).toLowerCase() !== "admin" ||
+          String(profile.status).toLowerCase() !== "active"
+        ) {
+          await sb.auth.signOut();
+          throw new Error(
+            "This account is not an active administrator."
+          );
+        }
+
+        $("adminIdentity").textContent =
+          profile.name || profile.email || user.email || "Administrator";
+
+        await loadAll();
+
+        $("loginScreen").classList.add("hidden");
+        $("app").classList.remove("hidden");
+
+        renderOverview();
+        renderCustomers();
+        renderApprovals();
+      } catch (error) {
+        $("app").classList.add("hidden");
+        $("loginScreen").classList.remove("hidden");
+
+        showLoginError(
+          error.message || "Unable to open the admin dashboard."
+        );
+      }
+    }
+
+    async function loadAll() {
+      const { data, error } = await sb
+        .from("profiles")
+        .select("id, name, email, status, role, created_at")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      customers = data || [];
+    }
+
+    function renderOverview() {
+      $("kCustomers").textContent = customers.length;
+      $("kAppr").textContent =
+        customers.filter(customer => isPending(customer.status)).length;
+
+      const recent = customers.slice(0, 5);
+
+      $("recentBody").innerHTML = recent.map(customer => `
+        <tr>
+          <td>
+            ${escapeHtml(customer.name || "Unnamed customer")}
+            <small>${escapeHtml(customer.email || "")}</small>
+          </td>
+          <td>${statusBadge(customer.status)}</td>
+          <td>${escapeHtml(customer.role || "customer")}</td>
+        </tr>
+      `).join("") || `
+        <tr><td colspan="3">No customer profiles found.</td></tr>
+      `;
+    }
+
+    function renderCustomers() {
+      $("custBody").innerHTML = customers.map((customer, index) => `
+        <tr>
+          <td>
+            ${escapeHtml(customer.name || "Unnamed customer")}
+            <small>${escapeHtml(customer.email || "")}</small>
+          </td>
+          <td>${statusBadge(customer.status)}</td>
+          <td>${escapeHtml(customer.role || "customer")}</td>
+          <td>
+            ${isPending(customer.status) ? `
+              <button
+                class="btn small approve-btn"
+                type="button"
+                data-index="${index}">
+                Approve
+              </button>
+            ` : "—"}
+          </td>
+        </tr>
+      `).join("") || `
+        <tr><td colspan="4">No customer profiles found.</td></tr>
+      `;
+    }
+
+    function renderApprovals() {
+      const pending = customers
+        .map((customer, index) => ({ customer, index }))
+        .filter(item => isPending(item.customer.status));
+
+      $("apprList").innerHTML = pending.map(({ customer, index }) => `
+        <div style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:14px;
+          padding:15px 0;
+          border-bottom:1px solid var(--border);
+        ">
+          <div style="min-width:0">
+            <strong>${escapeHtml(customer.name || "Unnamed customer")}</strong>
+            <small style="
+              display:block;
+              margin-top:5px;
+              color:var(--muted);
+              overflow-wrap:anywhere;
+            ">${escapeHtml(customer.email || "")}</small>
+            <small style="
+              display:block;
+              margin-top:5px;
+              color:var(--muted);
+            ">Status: ${escapeHtml(customer.status || "Pending")}</small>
+          </div>
+
+          <button
+            class="btn small approve-btn"
+            type="button"
+            data-index="${index}">
+            Approve
+          </button>
+        </div>
+      `).join("") || `
+        <div class="empty">There are no pending applications.</div>
+      `;
+    }
+
+    async function approve(index) {
+      const customer = customers[index];
+
+      if (!customer || !isPending(customer.status)) return;
+
+      const buttons = document.querySelectorAll(
+        `.approve-btn[data-index="${index}"]`
+      );
+
+      buttons.forEach(button => {
+        button.disabled = true;
+        button.textContent = "Updating…";
+      });
+
+      try {
+        const { data, error } = await sb
+          .from("profiles")
+          .update({ status: "Active" })
+          .eq("id", customer.id)
+          .select("id, status")
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (!data) {
+          throw new Error(
+            "The database did not confirm the update. Check your RLS policies."
+          );
+        }
+
+        customer.status = data.status;
+
+        renderOverview();
+        renderCustomers();
+        renderApprovals();
+
+        toast("Customer profile status updated.");
+      } catch (error) {
+        toast(error.message || "Could not update the customer status.");
+
+        buttons.forEach(button => {
+          button.disabled = false;
+          button.textContent = "Approve";
+        });
+      }
+    }
+
+    function nav(view, button) {
+      const section = $("view-" + view);
+      if (!section) return;
+
+      document.querySelectorAll(".view").forEach(element => {
+        element.classList.remove("on");
+      });
+
+      section.classList.add("on");
+
+      document.querySelectorAll(".side-btn").forEach(element => {
+        element.classList.remove("on");
+      });
+
+      button.classList.add("on");
+
+      $("pageTitle").textContent =
+        view === "dash" ? "Overview" :
+        view === "cust" ? "Customers" : "Approvals";
+
+      showPageError("");
+    }
+
+    async function logout() {
+      try {
+        const { error } = await sb.auth.signOut();
+        if (error) throw error;
+
+        customers = [];
+        $("app").classList.add("hidden");
+        $("loginScreen").classList.remove("hidden");
+        $("loginForm").reset();
+        showLoginError("");
+      } catch (error) {
+        toast(error.message || "Sign-out failed. Please try again.");
+      }
+    }
+
+    async function initAdmin() {
+      try {
+        if (!window.supabase) {
+          throw new Error("Supabase library did not load. Check your connection.");
+        }
+
+        if (
+          !SUPABASE_URL.startsWith("https://") ||
+          SUPABASE_KEY === "PASTE_YOUR_PUBLISHABLE_KEY_HERE"
+        ) {
+          throw new Error(
+            "Add your exact Supabase Project URL and publishable key in admin.html."
+          );
+        }
+
+        sb = window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_KEY,
+          {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true
+            }
+          }
+        );
+
+        $("loginForm").addEventListener("submit", tryLogin);
+        $("logoutBtn").addEventListener("click", logout);
+
+        document.querySelectorAll(".side-btn").forEach(button => {
+          button.addEventListener("click", () => {
+            nav(button.dataset.view, button);
+          });
+        });
+
+        // Event delegation keeps approval buttons working after rendering.
+        document.addEventListener("click", event => {
+          const button = event.target.closest(".approve-btn");
+          if (!button || button.disabled) return;
+
+          approve(Number(button.dataset.index));
+        });
+
+        const { data, error } = await sb.auth.getSession();
+        if (error) throw error;
+
+        if (data.session) {
+          await boot(data.session.user);
+        }
+      } catch (error) {
+        showLoginError(
+          error.message || "Unable to initialize the admin page."
+        );
+      }
+    }
+
+    initAdmin();
+  </script>
 </body>
 </html>
