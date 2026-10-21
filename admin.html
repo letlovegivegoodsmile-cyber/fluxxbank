@@ -27,8 +27,6 @@
   input,select{background:#0c1226;border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--txt);font-size:.88rem;outline:none}
   input:focus,select:focus{border-color:var(--accent)}
   ::-webkit-scrollbar{width:8px;height:8px} ::-webkit-scrollbar-thumb{background:#263058;border-radius:99px}
-
-  /* ---------- LOGIN ---------- */
   #loginScreen{position:fixed;inset:0;z-index:100;display:grid;place-items:center;
       background:radial-gradient(700px 400px at 70% 20%,rgba(79,124,255,.2),transparent 60%),var(--ink)}
   .login-box{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:40px;width:min(400px,92vw);text-align:center}
@@ -49,8 +47,6 @@
   .hint{margin-top:18px;font-size:.78rem;color:var(--mut);background:rgba(79,124,255,.07);border:1px dashed rgba(79,124,255,.3);
       border-radius:10px;padding:10px}
   .login-err{color:var(--bad);font-size:.83rem;min-height:18px;margin-bottom:10px}
-
-  /* ---------- LAYOUT ---------- */
   #app{display:none;min-height:100vh}
   #app.on{display:grid;grid-template-columns:230px 1fr}
   aside{background:var(--ink2);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
@@ -63,21 +59,18 @@
   .admin-chip{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
   .admin-chip .av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#e8a020);display:grid;place-items:center;font-weight:800;color:#241a02}
   .admin-chip small{color:var(--mut);display:block;font-size:.72rem}
-
   main{padding:26px 30px}
   .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:14px;flex-wrap:wrap}
   .topbar h2{font-size:1.35rem}
   .topbar .live{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--mut)}
   .pulse{width:9px;height:9px;border-radius:50%;background:var(--ok);animation:p 1.6s infinite}
   @keyframes p{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
-
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
   .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
   .kpi small{color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:1px}
   .kpi b{font-size:1.55rem;display:block;margin-top:8px}
   .kpi .delta{font-size:.78rem;margin-top:6px;display:block}
   .up{color:var(--ok)} .dn{color:var(--bad)}
-
   .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px}
   .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap}
   .panel-head h3{font-size:1.02rem}
@@ -107,52 +100,11 @@
   #toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent2);
       border-radius:12px;padding:14px 20px;font-size:.88rem;z-index:200;opacity:0;transform:translateY(12px);transition:all .3s;box-shadow:0 12px 40px rgba(0,0,0,.5)}
   #toast.show{opacity:1;transform:translateY(0)}
-
   .view{display:none}
   .view.on{display:block}
-
-
-  /* ---------- PRINTABLE RECEIPT ---------- */
-  #receiptWrap{position:fixed;inset:0;z-index:300;display:none;place-items:center;background:rgba(5,7,15,.78)}
-  #receiptWrap.on{display:grid}
-  #receipt{background:#fff;color:#141824;width:min(430px,92vw);border-radius:16px;padding:34px 32px 26px;font-size:.9rem;box-shadow:0 30px 80px rgba(0,0,0,.6)}
-  .r-logo{font-weight:800;font-size:1.35rem;color:#1a2b6d;display:flex;align-items:center;gap:8px}
-  .r-logo .bolt{width:26px;height:26px;border-radius:7px;display:inline-grid;place-items:center;background:#4f7cff;color:#fff;font-size:.9rem}
-  .r-sub{color:#8a90a3;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-top:4px}
-  .r-rule{border:none;border-top:2px dashed #d8dbe6;margin:18px 0}
-  .r-table{width:100%;border-collapse:collapse}
-  .r-table td{padding:7px 0;vertical-align:top}
-  .r-table td:first-child{color:#8a90a3;width:42%}
-  .r-table td:last-child{font-weight:600;text-align:right}
-  .r-total{text-align:center;margin:18px 0 6px}
-  .r-total small{display:block;color:#8a90a3;letter-spacing:2px;font-size:.7rem}
-  .r-total b{font-size:1.7rem;color:#141824}
-  .r-bar{height:42px;margin:16px 0 10px;background:repeating-linear-gradient(90deg,#141824 0 2px,transparent 2px 5px,#141824 5px 6px,transparent 6px 11px)}
-  .r-foot{text-align:center;color:#8a90a3;font-size:.72rem;line-height:1.6}
-  .r-actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
-  .r-actions button{padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;border:none}
-  .r-print{background:#4f7cff;color:#fff}
-  .r-close{background:#eef0f6;color:#141824}
-  @media print{
-    body *{visibility:hidden}
-    #receiptWrap,#receiptWrap *{visibility:visible}
-    #receiptWrap{position:absolute;inset:0;display:grid;background:#fff;padding:20px}
-    .r-actions{display:none}
-  }
-
-  @media(max-width:1000px){
-    #app.on{grid-template-columns:1fr}
-    aside{display:none}
-    .kpis{grid-template-columns:repeat(2,1fr)}
-    .two{grid-template-columns:1fr}
-    main{padding:18px}
-  }
 </style>
-<base target="_blank">
 </head>
 <body>
-
-<!-- ============ LOGIN ============ -->
 <div id="loginScreen">
   <div class="login-box">
     <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
@@ -165,487 +117,94 @@
     <div class="hint">Demo credentials — user: <b>admin</b> · pass: <b>fluxx2026</b></div>
   </div>
 </div>
-
-<!-- ============ APP ============ -->
 <div id="app">
   <aside>
-    <div class="logo">
-      <div class="mark" style="width:32px;height:32px;border-radius:9px;margin:0"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
-      Fluxxbank
-    </div>
-    <button class="side-btn on" onclick="nav('dash',this)">📊 Overview</button>
-    <button class="side-btn" onclick="nav('cust',this)">👥 Customers</button>
-    <button class="side-btn" onclick="nav('tx',this)">💸 Transactions</button>
-    <button class="side-btn" onclick="nav('appr',this)">✅ Approvals <span id="apprBadge" class="pill p-warn" style="margin-left:auto">0</span></button>
-    <button class="side-btn" onclick="nav('sec',this)">🛡️ Security log</button>
-    <div class="bottom">
-      <div class="admin-chip"><div class="av">A</div><div><b style="font-size:.85rem">A. Renard</b><small>Super admin</small></div></div>
-      <button class="side-btn" onclick="logout()" style="justify-content:center;color:var(--bad)">⏻ Log out</button>
-    </div>
+    <div class="logo">Fluxxbank Admin</div>
+    <button class="side-btn on" onclick="nav('dash',this)">Overview</button>
+    <button class="side-btn" onclick="nav('cust',this)">Customers</button>
+    <button class="side-btn" onclick="nav('appr',this)">Approvals</button>
   </aside>
-
   <main>
-    <div class="topbar">
-      <h2 id="pageTitle">Overview</h2>
-      <div class="live"><span class="pulse"></span> All systems operational · <span id="clock"></span></div>
-    </div>
-
-    <!-- ===== DASHBOARD ===== -->
+    <div class="topbar"><h2 id="pageTitle">Overview</h2></div>
     <div class="view on" id="view-dash">
       <div class="kpis">
-        <div class="kpi"><small>Total customers</small><b id="kCustomers">–</b><span class="delta up">▲ +312 this week</span></div>
-        <div class="kpi"><small>Deposits held</small><b id="kDeposits">–</b><span class="delta up">▲ +2.1% MoM</span></div>
-        <div class="kpi"><small>Transactions (24h)</small><b id="kTx">–</b><span class="delta up">▲ +18% vs yesterday</span></div>
-        <div class="kpi"><small>Pending approvals</small><b id="kAppr">–</b><span class="delta dn">Action needed</span></div>
-      </div>
-      <div class="two">
-        <div class="panel">
-          <div class="panel-head"><h3>Deposits — last 12 months</h3><span class="pill p-info">LIVE</span></div>
-          <canvas id="adminChart"></canvas>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><h3>Activity feed</h3></div>
-          <div id="feed"></div>
-        </div>
+        <div class="kpi"><small>Total customers</small><b id="kCustomers">–</b></div>
+        <div class="kpi"><small>Pending approvals</small><b id="kAppr">–</b></div>
       </div>
     </div>
-
-    <!-- ===== CUSTOMERS ===== -->
     <div class="view" id="view-cust">
       <div class="panel">
-        <div class="panel-head">
-          <h3>Customer accounts</h3> <span class="pill p-warn" id="custPending">0 awaiting approval</span>
-          <div class="searchbar">
-            <input type="text" id="custSearch" placeholder="Search name, email, ID…" oninput="renderCustomers()">
-            <select id="custFilter" onchange="renderCustomers()">
-              <option value="">All statuses</option><option>Active</option><option>Pending</option><option>Frozen</option>
-            </select>
-          </div>
-        </div>
-        <div style="overflow-x:auto">
+        <div class="panel-head"><h3>Customer accounts</h3></div>
         <table>
-          <thead><tr><th>Customer</th><th>ID</th><th>Balance</th><th>Plan</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Customer</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody id="custBody"></tbody>
         </table>
-        </div>
       </div>
     </div>
-
-    <!-- ===== TRANSACTIONS ===== -->
-    <div class="view" id="view-tx">
-      <div class="panel">
-        <div class="panel-head">
-          <h3>Transaction monitor</h3>
-          <div class="searchbar">
-            <input type="text" id="txSearch" placeholder="Search transactions…" oninput="renderTx()">
-            <select id="txFilter" onchange="renderTx()">
-              <option value="">All</option><option>Completed</option><option>Pending</option><option>Flagged</option>
-            </select>
-          </div>
-        </div>
-        <div style="overflow-x:auto">
-        <table>
-          <thead><tr><th>Transaction</th><th>From → To</th><th>Amount</th><th>Status</th><th></th></tr></thead>
-          <tbody id="txBody"></tbody>
-        </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== APPROVALS ===== -->
     <div class="view" id="view-appr">
       <div class="panel">
-        <div class="panel-head"><h3>Pending applications</h3><span class="pill p-warn" id="apprCountPill">0 waiting</span></div>
+        <div class="panel-head"><h3>Pending applications</h3></div>
         <div id="apprList"></div>
-      </div>
-    </div>
-
-    <!-- ===== SECURITY ===== -->
-    <div class="view" id="view-sec">
-      <div class="panel">
-        <div class="panel-head"><h3>Security & audit log</h3><button class="btn sm ghost" onclick="toast('Report exported (demo)')">Export report</button></div>
-        <div id="secLog"></div>
       </div>
     </div>
   </main>
 </div>
-
-<!-- PRINTABLE RECEIPT -->
-<div id="receiptWrap" onclick="if(event.target===this)closeReceipt()">
-  <div id="receipt">
-    <div class="r-logo"><span class="bolt">⚡</span> FLUXXBANK</div>
-    <div class="r-sub">Official Transaction Receipt</div>
-    <hr class="r-rule">
-    <table class="r-table">
-      <tr><td>Date</td><td id="rDate">–</td></tr>
-      <tr><td>From</td><td id="rFrom">–</td></tr>
-      <tr><td>To / Description</td><td id="rTo">–</td></tr>
-      <tr><td>Status</td><td id="rNote">–</td></tr>
-      <tr><td>Reference</td><td id="rRef">–</td></tr>
-    </table>
-    <hr class="r-rule">
-    <div class="r-total"><small>Amount</small><b id="rAmt">–</b></div>
-    <div class="r-bar"></div>
-    <div class="r-foot">Fluxxbank AG · fluxxbank.netlify.app<br>Thank you for banking in motion ⚡</div>
-    <div class="r-actions">
-      <button class="r-print" onclick="window.print()">🖨️ Print receipt</button>
-      <button class="r-close" onclick="closeReceipt()">Close</button>
-    </div>
-  </div>
-</div>
-
 <div id="toast"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ================= CONFIG ================= */
-const SUPABASE_URL = "https://jthmxuecjbyvltvjfhfyj.supabase.co";
-const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L"; // <-- paste your publishable/anon key between the quotes
+const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
 const ADMIN_USER = "admin", ADMIN_PASS = "fluxx2026";
 let sb = (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
-const PALETTE = ["#4f7cff","#22d3ee","#a855f7","#f5c451","#34d399","#f87171"];
-const KEY = "fluxxbank_admin_v1";
-const AUTH = "fluxxbank_admin_auth";
-
-const seed = {
-  customers: [
-    {uid:"s1", id:"FX-100234", name:"Amira Saleh", email:"amira.saleh@gmail.com", bal:24806.12, plan:"Plus", status:"Active", color:"#4f7cff"},
-    {uid:"s2", id:"FX-100241", name:"Daniel Kovač", email:"d.kovac@cafekovar.cz", bal:61420.55, plan:"Business", status:"Active", color:"#22d3ee"},
-    {uid:"s3", id:"FX-100263", name:"Henrik Larsen", email:"h.larsen@post.dk", bal:154903.00, plan:"Metal", status:"Active", color:"#f5c451"},
-    {uid:"s4", id:"FX-100271", name:"Luna Ortiz", email:"luna.ortiz@outlook.es", bal:3211.87, plan:"Basic", status:"Pending", color:"#34d399"},
-    {uid:"s5", id:"FX-100289", name:"Jonas Weber", email:"jonas.w@web.de", bal:0, plan:"Basic", status:"Frozen", color:"#f87171"},
-  ],
-  txs: [
-    {uid:1, id:"TX-90412", who:"Amira Saleh → Maya Chen", desc:"FluxxPay · Rent share", amt:-120.00, status:"Completed"},
-    {uid:2, id:"TX-90411", who:"Nordwind GmbH → Amira Saleh", desc:"Salary · SEPA credit", amt:3850.00, status:"Completed"},
-    {uid:3, id:"TX-90410", who:"Omar Haddad → Unknown wallet", desc:"Crypto exchange transfer", amt:-5000.00, status:"Flagged"},
-    {uid:4, id:"TX-90408", who:"Jonas Weber → Coinbase", desc:"Third-party deposit", amt:9500.00, status:"Pending"},
-  ],
-  approvals: [
-    {uid:1, id:"AP-5011", name:"Luna Ortiz", type:"Account upgrade → Fluxx Plus", detail:"KYC verified · Credit check passed", amount:null},
-    {uid:2, id:"AP-5012", name:"Daniel Kovač", type:"Business overdraft €15,000", detail:"12 months in good standing", amount:15000},
-  ],
-  security: [
-    {t:"19:02", msg:"Admin A. Renard signed in", lvl:"info"},
-    {t:"18:47", msg:"Flagged TX-90410 escalated to compliance", lvl:"bad"},
-    {t:"18:31", msg:"Failed login attempt (2x) — IP 84.121.9.44", lvl:"bad"},
-  ],
-  feed: [
-    {ic:"💳", msg:"<b>312 new cards</b> issued in the last hour", time:"2 min ago"},
-    {ic:"⚡", msg:"FluxxPay volume hit <b>€1.2M</b> today", time:"14 min ago"},
-    {ic:"🛡️", msg:"Fraud engine blocked <b>41 attempts</b> overnight", time:"1 hr ago"},
-    {ic:"🌍", msg:"New market live: <b>Romania</b> 🇷🇴", time:"3 hrs ago"},
-  ],
-};
-
-let db = JSON.parse(localStorage.getItem(KEY) || "null") || JSON.parse(JSON.stringify(seed));
-let liveMode = false;
-const save = () => { if(!liveMode) localStorage.setItem(KEY, JSON.stringify(db)); };
-const eur = n => "€" + Math.abs(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
-
-/* ================= AUTH ================= */
 function tryLogin(){
   const u = document.getElementById("aUser").value.trim(), p = document.getElementById("aPass").value;
-  if(u===ADMIN_USER && p===ADMIN_PASS){ sessionStorage.setItem(AUTH,"1"); boot(); }
-  else document.getElementById("loginErr").textContent = "Invalid credentials. Try admin / fluxx2026";
+  if(u===ADMIN_USER && p===ADMIN_PASS){ sessionStorage.setItem("fluxx_admin","1"); boot(); }
+  else document.getElementById("loginErr").textContent = "Invalid credentials.";
 }
-function logout(){ sessionStorage.removeItem(AUTH); location.reload(); }
-document.getElementById("aPass").addEventListener("keydown", e=>{ if(e.key==="Enter") tryLogin(); });
+function logout(){ sessionStorage.removeItem("fluxx_admin"); location.reload(); }
 
-/* ================= DATA LOADING ================= */
 async function loadAll(){
-  if(!sb){ liveMode = false; return; }
-  try{
-    const [r1, r2, r3] = await Promise.all([
-      sb.from("profiles").select("*").order("created_at",{ascending:false}),
-      sb.from("transactions").select("*").order("created_at",{ascending:false}).limit(50),
-      sb.from("approvals").select("*").order("created_at",{ascending:false}),
-    ]);
-    if(r1.error) throw r1.error;
-    db.customers = (r1.data||[]).map((p,i)=>({uid:p.id, id:"FX-"+String(p.id).replace(/-/g,"").slice(0,8).toUpperCase(),
-      name:p.name, email:p.email, bal:Number(p.balance), plan:p.plan, status:p.status, color:PALETTE[i%PALETTE.length]}));
-    db.txs = (r2.data||[]).map(x=>({uid:x.id, id:"TX-"+x.id, who:x.description,
-      acct:((db.customers.find(c=>c.uid===x.user_id)||{}).name||"Customer"),
-      desc:new Date(x.created_at).toLocaleDateString("en-IE",{day:"numeric",month:"short"}), amt:Number(x.amount), status:x.status}));
-    db.approvals = (r3.data||[]).map(x=>({uid:x.id, id:"AP-"+x.id, name:x.customer_name, type:x.type, detail:x.detail, amount:x.amount?Number(x.amount):null}));
-    liveMode = true;
-    toast("⚡ Connected to live Fluxxbank database");
-  }catch(err){
-    console.warn(err);
-    toast("Database unreachable — running on demo data");
-  }
+  if(!sb) return;
+  const { data } = await sb.from("profiles").select("*").order("created_at",{ascending:false});
+  if(data) window.customers = data;
 }
-
-/* ================= NAV ================= */
-const titles = {dash:"Overview", cust:"Customers", tx:"Transactions", appr:"Approvals", sec:"Security log"};
+function renderCustomers(){
+  const rows = window.customers || [];
+  document.getElementById("custBody").innerHTML = rows.map((c,i)=>`
+    <tr>
+      <td>${c.name}<br><small>${c.email}</small></td>
+      <td>${c.status}</td>
+      <td>${c.status==="Pending" ? `<button class="btn sm ok" onclick="approve(${i})">Approve</button>` : ""}</td>
+    </tr>`).join("") || "<tr><td colspan='3'>No customers</td></tr>";
+}
+async function approve(i){
+  const c = window.customers[i];
+  await sb.from("profiles").update({ status: "Active" }).eq("id", c.id);
+  c.status = "Active";
+  renderCustomers();
+  toast(c.name + " approved");
+}
 function nav(v, btn){
   document.querySelectorAll(".view").forEach(x=>x.classList.remove("on"));
   document.getElementById("view-"+v).classList.add("on");
   document.querySelectorAll(".side-btn").forEach(b=>b.classList.remove("on"));
   btn.classList.add("on");
-  document.getElementById("pageTitle").textContent = titles[v];
-  if(v==="dash") setTimeout(drawChart, 30);
+  document.getElementById("pageTitle").textContent = v === "dash" ? "Overview" : v === "cust" ? "Customers" : "Approvals";
+  if(v==="cust") renderCustomers();
 }
-
-/* ================= RENDER ================= */
-function initials(n){ return n.split(" ").map(x=>x[0]).join("").slice(0,2).toUpperCase(); }
-function statusPill(s){
-  const map = {Active:"p-ok", Completed:"p-ok", Pending:"p-warn", Frozen:"p-bad", Flagged:"p-bad"};
-  return '<span class="pill '+(map[s]||"p-info")+'">'+s+'</span>';
-}
-function renderCustomers(){
-  const q = (document.getElementById("custSearch").value||"").toLowerCase();
-  const f = document.getElementById("custFilter").value;
-  const rows = db.customers.filter(c =>
-    (!f || c.status===f) &&
-    (c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.id.toLowerCase().includes(q)));
-  const pend = db.customers.filter(c=>c.status==="Pending").length;
-  const pendEl = document.getElementById("custPending");
-  if(pendEl){ pendEl.textContent = pend + " awaiting approval"; pendEl.style.display = pend ? "inline-block" : "none"; }
-  document.getElementById("custBody").innerHTML = rows.length ? rows.map((c)=>{
-    const i = db.customers.indexOf(c);
-    return `<tr>
-      <td><div class="cust"><div class="av" style="background:${c.color}22;color:${c.color}">${initials(c.name)}</div>
-          <div>${c.name}<small>${c.email}</small></div></div></td>
-      <td class="mono" style="color:var(--mut)">${c.id}</td>
-      <td class="mono"><b>${eur(c.bal)}</b></td>
-      <td><span class="pill p-info">${c.plan}</span></td>
-      <td>${statusPill(c.status)}</td>
-      <td>${c.status==="Pending"
-          ? `<button class="btn sm ok" onclick="approveCustomer(${i})">\u2714 Approve</button>
-             <button class="btn sm bad" onclick="rejectCustomer(${i})" style="margin-left:6px">Reject</button>`
-          : c.status==="Frozen"
-          ? `<button class="btn sm ok" onclick="addFunds(${i})">\u002B \u20AC</button>
-             <button class="btn sm ok" onclick="setStatus(${i},'Active')">Unfreeze</button>
-             <button class="btn sm ghost" onclick="editCustomer(${i})" style="margin-left:6px" title="Rename">\u270F\uFE0F</button>
-             <button class="btn sm ghost" onclick="viewHistory(${i})" title="Transaction history">\uD83D\uDCCB</button>
-             <button class="btn sm bad" onclick="delCustomer(${i})" style="margin-left:6px">Delete</button>`
-          : `<button class="btn sm ok" onclick="addFunds(${i})">\u002B \u20AC</button>
-             <button class="btn sm ghost" onclick="setStatus(${i},'Frozen')">Freeze</button>
-             <button class="btn sm ghost" onclick="editCustomer(${i})" style="margin-left:6px" title="Rename">\u270F\uFE0F</button>
-             <button class="btn sm ghost" onclick="viewHistory(${i})" title="Transaction history">\uD83D\uDCCB</button>
-             <button class="btn sm bad" onclick="delCustomer(${i})" style="margin-left:6px">Delete</button>`}</td>
-    </tr>`;
-  }).join("") : '<tr><td colspan="6" class="empty">No customers found.</td></tr>';
-}
-async function setStatus(i, s){
-  const c = db.customers[i];
-  if(liveMode){
-    const { error } = await sb.from("profiles").update({ status: s }).eq("id", c.uid);
-    if(error){ toast("Update failed: " + error.message); return; }
-  }
-  c.status = s; save(); renderCustomers(); renderKpis();
-  toast(c.name + " account " + s.toLowerCase() + " ✔");
-}
-async function approveCustomer(i){
-  const c = db.customers[i];
-  if(liveMode){
-    const { error } = await sb.from("profiles").update({ status: "Active" }).eq("id", c.uid);
-    if(error){ toast("Approve failed: " + error.message); return; }
-  }
-  c.status = "Active"; save(); renderCustomers(); renderKpis();
-  toast("\u2705 " + c.name + " approved \u2014 they can now log in!");
-}
-async function rejectCustomer(i){
-  const c = db.customers[i];
-  if(!confirm("Reject and delete " + c.name + "'s account?")) return;
-  if(liveMode){
-    const { error } = await sb.from("profiles").delete().eq("id", c.uid);
-    if(error){ toast("Reject failed: " + error.message); return; }
-  }
-  db.customers.splice(i,1); save(); renderCustomers(); renderKpis();
-  toast("\u274C " + c.name + " rejected and removed");
-}
-/* ------- ADMIN: credit / deduct funds ------- */
-function addFunds(i){
-  const c = db.customers[i];
-  const input = prompt("Amount for " + c.name + " (EUR). Use a minus to deduct, e.g. -50:", "100");
-  if(input === null) return;
-  const amt = parseFloat(input);
-  if(isNaN(amt) || amt === 0){ toast("Invalid amount"); return; }
-  if(liveMode){
-    sb.from("profiles").select("balance").eq("id", c.uid).single().then(async ({ data, error }) => {
-      if(error){ toast("Failed: " + error.message); return; }
-      const newBal = Number(data.balance) + amt;
-      const { error: uerr } = await sb.from("profiles").update({ balance: newBal }).eq("id", c.uid);
-      if(uerr){ toast("Failed: " + uerr.message); return; }
-      await sb.from("transactions").insert({ user_id: c.uid, description: "Admin adjustment \u00B7 Fluxxbank HQ", amount: amt, status: "Completed" });
-      c.bal = newBal; save(); renderCustomers(); renderKpis();
-      toast((amt > 0 ? "\u2795 Credited " : "\u2212 Deducted ") + eur(Math.abs(amt)) + " \u2192 " + c.name);
-    });
-  } else {
-    c.bal = (+c.bal || 0) + amt; save(); renderCustomers(); renderKpis();
-    toast((amt > 0 ? "\u2795 Credited " : "\u2212 Deducted ") + eur(Math.abs(amt)) + " \u2192 " + c.name + " (demo)");
-  }
-}
-/* ------- ADMIN: rename customer ------- */
-async function editCustomer(i){
-  const c = db.customers[i];
-  const nn = prompt("New name for " + c.name + ":", c.name);
-  if(nn === null) return;
-  const name = nn.trim();
-  if(!name) return;
-  if(liveMode){
-    const { error } = await sb.from("profiles").update({ name: name }).eq("id", c.uid);
-    if(error){ toast("Failed: " + error.message); return; }
-  }
-  c.name = name; save(); renderCustomers();
-  toast("\u270F\uFE0F Renamed to " + name);
-}
-/* ------- ADMIN: view one customer's full history ------- */
-async function viewHistory(i){
-  const c = db.customers[i];
-  if(liveMode){
-    const { data } = await sb.from("transactions").select("*").eq("user_id", c.uid).order("created_at",{ascending:false});
-    if(data){
-      data.forEach(x => {
-        const t = { uid:x.id, id:"TX-"+x.id, who:x.description,
-          desc:new Date(x.created_at).toLocaleDateString("en-IE",{day:"numeric",month:"short"}),
-          amt:Number(x.amount), status:x.status };
-        const k = db.txs.findIndex(y => String(y.uid) === String(t.uid));
-        if(k >= 0) db.txs[k] = t; else db.txs.unshift(t);
-      });
-    }
-  }
-  document.getElementById("txSearch").value = c.name;
-  document.getElementById("txFilter").value = "";
-  const btns = document.querySelectorAll(".side-btn");
-  if(btns[2]) btns[2].click();
-  renderTx();
-  toast("\uD83D\uDCCB History of " + c.name);
-}
-/* ------- ADMIN: printable receipts ------- */
-function printTx(uid){
-  const t = db.txs.find(x=>String(x.uid)===String(uid));
-  if(!t) return;
-  document.getElementById("rDate").textContent = t.desc + " \u00B7 " + new Date().toLocaleTimeString("en-IE",{hour:"2-digit",minute:"2-digit"});
-  document.getElementById("rFrom").innerHTML = (t.acct || "Customer") + '<br><span style="font-weight:400;color:#8a90a3;font-size:.78rem">Fluxx Everyday Account</span>';
-  document.getElementById("rTo").textContent = t.who;
-  document.getElementById("rNote").textContent = t.status;
-  document.getElementById("rRef").textContent = t.id;
-  document.getElementById("rAmt").textContent = (t.amt >= 0 ? "+" : "\u2212") + eur(t.amt);
-  document.getElementById("receiptWrap").classList.add("on");
-}
-function closeReceipt(){ document.getElementById("receiptWrap").classList.remove("on"); }
-async function delCustomer(i){
-  const c = db.customers[i];
-  if(!confirm("Delete " + c.name + "? This cannot be undone.")) return;
-  if(liveMode){
-    const { error } = await sb.from("profiles").delete().eq("id", c.uid);
-    if(error){ toast("Delete failed: " + error.message); return; }
-  }
-  db.customers.splice(i,1); save(); renderCustomers(); renderKpis();
-  toast("Customer removed");
-}
-function renderTx(){
-  const q = (document.getElementById("txSearch").value||"").toLowerCase();
-  const f = document.getElementById("txFilter").value;
-  const rows = db.txs.filter(t =>
-    (!f || t.status===f) &&
-    (t.who.toLowerCase().includes(q) || t.id.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q)));
-  document.getElementById("txBody").innerHTML = rows.length ? rows.map(t=>`<tr>
-    <td>${t.desc}<small style="display:block;color:var(--mut)" class="mono">${t.id}</small></td>
-    <td>${t.who}</td>
-    <td class="mono"><b style="color:${t.amt>=0?"var(--ok)":"var(--txt)"}">${t.amt>=0?"+":"−"}${eur(t.amt)}</b></td>
-    <td>${statusPill(t.status)}</td>
-    <td>${t.status==="Flagged" ? `<button class="btn sm ok" onclick="resolveTx('${t.uid}')">Clear flag</button>` : ""} <button class="btn sm ghost" onclick="printTx('${t.uid}')" title="Print receipt">\uD83E\uDDFE</button></td>
-  </tr>`).join("") : '<tr><td colspan="5" class="empty">No transactions found.</td></tr>';
-}
-async function resolveTx(uid){
-  if(liveMode){
-    const { error } = await sb.from("transactions").update({ status: "Completed" }).eq("id", uid);
-    if(error){ toast("Failed: " + error.message); return; }
-  }
-  const t = db.txs.find(x=>String(x.uid)===String(uid));
-  if(t) t.status = "Completed";
-  save(); renderTx(); toast("Flag cleared");
-}
-function renderAppr(){
-  document.getElementById("apprList").innerHTML = db.approvals.length ? db.approvals.map((a,i)=>`
-    <div class="feed-item" style="align-items:center">
-      <div class="ic" style="background:rgba(245,196,81,.14)">📋</div>
-      <div style="flex:1"><b>${a.type}</b> — ${a.name}
-        <small>${a.id} · ${a.detail}${a.amount?" · Requested: "+eur(a.amount):""}</small></div>
-      <button class="btn sm ok" onclick="decide(${i},true)">Approve</button>
-      <button class="btn sm bad" onclick="decide(${i},false)" style="margin-left:8px">Reject</button>
-    </div>`).join("") : '<div class="empty">🎉 All caught up — nothing waiting for approval.</div>';
-  const n = db.approvals.length;
-  document.getElementById("apprBadge").textContent = n;
-  document.getElementById("apprCountPill").textContent = n + " waiting";
-}
-async function decide(i, ok){
-  const a = db.approvals[i];
-  if(liveMode){
-    const { error } = await sb.from("approvals").delete().eq("id", a.uid);
-    if(error){ toast("Failed: " + error.message); return; }
-  }
-  db.approvals.splice(i,1);
-  db.security.unshift({t:new Date().toTimeString().slice(0,5), msg:(ok?"Approved: ":"Rejected: ")+a.type+" — "+a.name, lvl:ok?"info":"warn"});
-  save(); renderAppr(); renderKpis(); renderSec();
-  toast((ok?"✅ Approved: ":"❌ Rejected: ")+a.type);
-}
-function renderSec(){
-  const map = {info:"p-info", warn:"p-warn", bad:"p-bad"};
-  const lab = {info:"info", warn:"Pending", bad:"Flagged"};
-  document.getElementById("secLog").innerHTML = db.security.map(s=>`
-    <div class="feed-item"><div class="ic" style="background:rgba(255,255,255,.04)">🕒</div>
-    <div style="flex:1">${s.msg}<small>${s.t} today</small></div><span class="pill ${map[s.lvl]}">${lab[s.lvl]}</span></div>`).join("");
-}
-function renderFeed(){
-  document.getElementById("feed").innerHTML = db.feed.map(f=>`
-    <div class="feed-item"><div class="ic">${f.ic}</div><div style="flex:1">${f.msg}<small>${f.time}</small></div></div>`).join("");
-}
-function renderKpis(){
-  const total = db.customers.reduce((s,c)=>s+(+c.bal||0),0);
-  document.getElementById("kCustomers").textContent = (2400000 + db.customers.length).toLocaleString();
-  document.getElementById("kDeposits").textContent = "€" + (8.2 + total/1e9).toFixed(2) + "B";
-  document.getElementById("kTx").textContent = (104200 + db.txs.length*7).toLocaleString();
-  document.getElementById("kAppr").textContent = db.approvals.length;
-}
-
-/* ================= CHART ================= */
-function drawChart(){
-  const cv = document.getElementById("adminChart"), ctx = cv.getContext("2d");
-  const dpr = window.devicePixelRatio||1;
-  cv.width = cv.offsetWidth*dpr; cv.height = 240*dpr; ctx.scale(dpr,dpr);
-  const W = cv.offsetWidth, H = 240, pad=10, n=12;
-  const data = [3.1,3.4,3.8,4.2,4.7,5.1,5.8,6.2,6.9,7.3,7.8,8.2];
-  const max = Math.max(...data)*1.15;
-  const pts = data.map((v,i)=>[pad+i*(W-2*pad)/(n-1), H-pad-(v/max)*(H-2*pad)]);
-  ctx.clearRect(0,0,W,H);
-  const grad = ctx.createLinearGradient(0,0,0,H);
-  grad.addColorStop(0,"rgba(34,211,238,.4)"); grad.addColorStop(1,"rgba(34,211,238,0)");
-  ctx.beginPath(); ctx.moveTo(pts[0][0],H-pad); pts.forEach(p=>ctx.lineTo(p[0],p[1]));
-  ctx.lineTo(pts[n-1][0],H-pad); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
-  ctx.beginPath(); pts.forEach((p,i)=> i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));
-  ctx.strokeStyle="#22d3ee"; ctx.lineWidth=2.5; ctx.lineJoin="round"; ctx.stroke();
-  pts.forEach((p,i)=>{ ctx.beginPath(); ctx.arc(p[0],p[1],i===n-1?5:3,0,7);
-    ctx.fillStyle = i===n-1 ? "#f5c451" : "#22d3ee"; ctx.fill(); });
-}
-
-/* ================= MISC ================= */
-let toastT;
 function toast(msg){
   const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show");
-  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove("show"), 2800);
+  setTimeout(()=>t.classList.remove("show"), 2500);
 }
-function tick(){ document.getElementById("clock").textContent = new Date().toLocaleTimeString(); }
 async function boot(){
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").classList.add("on");
-  renderKpis(); renderCustomers(); renderTx(); renderAppr(); renderSec(); renderFeed();
-  setTimeout(drawChart, 60); tick(); setInterval(tick, 1000);
   await loadAll();
-  renderKpis(); renderCustomers(); renderTx(); renderAppr();
-  // live refresh: new signups appear automatically every 20 seconds
-  setInterval(async ()=>{
-    if(liveMode){ await loadAll(); renderKpis(); renderCustomers(); renderTx(); renderAppr(); }
-  }, 20000);
+  renderCustomers();
 }
-if(sessionStorage.getItem(AUTH)==="1") boot();
-window.addEventListener("resize", ()=>{ if(document.getElementById("app").classList.contains("on")) drawChart(); });
+if(sessionStorage.getItem("fluxx_admin")==="1") boot();
 </script>
 </body>
 </html>
