@@ -8,22 +8,24 @@
     :root { --bg: #080e1c; --panel: #101a2e; --panel2: #15223b; --border: #263653; --text: #edf3ff; --muted: #98a8c2; --orange: #f58220; --green: #32c997; --red: #ff7070; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: Arial, Helvetica, sans-serif; }
-    button, input { font: inherit; }
+    button, input, select { font: inherit; }
     button { cursor: pointer; }
     .hidden { display: none !important; }
+    
+    /* Login */
     #loginScreen { min-height: 100vh; display: grid; place-items: center; padding: 20px; background: radial-gradient(ellipse at top, #192c4c 0%, var(--bg) 65%); }
     .login-box { width: 100%; max-width: 410px; padding: 32px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 70px #0005; }
     .brand { color: var(--orange); font-size: 25px; font-weight: 800; letter-spacing: .3px; }
-    .subtitle { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 9px 0 25px; }
     label { display: block; margin: 16px 0 7px; font-size: 13px; color: #c8d5e9; }
-    input { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; outline: none; }
-    input:focus { border-color: var(--orange); }
+    input, select { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; outline: none; }
+    input:focus, select:focus { border-color: var(--orange); }
     .btn { border: 0; border-radius: 8px; padding: 11px 15px; font-weight: 700; background: var(--orange); color: #111827; }
     .full { width: 100%; margin-top: 20px; }
     .secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
     .small { padding: 7px 10px; font-size: 12px; }
     .error { color: var(--red); font-size: 13px; line-height: 1.5; margin-top: 12px; }
-    .success { color: var(--green); }
+    
+    /* App Layout */
     #app { min-height: 100vh; }
     .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
     .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
@@ -44,6 +46,8 @@
     .stat-label { color: var(--muted); font-size: 13px; }
     .stat-value { margin-top: 12px; font-size: 30px; font-weight: 800; overflow-wrap: anywhere; }
     .panel h2 { margin: 0 0 17px; font-size: 16px; }
+    
+    /* Tables */
     .table-wrap { width: 100%; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
@@ -52,19 +56,25 @@
     .status { display: inline-block; padding: 5px 8px; border-radius: 6px; background: #26344c; color: #dce7f8; font-size: 11px; white-space: nowrap; }
     .status.active { background: #103a32; color: #72e4bb; }
     .status.pending { background: #49341b; color: #ffd18c; }
-    .empty { padding: 25px 10px; color: var(--muted); text-align: center; font-size: 13px; }
-    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; overflow-wrap: anywhere; }
+    
+    /* Modal */
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; place-items: center; z-index: 100; }
+    .modal-bg.show { display: grid; }
+    .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 100%; max-width: 500px; }
+    .modal h2 { margin: 0 0 20px; color: var(--orange); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    
+    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 200; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; }
   </style>
 </head>
 <body>
   <section id="loginScreen">
     <div class="login-box">
       <div class="brand">FluxxBank</div>
-      <p class="subtitle" id="loginSubtitle">Administrator access. Sign in using your authorized Supabase account.</p>
       <form id="loginForm">
-        <label for="aEmail">Administrator email</label>
+        <label>Administrator email</label>
         <input type="email" id="aEmail" autocomplete="username" placeholder="Enter your email" required>
-        <label for="aPass">Password</label>
+        <label>Password</label>
         <input type="password" id="aPass" autocomplete="current-password" placeholder="Enter your password" required>
         <div id="loginErr" class="error" role="alert"></div>
         <button class="btn full" id="loginBtn" type="submit">Sign in</button>
@@ -77,7 +87,7 @@
       <aside class="sidebar">
         <div class="brand">FluxxBank</div>
         <div class="side-label">Administration</div>
-        <nav class="side-nav" aria-label="Admin navigation">
+        <nav class="side-nav">
           <button class="side-btn on" data-view="dash" type="button">Overview</button>
           <button class="side-btn" data-view="cust" type="button">Customers</button>
           <button class="side-btn" data-view="appr" type="button">Approvals</button>
@@ -95,7 +105,6 @@
         <div class="content">
           <section id="view-dash" class="view on">
             <h2 class="section-title">Overview</h2>
-            <p class="section-desc">Customer profile and application status from your database.</p>
             <div class="stats">
               <div class="stat"><div class="stat-label">Customer profiles</div><div class="stat-value" id="kCustomers">—</div></div>
               <div class="stat"><div class="stat-label">Pending applications</div><div class="stat-value" id="kAppr">—</div></div>
@@ -104,43 +113,75 @@
               <h2>Recent customer profiles</h2>
               <div class="table-wrap"><table>
                 <thead><tr><th>Customer</th><th>Status</th><th>Role</th></tr></thead>
-                <tbody id="recentBody"><tr><td colspan="3">Loading records…</td></tr></tbody>
+                <tbody id="recentBody"></tbody>
               </table></div>
             </div>
           </section>
 
           <section id="view-cust" class="view">
             <h2 class="section-title">Customers</h2>
-            <p class="section-desc">View customer profiles, balances, and manage their accounts.</p>
             <div class="panel"><div class="table-wrap"><table>
               <thead><tr><th>Customer</th><th>Status</th><th>Balance</th><th>Action</th></tr></thead>
-              <tbody id="custBody"><tr><td colspan="4">Loading records…</td></tr></tbody>
+              <tbody id="custBody"></tbody>
             </table></div></div>
           </section>
 
           <section id="view-appr" class="view">
             <h2 class="section-title">Approvals</h2>
-            <p class="section-desc">Review pending customer profiles. Approval changes the profile status in Supabase.</p>
-            <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading applications…</div></div></div>
+            <div class="panel"><h2>Pending applications</h2><div id="apprList"></div></div>
           </section>
 
           <section id="view-txs" class="view">
             <h2 class="section-title">Global Transaction Ledger</h2>
-            <p class="section-desc">A complete record of all money movements across the bank.</p>
             <div class="panel">
               <div class="table-wrap"><table>
                 <thead><tr><th>Date</th><th>Customer</th><th>Description</th><th>Ref</th><th>Amount</th><th>Status</th></tr></thead>
-                <tbody id="globalTxBody"><tr><td colspan="6">Loading records…</td></tr></tbody>
+                <tbody id="globalTxBody"></tbody>
               </table></div>
             </div>
           </section>
-
-          <div id="pageErr" class="error" role="alert"></div>
         </div>
       </main>
     </div>
   </div>
-  <div id="toast" class="hidden" role="status" aria-live="polite"></div>
+
+  <!-- DEPOSIT MODAL -->
+  <div class="modal-bg" id="depositModal">
+    <div class="modal">
+      <h2>New Incoming Deposit</h2>
+      <form id="depositForm">
+        <input type="hidden" id="dUserId">
+        <input type="hidden" id="dCurrency">
+        
+        <label>Amount</label>
+        <input type="number" id="dAmount" step="0.01" required placeholder="0.00">
+        
+        <div class="form-row">
+          <div>
+            <label>Sender Name</label>
+            <input type="text" id="dSenderName" required placeholder="e.g. Acme Corp Ltd">
+          </div>
+          <div>
+            <label>Sender IBAN / Account</label>
+            <input type="text" id="dSenderAcc" required placeholder="e.g. GB29 NWBK...">
+          </div>
+        </div>
+        
+        <label>Purpose of Payment</label>
+        <input type="text" id="dPurpose" required placeholder="e.g. October Salary">
+        
+        <label>Backdate (Date & Time)</label>
+        <input type="datetime-local" id="dDate" required>
+        
+        <div style="display:flex; gap:10px; margin-top:24px;">
+          <button type="button" class="btn secondary" style="flex:1" onclick="closeDepositModal()">Cancel</button>
+          <button type="submit" class="btn" style="flex:1">Confirm Deposit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -154,7 +195,6 @@
     const $ = id => document.getElementById(id);
 
     document.addEventListener("DOMContentLoaded", async () => {
-      if (!window.supabase) return alert("Supabase failed to load.");
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       
       const { data } = await sb.auth.getSession();
@@ -164,6 +204,7 @@
       $("loginForm").addEventListener("submit", tryLogin);
       $("logoutBtn").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
 
+      // Navigation
       document.querySelectorAll(".side-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
@@ -174,26 +215,64 @@
         });
       });
 
+      // Approve Button
       document.addEventListener("click", async (e) => {
         if (e.target.classList.contains("approve-btn")) {
           const index = e.target.getAttribute("data-index");
           const customer = customers[index];
-          
-          e.target.disabled = true;
           e.target.textContent = "Approving...";
-          
-          const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
-          if (error) {
-            toast("Error: " + error.message);
-            e.target.disabled = false;
-            e.target.textContent = "Approve";
-          } else {
-            toast("Customer approved successfully!");
-            await loadAll();
-            await loadGlobalTransactions();
-            renderOverview(); renderCustomers(); renderApprovals();
-          }
+          await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
+          toast("Customer approved!");
+          loadAll(); loadGlobalTransactions();
         }
+      });
+
+      // Handle Deposit Form Submit
+      $("depositForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const userId = $("dUserId").value;
+        const currency = $("dCurrency").value;
+        const amount = parseFloat($("dAmount").value);
+        const senderName = $("dSenderName").value;
+        const senderAcc = $("dSenderAcc").value;
+        const purpose = $("dPurpose").value;
+        const dateVal = $("dDate").value; // Local date string
+
+        // Convert local date string to ISO string for Supabase
+        const isoDate = new Date(dateVal).toISOString();
+
+        // Get current balance
+        const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
+        const newBalance = Number(profile.balance || 0) + amount;
+
+        // 1. Update Balance
+        const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
+        if (err1) return toast("Error: " + err1.message);
+
+        // 2. Insert Transaction
+        const txRef = "DEP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const { error: err2 } = await sb.from("transactions").insert({ 
+          user_id: userId, 
+          reference: txRef,
+          description: `Incoming transfer from ${senderName}`, 
+          amount: amount, 
+          currency: currency,
+          type: 'deposit', 
+          status: 'completed',
+          account_name: 'Everyday Account',
+          account_number: '•••• 4021',
+          balance_after: newBalance,
+          sender_name: senderName,
+          sender_account: senderAcc,
+          purpose: purpose,
+          created_at: isoDate // <--- BACKDATED HERE
+        });
+
+        if (err2) return toast("Error: " + err2.message);
+
+        closeDepositModal();
+        toast(`✅ Deposited €${amount} successfully.`);
+        loadAll(); loadGlobalTransactions();
       });
     });
 
@@ -229,17 +308,14 @@
     async function boot(user) {
       $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
       try {
-        if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }
-        if (!user) throw new Error("Please sign in.");
-        const { data: profile } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
-        if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
-          await sb.auth.signOut(); throw new Error("Not an active admin.");
-        }
+        const { data: profile } = await sb.from("profiles").select("id, name, role, status").eq("id", user.id).single();
+        if (!profile || profile.role.toLowerCase() !== "admin") throw new Error("Not an admin.");
+        
         $("adminIdentity").textContent = profile.name || "Administrator";
         await loadAll();
         await loadGlobalTransactions();
+        
         $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
-        renderOverview(); renderCustomers(); renderApprovals();
       } catch (error) {
         $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
         showLoginError(error.message);
@@ -247,122 +323,74 @@
     }
 
     async function loadAll() {
-      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, currency, dob, phone, created_at").order("created_at", { ascending: false });
-      if (error) throw error;
+      const { data } = await sb.from("profiles").select("*").order("created_at", { ascending: false });
       customers = data || [];
+      $("kCustomers").textContent = customers.length;
+      $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
+
+      // Dashboard recent list
+      $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
+        <tr><td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td><td>${statusBadge(c.status)}</td><td>${c.role}</td></tr>
+      `).join("");
+
+      // Customers table
+      $("custBody").innerHTML = customers.map((c, i) => {
+        const sym = c.currency === 'USD' ? '$' : c.currency === 'GBP' ? '£' : '€';
+        return `
+        <tr>
+          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
+          <td>${statusBadge(c.status)}</td>
+          <td style="font-weight:bold; color:var(--green);">${sym}${Number(c.balance || 0).toFixed(2)}</td>
+          <td>
+            ${isPending(c.status) ? `<button class="btn small approve-btn" data-index="${i}">Approve</button>` : ""}
+            <button class="btn small" style="background:var(--orange); color:#000;" onclick="openDepositModal('${c.id}', '${c.currency || 'EUR'}')">+ Deposit</button>
+          </td>
+        </tr>`;
+      }).join("");
+
+      // Approvals tab
+      const pending = customers.filter(c => isPending(c.status));
+      $("apprList").innerHTML = pending.map((c, i) => `
+        <div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--border)">
+          <div><strong>${escapeHtml(c.name)}</strong><div style="color:var(--muted);font-size:12px">${escapeHtml(c.email)}</div></div>
+          <button class="btn small approve-btn" data-index="${customers.indexOf(c)}">Approve</button>
+        </div>`).join("") || '<div class="empty">No pending applications.</div>';
     }
 
     async function loadGlobalTransactions() {
-      const { data, error } = await sb.from("transactions")
-        .select("*, profiles(name)")
-        .order("created_at", { ascending: false })
-        .limit(50);
-        
-      if (error) return console.error(error);
-
-      const body = document.getElementById("globalTxBody");
-      if (!data || data.length === 0) {
-        body.innerHTML = '<tr><td colspan="6">No transactions found.</td></tr>';
-        return;
-      }
+      const { data } = await sb.from("transactions").select("*, profiles(name)").order("created_at", { ascending: false }).limit(50);
+      const body = $("globalTxBody");
+      if (!data || data.length === 0) return body.innerHTML = '<tr><td colspan="6">No transactions.</td></tr>';
 
       body.innerHTML = data.map(t => {
         const isPos = t.amount > 0;
         const sym = t.currency === 'USD' ? '$' : t.currency === 'GBP' ? '£' : '€';
         return `
           <tr>
-            <td>${new Date(t.created_at).toLocaleDateString()}</td>
+            <td>${new Date(t.created_at).toLocaleString()}</td>
             <td>${t.profiles ? t.profiles.name : 'Unknown'}</td>
             <td>${t.description}</td>
             <td><small style="font-family:monospace">${t.reference}</small></td>
-            <td style="font-weight:bold; color:${isPos ? 'var(--green)' : 'var(--text)'}">
-              ${isPos ? '+' : ''}${sym}${Math.abs(t.amount).toFixed(2)}
-            </td>
+            <td style="font-weight:bold; color:${isPos ? 'var(--green)' : 'var(--text)'}">${isPos ? '+' : ''}${sym}${Math.abs(t.amount).toFixed(2)}</td>
             <td><span class="status ${t.status.toLowerCase()}">${t.status}</span></td>
-          </tr>
-        `;
+          </tr>`;
       }).join("");
     }
 
-    function renderOverview() {
-      $("kCustomers").textContent = customers.length;
-      $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
-      $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
-        <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role)}</td>
-        </tr>`).join("") || '<tr><td colspan="3">No profiles.</td></tr>';
+    // --- DEPOSIT MODAL LOGIC ---
+    function openDepositModal(userId, currency) {
+      $("dUserId").value = userId;
+      $("dCurrency").value = currency;
+      $("depositForm").reset();
+      // Set default date to now
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      $("dDate").value = now.toISOString().slice(0,16);
+      $("depositModal").classList.add("show");
     }
 
-    function renderCustomers() {
-      $("custBody").innerHTML = customers.map((c, i) => {
-        const curSymbol = c.currency === 'USD' ? '$' : c.currency === 'GBP' ? '£' : '€';
-        return `
-        <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)} | ${c.phone || 'No phone'}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td style="font-weight:bold; color:var(--green);">${curSymbol}${Number(c.balance || 0).toFixed(2)}</td>
-          <td>
-            ${isPending(c.status) ? `<button class="btn small approve-btn" type="button" data-index="${i}">Approve</button>` : ""}
-            <button class="btn small" style="background:var(--orange); color:#000; margin-left:5px;" onclick="depositMoney('${c.id}', '${c.name}', '${c.currency || 'EUR'}')">+ Deposit</button>
-          </td>
-        </tr>`;
-      }).join("") || '<tr><td colspan="4">No profiles.</td></tr>';
-    }
-
-    function renderApprovals() {
-      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
-      $("apprList").innerHTML = pending.map(({ customer, index }) => `
-        <div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--border)">
-          <div><strong>${escapeHtml(customer.name)}</strong><div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email)}</div></div>
-          <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
-        </div>`).join("") || '<div class="empty">No pending applications.</div>';
-    }
-
-    async function depositMoney(userId, userName, currency) {
-      const amountStr = prompt(`How much to deposit for ${userName}? (e.g. 500)`);
-      if (!amountStr) return;
-      const amount = parseFloat(amountStr);
-      if (isNaN(amount) || amount <= 0) return alert("Invalid amount");
-
-      const senderName = prompt("Enter Sender Name (e.g. John Doe / Acme Corp):");
-      if (!senderName) return alert("Sender name is required.");
-
-      const senderAccount = prompt("Enter Sender IBAN / Account (e.g. GB29 NWBK...):");
-      if (!senderAccount) return alert("Sender account is required.");
-
-      const purpose = prompt("Enter Purpose of Payment (e.g. Salary / Invoice #402):");
-      if (!purpose) return alert("Purpose is required.");
-
-      const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
-      const newBalance = Number(profile.balance || 0) + amount;
-
-      const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
-      if (err1) return toast("Error: " + err1.message);
-
-      const txRef = "DEP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-      await sb.from("transactions").insert({ 
-        user_id: userId, 
-        reference: txRef,
-        description: `Incoming transfer from ${senderName}`, 
-        amount: amount, 
-        currency: currency,
-        type: 'deposit', 
-        status: 'completed',
-        account_name: 'Everyday Account',
-        account_number: '•••• 4021',
-        balance_after: newBalance,
-        sender_name: senderName,
-        sender_account: senderAccount,
-        purpose: purpose
-      });
-      
-      const sym = currency === 'USD' ? '$' : currency === 'GBP' ? '£' : '€';
-      toast(`✅ Credited ${sym}${amount} from ${senderName}`);
-      await loadAll(); 
-      await loadGlobalTransactions();
-      renderCustomers();
+    function closeDepositModal() {
+      $("depositModal").classList.remove("show");
     }
   </script>
 </body>
