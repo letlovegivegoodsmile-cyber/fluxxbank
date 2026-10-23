@@ -158,8 +158,6 @@
   .modal input{width:100%;background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);margin-bottom:12px;outline:none}
   .modal .btn{width:100%;justify-content:center}
 
-
-
   /* ---------- TRUST STRIP ---------- */
   .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:34px 5%;text-align:center}
   .trust p{color:var(--mut);font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
@@ -199,14 +197,12 @@
   #toTop.show{opacity:1;pointer-events:auto;transform:translateY(0)}
   #toTop:hover{transform:translateY(-3px)}
 
-
   /* ---------- 5 STAR RATING ---------- */
   .rating-badge{display:inline-flex;align-items:center;gap:12px;margin-top:34px;background:rgba(245,196,81,.08);
       border:1px solid rgba(245,196,81,.35);border-radius:999px;padding:10px 22px}
   .rating-badge .stars-big{color:var(--gold);font-size:1.15rem;letter-spacing:3px;text-shadow:0 0 14px rgba(245,196,81,.6)}
   .rating-badge b{font-size:1.05rem}
   .rating-badge span{color:var(--mut);font-size:.85rem}
-
 
   /* ---------- SHOWCASE GALLERY ---------- */
   .gallery-stage{position:relative;max-width:1000px;margin:0 auto;border-radius:22px;overflow:hidden;
@@ -229,7 +225,6 @@
   .gal-thumbs button.on{border-color:var(--accent2);opacity:1;transform:translateY(-3px)}
   .gal-count{position:absolute;z-index:3;top:16px;right:18px;font-size:.8rem;color:rgba(255,255,255,.85);
       background:rgba(11,16,32,.55);border:1px solid var(--line);border-radius:999px;padding:5px 13px;backdrop-filter:blur(6px)}
-
 
   /* ---------- PRINTABLE RECEIPT ---------- */
   #receiptWrap{position:fixed;inset:0;z-index:300;display:none;place-items:center;background:rgba(5,7,15,.78);backdrop-filter:blur(4px)}
@@ -468,7 +463,6 @@
   </div>
 </section>
 
-
 <!-- CUSTOMER REVIEWS SLIDESHOW -->
 <section class="reviews" id="reviews">
   <div class="rev-bg" id="revBg">
@@ -501,7 +495,6 @@
   </div>
   <div style="text-align:center;margin-top:50px"><button class="btn gold" style="padding:16px 36px;font-size:1.05rem" onclick="openModal()">Open my Fluxxbank account →</button></div>
 </section>
-
 
 <!-- SHOWCASE GALLERY -->
 <section id="showcase">
@@ -567,7 +560,6 @@
 </footer>
 
 <button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
-
 
 <!-- PRINTABLE RECEIPT -->
 <div id="receiptWrap" onclick="if(event.target===this)closeReceipt()">
@@ -720,11 +712,11 @@
   function openModal(){ bg.classList.add("show"); }
   function closeModal(){ bg.classList.remove("show"); }
   const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-let sb = null;
-if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-}
+  const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+  let sb = null;
+  if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
   let authMode = "login";
   const eur2 = n => "\u20AC" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -755,29 +747,43 @@ if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
     }
     try{
       if(authMode === "signup"){
-  if(pw.length < 6){ err.textContent = "Password needs at least 6 characters."; return; }
-  const { data: su, error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm || "Customer" } } });
-  if(error) throw error;
-  if(su.user){
-    await sb.from("profiles").insert({
-      id: su.user.id,
-      name: nm || "Customer",
-      email: em,
-      balance: 0,
-      plan: "Basic",
-      status: "Pending",
-      color: "#34d399"
-    });
-  }
-  err.style.color = "var(--ok)";
-  err.textContent = "✅ Account created! Confirm the email, then wait for admin activation — usually minutes! 🚀";
-      } else {
-        const { error } = await sb.auth.signInWithPassword({ email: em, password: pw });
+        if(pw.length < 6){ err.textContent = "Password needs at least 6 characters."; return; }
+        const { data: su, error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm || "Customer" } } });
         if(error) throw error;
-        // APPROVAL GATE: check account status before allowing access
+        if(su.user){
+          await sb.from("profiles").insert({
+            id: su.user.id,
+            name: nm || "Customer",
+            email: em,
+            balance: 0,
+            plan: "Basic",
+            status: "Pending",
+            color: "#34d399"
+          });
+        }
+        err.style.color = "var(--ok)";
+        err.textContent = "✅ Account created! Confirm the email, then wait for admin activation — usually minutes! 🚀";
+      } else {
+        // 1. Try to log in
+        const { data: authData, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
+        if(error) throw error;
         
-          throw new Error("\u23F3 Account awaiting approval \u2014 an admin must activate it first. Usually takes minutes!");
+        // 2. Go fetch the profile from the database
+        const { data: profile, error: pError } = await sb
+          .from("profiles")
+          .select("status, name")
+          .eq("id", authData.user.id)
+          .single();
+          
+        if(pError) throw pError;
         
+        // 3. THE REAL APPROVAL GATE
+        if (profile.status !== "active") {
+          await sb.auth.signOut(); // Log them out immediately if not active
+          throw new Error("⏳ Account awaiting approval — an admin must activate it first. Usually takes minutes!");
+        }
+        
+        // 4. If they are active, let them in!
         closeModal();
         await refreshAuthUI();
         document.getElementById("dashboard").scrollIntoView({behavior:"smooth"});
@@ -806,7 +812,6 @@ if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
     }
   }
   async function doLogout(){ if(sb) await sb.auth.signOut(); location.reload(); }
-
 
   /* ------- reviews slideshow ------- */
   const reviews = [
@@ -838,8 +843,6 @@ if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
   function goRev(i){ clearInterval(revTimer); showRev(i); revTimer = setInterval(()=>showRev(cur+1), 5200); }
   showRev(0);
   revTimer = setInterval(()=>showRev(cur+1), 5200);
-
-
 
   /* ------- showcase gallery ------- */
   const gallery = [
