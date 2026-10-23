@@ -5,69 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FluxxBank Admin Console</title>
   <style>
-    :root { --bg: #080e1c; --panel: #101a2e; --panel2: #15223b; --border: #263653; --text: #edf3ff; --muted: #98a8c2; --orange: #f58220; --green: #32c997; --red: #ff7070; }
+    :root { --bg: #080e1c; --panel: #101a2e; --border: #263653; --text: #edf3ff; --muted: #98a8c2; --orange: #f58220; --green: #32c997; --red: #ff7070; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: Arial, Helvetica, sans-serif; }
-    button, input { font: inherit; }
-    button { cursor: pointer; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: sans-serif; }
     .hidden { display: none !important; }
-    #loginScreen { min-height: 100vh; display: grid; place-items: center; padding: 20px; background: radial-gradient(ellipse at top, #192c4c 0%, var(--bg) 65%); }
-    .login-box { width: 100%; max-width: 410px; padding: 32px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 70px #0005; }
-    .brand { color: var(--orange); font-size: 25px; font-weight: 800; letter-spacing: .3px; }
-    .subtitle { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 9px 0 25px; }
-    label { display: block; margin: 16px 0 7px; font-size: 13px; color: #c8d5e9; }
-    input { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; outline: none; }
-    input:focus { border-color: var(--orange); }
-    .btn { border: 0; border-radius: 8px; padding: 11px 15px; font-weight: 700; background: var(--orange); color: #111827; }
-    .full { width: 100%; margin-top: 20px; }
-    .secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
-    .small { padding: 7px 10px; font-size: 12px; }
-    .error { color: var(--red); font-size: 13px; line-height: 1.5; margin-top: 12px; }
-    .success { color: var(--green); }
-    #app { min-height: 100vh; }
-    .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
+    #loginScreen { min-height: 100vh; display: grid; place-items: center; }
+    .login-box { width: 100%; max-width: 410px; padding: 32px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; }
+    .brand { color: var(--orange); font-size: 25px; font-weight: 800; }
+    input { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; margin-bottom: 12px; }
+    .btn { border: 0; border-radius: 8px; padding: 11px 15px; font-weight: 700; background: var(--orange); color: #111827; cursor: pointer; }
+    .layout { display: grid; grid-template-columns: 235px 1fr; min-height: 100vh; }
     .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
-    .sidebar .brand { padding: 0 10px 27px; font-size: 22px; }
-    .side-label { padding: 12px 10px; color: var(--muted); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
-    .side-btn { display: block; width: 100%; margin: 5px 0; padding: 12px; text-align: left; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #b9c7dd; }
-    .side-btn:hover, .side-btn.on { background: #172742; border-color: #293d5e; color: white; }
-    .side-btn.on { box-shadow: inset 3px 0 var(--orange); }
-    main { min-width: 0; }
-    .topbar { min-height: 82px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: #0c1526; }
+    .side-btn { display: block; width: 100%; margin: 5px 0; padding: 12px; text-align: left; border-radius: 8px; background: transparent; color: #b9c7dd; cursor: pointer; border: none;}
+    .side-btn.on { background: #172742; color: white; box-shadow: inset 3px 0 var(--orange); }
+    .topbar { padding: 20px 28px; border-bottom: 1px solid var(--border); background: #0c1526; display: flex; justify-content: space-between;}
     .content { padding: 28px; }
-    .view { display: none; }
-    .view.on { display: block; }
-    .section-title { margin: 0 0 8px; font-size: 20px; }
-    .section-desc { margin: 0 0 23px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-    .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 25px; }
-    .stat, .panel { min-width: 0; padding: 21px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 24px;}
-    .stat-label { color: var(--muted); font-size: 13px; }
-    .stat-value { margin-top: 12px; font-size: 30px; font-weight: 800; overflow-wrap: anywhere; }
-    .panel h2 { margin: 0 0 17px; font-size: 16px; }
-    .table-wrap { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    th { color: var(--muted); font-weight: 600; white-space: nowrap; }
-    td small { display: block; margin-top: 5px; color: var(--muted); overflow-wrap: anywhere; }
-    .status { display: inline-block; padding: 5px 8px; border-radius: 6px; background: #26344c; color: #dce7f8; font-size: 11px; white-space: nowrap; }
+    .view { display: none; } .view.on { display: block; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--panel); border-radius: 12px; overflow: hidden;}
+    th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    .status { padding: 5px 8px; border-radius: 6px; font-size: 11px; }
     .status.active { background: #103a32; color: #72e4bb; }
     .status.pending { background: #49341b; color: #ffd18c; }
-    .empty { padding: 25px 10px; color: var(--muted); text-align: center; font-size: 13px; }
-    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; overflow-wrap: anywhere; }
+    #toast { position: fixed; right: 20px; bottom: 20px; padding: 13px; background: #15223b; color: white; border-radius: 9px; display: none; z-index: 99;}
   </style>
 </head>
 <body>
   <section id="loginScreen">
     <div class="login-box">
       <div class="brand">FluxxBank</div>
-      <p class="subtitle" id="loginSubtitle">Administrator access. Sign in using your authorized Supabase account.</p>
+      <p style="color:var(--muted);font-size:13px;margin:10px 0 20px;">Admin Access</p>
       <form id="loginForm">
-        <label for="aEmail">Administrator email</label>
-        <input type="email" id="aEmail" autocomplete="username" placeholder="Enter your email" required>
-        <label for="aPass">Password</label>
-        <input type="password" id="aPass" autocomplete="current-password" placeholder="Enter your password" required>
-        <div id="loginErr" class="error" role="alert"></div>
-        <button class="btn full" id="loginBtn" type="submit">Sign in</button>
+        <input type="email" id="aEmail" placeholder="Admin email" required>
+        <input type="password" id="aPass" placeholder="Password" required>
+        <div id="loginErr" style="color:var(--red);font-size:13px;margin-bottom:10px;"></div>
+        <button class="btn" style="width:100%" id="loginBtn" type="submit">Sign in</button>
       </form>
     </div>
   </section>
@@ -75,295 +46,126 @@
   <div id="app" class="hidden">
     <div class="layout">
       <aside class="sidebar">
-        <div class="brand">FluxxBank</div>
-        <div class="side-label">Administration</div>
-        <nav class="side-nav" aria-label="Admin navigation">
-          <button class="side-btn on" data-view="dash" type="button">Overview</button>
-          <button class="side-btn" data-view="cust" type="button">Customers</button>
-          <button class="side-btn" data-view="appr" type="button">Approvals</button>
-          <button class="side-btn" data-view="txs" type="button">Global Ledger</button>
-        </nav>
-        <div class="sidebar-note">Restricted administrator area.<br>Access is checked against your Supabase profile.</div>
+        <div class="brand" style="padding:0 10px 20px">FluxxBank</div>
+        <button class="side-btn on" data-view="dash">Overview</button>
+        <button class="side-btn" data-view="cust">Customers</button>
+        <button class="side-btn" data-view="appr">Approvals</button>
       </aside>
-
       <main>
         <header class="topbar">
-          <div><h1 id="pageTitle">Overview</h1><small id="adminIdentity">Administrator</small></div>
-          <button class="btn secondary" id="logoutBtn" type="button">Sign out</button>
+          <h1 id="pageTitle" style="margin:0;font-size:20px;">Overview</h1>
+          <button class="btn" style="background:var(--panel);color:white;border:1px solid var(--border)" id="logoutBtn">Sign out</button>
         </header>
-
         <div class="content">
           <section id="view-dash" class="view on">
-            <h2 class="section-title">Overview</h2>
-            <p class="section-desc">Customer profile and application status from your database.</p>
-            <div class="stats">
-              <div class="stat"><div class="stat-label">Customer profiles</div><div class="stat-value" id="kCustomers">—</div></div>
-              <div class="stat"><div class="stat-label">Pending applications</div><div class="stat-value" id="kAppr">—</div></div>
-            </div>
-            <div class="panel">
-              <h2>Recent customer profiles</h2>
-              <div class="table-wrap"><table>
-                <thead><tr><th>Customer</th><th>Status</th><th>Role</th></tr></thead>
-                <tbody id="recentBody"><tr><td colspan="3">Loading records…</td></tr></tbody>
-              </table></div>
-            </div>
+            <h2>Customers: <span id="kCustomers">—</span></h2>
+            <br>
+            <div id="recentBody">Loading...</div>
           </section>
-
           <section id="view-cust" class="view">
-            <h2 class="section-title">Customers</h2>
-            <p class="section-desc">View customer profiles, balances, and manage their accounts.</p>
-            <div class="panel"><div class="table-wrap"><table>
-              <thead><tr><th>Customer</th><th>Status</th><th>Balance</th><th>Action</th></tr></thead>
-              <tbody id="custBody"><tr><td colspan="4">Loading records…</td></tr></tbody>
-            </table></div></div>
+             <div id="custBody">Loading...</div>
           </section>
-
           <section id="view-appr" class="view">
-            <h2 class="section-title">Approvals</h2>
-            <p class="section-desc">Review pending customer profiles. Approval changes the profile status in Supabase.</p>
-            <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading applications…</div></div></div>
+            <div id="apprList">Loading...</div>
           </section>
-
-          <section id="view-txs" class="view">
-            <h2 class="section-title">Global Transaction Ledger</h2>
-            <p class="section-desc">A complete record of all money movements across the bank.</p>
-            <div class="panel">
-              <div class="table-wrap"><table>
-                <thead><tr><th>Date</th><th>Customer</th><th>Description</th><th>Ref</th><th>Amount</th><th>Status</th></tr></thead>
-                <tbody id="globalTxBody"><tr><td colspan="6">Loading records…</td></tr></tbody>
-              </table></div>
-            </div>
-          </section>
-
-          <div id="pageErr" class="error" role="alert"></div>
         </div>
       </main>
     </div>
   </div>
-  <div id="toast" class="hidden" role="status" aria-live="polite"></div>
+  <div id="toast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    "use strict";
-    const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-    
-    let sb = null;
+    const sb = supabase.createClient("https://jthmxuecjbyvltvjfhyj.supabase.co", "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L");
     let customers = [];
-    let toastTimer = null;
-    const $ = id => document.getElementById(id);
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      if (!window.supabase) return alert("Supabase failed to load.");
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      
-      const { data } = await sb.auth.getSession();
-      if (data.session) { boot(data.session.user); } 
-      else { $("loginScreen").classList.remove("hidden"); }
-
-      $("loginForm").addEventListener("submit", tryLogin);
-      $("logoutBtn").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
-
-      document.querySelectorAll(".side-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
-          btn.classList.add("on");
-          document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
-          $("view-" + btn.dataset.view).classList.add("on");
-          $("pageTitle").textContent = btn.textContent;
-        });
-      });
-
-      document.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("approve-btn")) {
-          const index = e.target.getAttribute("data-index");
-          const customer = customers[index];
-          
-          e.target.disabled = true;
-          e.target.textContent = "Approving...";
-          
-          const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
-          if (error) {
-            toast("Error: " + error.message);
-            e.target.disabled = false;
-            e.target.textContent = "Approve";
-          } else {
-            toast("Customer approved successfully!");
-            await loadAll();
-            await loadGlobalTransactions();
-            renderOverview(); renderCustomers(); renderApprovals();
-          }
-        }
-      });
-    });
-
-    function showLoginError(msg) { $("loginErr").textContent = msg || ""; }
-    function toast(msg) {
-      const el = $("toast"); el.textContent = msg; el.classList.remove("hidden");
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.add("hidden"), 3500);
-    }
-    function escapeHtml(v) {
-      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
-    }
-    function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
-    function statusBadge(status) {
-      const v = String(status ?? "Unknown"); const l = v.toLowerCase();
-      const css = l === "active" ? "active" : l.includes("pending") ? "pending" : "";
-      return `<span class="status ${css}">${escapeHtml(v)}</span>`;
-    }
-
-    async function tryLogin(e) {
-      e.preventDefault(); showLoginError("");
-      const email = $("aEmail").value.trim(), password = $("aPass").value;
-      const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
+    
+    function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.style.display = "block"; setTimeout(()=>t.style.display="none", 3000); }
+    
+    document.getElementById("loginForm").onsubmit = async (e) => {
+      e.preventDefault();
       try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        const { data, error } = await sb.auth.signInWithPassword({ email: document.getElementById("aEmail").value, password: document.getElementById("aPass").value });
         if (error) throw error;
         await boot(data.user);
-      } catch (error) {
-        showLoginError(error.message);
-      } finally { btn.disabled = false; btn.textContent = "Sign in"; }
-    }
+      } catch (err) { document.getElementById("loginErr").textContent = err.message; }
+    };
+
+    document.getElementById("logoutBtn").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+    
+    document.querySelectorAll(".side-btn").forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
+        btn.classList.add("on");
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
+        document.getElementById("view-" + btn.dataset.view).classList.add("on");
+        document.getElementById("pageTitle").textContent = btn.textContent;
+      };
+    });
+
+    document.addEventListener("click", async (e) => {
+      if (e.target.classList.contains("approve-btn")) {
+        const index = e.target.getAttribute("data-index");
+        const customer = customers[index];
+        e.target.disabled = true; e.target.textContent = "Approving...";
+        
+        const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
+        if (error) {
+          toast("Error: " + error.message);
+          e.target.disabled = false; e.target.textContent = "Approve";
+        } else {
+          await sb.functions.invoke('send-approval-email', { body: { email: customer.email, name: customer.name } });
+          toast("Approved & email sent! 🚀");
+          await loadAll();
+        }
+      }
+    });
 
     async function boot(user) {
-      $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
-      try {
-        if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }
-        if (!user) throw new Error("Please sign in.");
-        const { data: profile } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
-        if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
-          await sb.auth.signOut(); throw new Error("Not an active admin.");
-        }
-        $("adminIdentity").textContent = profile.name || "Administrator";
-        await loadAll();
-        await loadGlobalTransactions();
-        $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
-        renderOverview(); renderCustomers(); renderApprovals();
-      } catch (error) {
-        $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
-        showLoginError(error.message);
+      const { data: profile } = await sb.from("profiles").select("role, status").eq("id", user.id).single();
+      if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
+        await sb.auth.signOut(); throw new Error("Not an active admin.");
       }
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("app").classList.remove("hidden");
+      await loadAll();
     }
 
     async function loadAll() {
-      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, currency, dob, phone, created_at").order("created_at", { ascending: false });
-      if (error) throw error;
+      const { data } = await sb.from("profiles").select("*").order("created_at", { ascending: false });
       customers = data || [];
+      render();
     }
 
-    async function loadGlobalTransactions() {
-      const { data, error } = await sb.from("transactions")
-        .select("*, profiles(name)")
-        .order("created_at", { ascending: false })
-        .limit(50);
-        
-      if (error) return console.error(error);
-
-      const body = document.getElementById("globalTxBody");
-      if (!data || data.length === 0) {
-        body.innerHTML = '<tr><td colspan="6">No transactions found.</td></tr>';
-        return;
-      }
-
-      body.innerHTML = data.map(t => {
-        const isPos = t.amount > 0;
-        const sym = t.currency === 'USD' ? '$' : t.currency === 'GBP' ? '£' : '€';
-        return `
-          <tr>
-            <td>${new Date(t.created_at).toLocaleDateString()}</td>
-            <td>${t.profiles ? t.profiles.name : 'Unknown'}</td>
-            <td>${t.description}</td>
-            <td><small style="font-family:monospace">${t.reference}</small></td>
-            <td style="font-weight:bold; color:${isPos ? 'var(--green)' : 'var(--text)'}">
-              ${isPos ? '+' : ''}${sym}${Math.abs(t.amount).toFixed(2)}
-            </td>
-            <td><span class="status ${t.status.toLowerCase()}">${t.status}</span></td>
-          </tr>
-        `;
-      }).join("");
+    function render() {
+      document.getElementById("kCustomers").textContent = customers.length;
+      
+      document.getElementById("recentBody").innerHTML = `<table><tr><th>Name</th><th>Status</th></tr>${customers.slice(0,5).map(c => `<tr><td>${c.name}</td><td><span class="status ${c.status === 'active' ? 'active' : 'pending'}">${c.status}</span></td></tr>`).join("")}</table>`;
+      
+      document.getElementById("custBody").innerHTML = `<table><tr><th>Name</th><th>Balance</th><th>Action</th></tr>${customers.map((c, i) => `<tr><td>${c.name}<br><small>${c.email}</small></td><td>$${Number(c.balance||0).toFixed(2)}</td><td><button class="btn" style="padding:5px 10px;font-size:12px" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button></td></tr>`).join("")}</table>`;
+      
+      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => item.customer.status.toLowerCase() === 'pending');
+      document.getElementById("apprList").innerHTML = pending.map(({ customer, index }) => `<div style="background:var(--panel);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;"><div><b>${customer.name}</b><br><small>${customer.email}</small></div><button class="btn small approve-btn" data-index="${index}">Approve</button></div>`).join("") || '<p>No pending applications.</p>';
     }
 
-    function renderOverview() {
-      $("kCustomers").textContent = customers.length;
-      $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
-      $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
-        <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role)}</td>
-        </tr>`).join("") || '<tr><td colspan="3">No profiles.</td></tr>';
-    }
-
-    function renderCustomers() {
-      $("custBody").innerHTML = customers.map((c, i) => {
-        const curSymbol = c.currency === 'USD' ? '$' : c.currency === 'GBP' ? '£' : '€';
-        return `
-        <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)} | ${c.phone || 'No phone'}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td style="font-weight:bold; color:var(--green);">${curSymbol}${Number(c.balance || 0).toFixed(2)}</td>
-          <td>
-            ${isPending(c.status) ? `<button class="btn small approve-btn" type="button" data-index="${i}">Approve</button>` : ""}
-            <button class="btn small" style="background:var(--orange); color:#000; margin-left:5px;" onclick="depositMoney('${c.id}', '${c.name}', '${c.currency || 'EUR'}')">+ Deposit</button>
-          </td>
-        </tr>`;
-      }).join("") || '<tr><td colspan="4">No profiles.</td></tr>';
-    }
-
-    function renderApprovals() {
-      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
-      $("apprList").innerHTML = pending.map(({ customer, index }) => `
-        <div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--border)">
-          <div><strong>${escapeHtml(customer.name)}</strong><div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email)}</div></div>
-          <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
-        </div>`).join("") || '<div class="empty">No pending applications.</div>';
-    }
-
-    async function depositMoney(userId, userName, currency) {
-      const amountStr = prompt(`How much to deposit for ${userName}? (e.g. 500)`);
+    async function depositMoney(userId, userName) {
+      const amountStr = prompt(`How much to deposit for ${userName}?`);
       if (!amountStr) return;
       const amount = parseFloat(amountStr);
-      if (isNaN(amount) || amount <= 0) return alert("Invalid amount");
-
-      const senderName = prompt("Enter Sender Name (e.g. John Doe / Acme Corp):");
-      if (!senderName) return alert("Sender name is required.");
-
-      const senderAccount = prompt("Enter Sender IBAN / Account (e.g. GB29 NWBK...):");
-      if (!senderAccount) return alert("Sender account is required.");
-
-      const purpose = prompt("Enter Purpose of Payment (e.g. Salary / Invoice #402):");
-      if (!purpose) return alert("Purpose is required.");
+      if (isNaN(amount) || amount <= 0) return;
 
       const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
       const newBalance = Number(profile.balance || 0) + amount;
 
-      const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
-      if (err1) return toast("Error: " + err1.message);
+      const { error } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
+      if (error) return toast(error.message);
 
-      const txRef = "DEP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-      await sb.from("transactions").insert({ 
-        user_id: userId, 
-        reference: txRef,
-        description: `Incoming transfer from ${senderName}`, 
-        amount: amount, 
-        currency: currency,
-        type: 'deposit', 
-        status: 'completed',
-        account_name: 'Everyday Account',
-        account_number: '•••• 4021',
-        balance_after: newBalance,
-        sender_name: senderName,
-        sender_account: senderAccount,
-        purpose: purpose
-      });
-      
-      const sym = currency === 'USD' ? '$' : currency === 'GBP' ? '£' : '€';
-      toast(`✅ Credited ${sym}${amount} from ${senderName}`);
-      await loadAll(); 
-      await loadGlobalTransactions();
-      renderCustomers();
+      await sb.from("transactions").insert({ user_id: userId, type: 'deposit', amount: amount, description: 'Admin deposit' });
+      toast(`Deposited $${amount} to ${userName}`);
+      await loadAll();
     }
+
+    // Auto boot on load
+    sb.auth.getSession().then(({data}) => { if(data.session) boot(data.session.user); });
   </script>
 </body>
 </html>
