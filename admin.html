@@ -236,20 +236,16 @@
         const senderName = $("dSenderName").value;
         const senderAcc = $("dSenderAcc").value;
         const purpose = $("dPurpose").value;
-        const dateVal = $("dDate").value; // Local date string
+        const dateVal = $("dDate").value; 
 
-        // Convert local date string to ISO string for Supabase
         const isoDate = new Date(dateVal).toISOString();
 
-        // Get current balance
         const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
         const newBalance = Number(profile.balance || 0) + amount;
 
-        // 1. Update Balance
         const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
         if (err1) return toast("Error: " + err1.message);
 
-        // 2. Insert Transaction
         const txRef = "DEP-" + Math.random().toString(36).substring(2, 8).toUpperCase();
         const { error: err2 } = await sb.from("transactions").insert({ 
           user_id: userId, 
@@ -265,7 +261,7 @@
           sender_name: senderName,
           sender_account: senderAcc,
           purpose: purpose,
-          created_at: isoDate // <--- BACKDATED HERE
+          created_at: isoDate
         });
 
         if (err2) return toast("Error: " + err2.message);
@@ -328,12 +324,10 @@
       $("kCustomers").textContent = customers.length;
       $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
 
-      // Dashboard recent list
       $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
         <tr><td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td><td>${statusBadge(c.status)}</td><td>${c.role}</td></tr>
       `).join("");
 
-      // Customers table
       $("custBody").innerHTML = customers.map((c, i) => {
         const sym = c.currency === 'USD' ? '$' : c.currency === 'GBP' ? '£' : '€';
         return `
@@ -348,7 +342,6 @@
         </tr>`;
       }).join("");
 
-      // Approvals tab
       const pending = customers.filter(c => isPending(c.status));
       $("apprList").innerHTML = pending.map((c, i) => `
         <div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--border)">
@@ -365,11 +358,14 @@
       body.innerHTML = data.map(t => {
         const isPos = t.amount > 0;
         const sym = t.currency === 'USD' ? '$' : t.currency === 'GBP' ? '£' : '€';
+        let details = t.description;
+        if(t.purpose && t.type === 'transfer') details += `<br><small style="color:var(--muted)">Purpose: ${t.purpose} | To: ${t.sender_account}</small>`;
+        
         return `
           <tr>
             <td>${new Date(t.created_at).toLocaleString()}</td>
             <td>${t.profiles ? t.profiles.name : 'Unknown'}</td>
-            <td>${t.description}</td>
+            <td>${details}</td>
             <td><small style="font-family:monospace">${t.reference}</small></td>
             <td style="font-weight:bold; color:${isPos ? 'var(--green)' : 'var(--text)'}">${isPos ? '+' : ''}${sym}${Math.abs(t.amount).toFixed(2)}</td>
             <td><span class="status ${t.status.toLowerCase()}">${t.status}</span></td>
@@ -382,7 +378,6 @@
       $("dUserId").value = userId;
       $("dCurrency").value = currency;
       $("depositForm").reset();
-      // Set default date to now
       const now = new Date();
       now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
       $("dDate").value = now.toISOString().slice(0,16);
