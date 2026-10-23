@@ -155,10 +155,9 @@
   .modal{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:34px;width:min(400px,92vw)}
   .modal h3{margin-bottom:6px}
   .modal p{color:var(--mut);font-size:.88rem;margin-bottom:20px}
-  .modal input{width:100%;background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);margin-bottom:12px;outline:none}
+  .modal input, .modal select{width:100%;background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);margin-bottom:12px;outline:none}
+  .modal label{display:block;font-size:0.8rem;color:var(--mut);margin-bottom:5px;margin-left:2px;}
   .modal .btn{width:100%;justify-content:center}
-
-
 
   /* ---------- TRUST STRIP ---------- */
   .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:34px 5%;text-align:center}
@@ -199,14 +198,12 @@
   #toTop.show{opacity:1;pointer-events:auto;transform:translateY(0)}
   #toTop:hover{transform:translateY(-3px)}
 
-
   /* ---------- 5 STAR RATING ---------- */
   .rating-badge{display:inline-flex;align-items:center;gap:12px;margin-top:34px;background:rgba(245,196,81,.08);
       border:1px solid rgba(245,196,81,.35);border-radius:999px;padding:10px 22px}
   .rating-badge .stars-big{color:var(--gold);font-size:1.15rem;letter-spacing:3px;text-shadow:0 0 14px rgba(245,196,81,.6)}
   .rating-badge b{font-size:1.05rem}
   .rating-badge span{color:var(--mut);font-size:.85rem}
-
 
   /* ---------- SHOWCASE GALLERY ---------- */
   .gallery-stage{position:relative;max-width:1000px;margin:0 auto;border-radius:22px;overflow:hidden;
@@ -229,7 +226,6 @@
   .gal-thumbs button.on{border-color:var(--accent2);opacity:1;transform:translateY(-3px)}
   .gal-count{position:absolute;z-index:3;top:16px;right:18px;font-size:.8rem;color:rgba(255,255,255,.85);
       background:rgba(11,16,32,.55);border:1px solid var(--line);border-radius:999px;padding:5px 13px;backdrop-filter:blur(6px)}
-
 
   /* ---------- PRINTABLE RECEIPT ---------- */
   #receiptWrap{position:fixed;inset:0;z-index:300;display:none;place-items:center;background:rgba(5,7,15,.78);backdrop-filter:blur(4px)}
@@ -346,7 +342,7 @@
       <div class="ph-top"><span>9:41</span><span>⚡ FluxxPay</span></div>
       <div class="ph-bal">
         <small>Total balance</small>
-        <b id="phBal">€24,806.12</b>
+        <b id="phBal">€0.00</b>
         <div class="chip"></div>
       </div>
       <div class="ph-row"><span>Nordwind Salary</span><span class="up">+€3,850</span></div>
@@ -468,7 +464,6 @@
   </div>
 </section>
 
-
 <!-- CUSTOMER REVIEWS SLIDESHOW -->
 <section class="reviews" id="reviews">
   <div class="rev-bg" id="revBg">
@@ -501,7 +496,6 @@
   </div>
   <div style="text-align:center;margin-top:50px"><button class="btn gold" style="padding:16px 36px;font-size:1.05rem" onclick="openModal()">Open my Fluxxbank account →</button></div>
 </section>
-
 
 <!-- SHOWCASE GALLERY -->
 <section id="showcase">
@@ -568,7 +562,6 @@
 
 <button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
 
-
 <!-- PRINTABLE RECEIPT -->
 <div id="receiptWrap" onclick="if(event.target===this)closeReceipt()">
   <div id="receipt">
@@ -600,9 +593,23 @@
   <div class="modal">
     <h3 id="authTitle">Welcome back ⚡</h3>
     <p id="authSub">Log in to your Fluxxbank account.</p>
-    <input type="text" placeholder="Full name" id="authName" style="display:none" autocomplete="off">
-    <input type="email" placeholder="Email address" id="loginEmail">
-    <input type="password" placeholder="Password (min. 6 characters)" id="loginPass">
+    
+    <div id="signupFields" style="display:none;">
+      <input type="text" placeholder="Full Name" id="authName" autocomplete="name">
+      <input type="tel" placeholder="Phone Number" id="authPhone" autocomplete="tel">
+      <label>Date of Birth</label>
+      <input type="date" id="authDob" style="color:#fff;">
+      <label>Preferred Currency</label>
+      <select id="authCurrency">
+        <option value="EUR">Euro (€)</option>
+        <option value="USD">US Dollar ($)</option>
+        <option value="GBP">British Pound (£)</option>
+      </select>
+    </div>
+
+    <input type="email" placeholder="Email address" id="loginEmail" autocomplete="email">
+    <input type="password" placeholder="Password (min. 6 characters)" id="loginPass" autocomplete="current-password">
+    
     <div id="authErr" style="color:var(--bad);font-size:.83rem;min-height:18px;margin-bottom:8px"></div>
     <button class="btn" id="authBtn" onclick="submitAuth()">Log in</button>
     <p style="margin-top:16px;font-size:.82rem"><a href="#" id="authSwitch" style="color:var(--accent2)" onclick="switchAuthMode(event)">New here? Create a free account →</a></p>
@@ -612,33 +619,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   /* ------- state ------- */
-  let balance = 24806.12, income = 5850, spending = 1932.45, cashback = 86.40;
-  const txs = [
-    {w:"Nordwind GmbH", s:"Salary · Today", a:3850, c:"NW"},
-    {w:"Blue Bottle Coffee", s:"Card · Today", a:-4.80, c:"BB"},
-    {w:"Metro Transit", s:"Card · Yesterday", a:-2.40, c:"MT"},
-    {w:"Fluxx Vault", s:"Auto-save · Yesterday", a:-250, c:"FV"},
-    {w:"Spotify", s:"Subscription · Oct 8", a:-9.99, c:"SP"},
-    {w:"Maya Chen", s:"FluxxPay · Oct 7", a:120, c:"MC"},
-  ];
+  let income = 5850, spending = 1932.45, cashback = 86.40;
   const spend = [420,380,510,460,300,390,450,340,410,380,290,340];
   const eur = n => "€" + n.toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
-
-  /* ------- renderers ------- */
-  function renderAll(){
-    document.getElementById("dashBal").textContent = eur(balance);
-    document.getElementById("phBal").textContent = eur(balance);
-    document.getElementById("kpiIn").textContent = eur(income);
-    document.getElementById("kpiOut").textContent = eur(spending);
-    document.getElementById("kpiCb").textContent = eur(cashback);
-    const el = document.getElementById("txlist");
-    el.innerHTML = txs.slice(0,6).map(t=>`
-      <div class="tx">
-        <div class="who"><div class="dot">${t.c}</div><div>${t.w}<small>${t.s}</small></div></div>
-        <span class="${t.a>=0?'up':'dn'}" style="font-weight:700">${t.a>=0?'+':'−'}${eur(Math.abs(t.a))}</span>
-      </div>`).join("");
-    drawChart();
-  }
 
   function drawChart(){
     const cv = document.getElementById("chart"), ctx = cv.getContext("2d");
@@ -646,43 +629,16 @@
     cv.width = cv.offsetWidth*dpr; cv.height = 220*dpr; ctx.scale(dpr,dpr);
     const W = cv.offsetWidth, H = 220, pad = 8, max = Math.max(...spend)*1.15, n = spend.length;
     ctx.clearRect(0,0,W,H);
-    // area
     const pts = spend.map((v,i)=>[pad+i*(W-2*pad)/(n-1), H-pad-(v/max)*(H-2*pad)]);
     const grad = ctx.createLinearGradient(0,0,0,H);
     grad.addColorStop(0,"rgba(79,124,255,.45)"); grad.addColorStop(1,"rgba(79,124,255,0)");
     ctx.beginPath(); ctx.moveTo(pts[0][0],H-pad);
     pts.forEach(p=>ctx.lineTo(p[0],p[1])); ctx.lineTo(pts[n-1][0],H-pad); ctx.closePath();
     ctx.fillStyle = grad; ctx.fill();
-    // line
     ctx.beginPath(); pts.forEach((p,i)=> i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));
     ctx.strokeStyle="#4f7cff"; ctx.lineWidth=2.5; ctx.lineJoin="round"; ctx.stroke();
-    // dots
     pts.forEach((p,i)=>{ ctx.beginPath(); ctx.arc(p[0],p[1],i===n-1?5:3,0,7);
       ctx.fillStyle = i===n-1 ? "#22d3ee" : "#4f7cff"; ctx.fill(); });
-  }
-
-  /* ------- payment ------- */
-  function doPay(e){
-    e.preventDefault();
-    const who = document.getElementById("pWho").value;
-    const amt = parseFloat(document.getElementById("pAmt").value);
-    const note = document.getElementById("pNote").value || "FluxxPay";
-    const msg = document.getElementById("paymsg");
-    if(who==="Fluxx Vault"){
-      balance -= amt; spending -= 0; cashback += 0;
-      txs.unshift({w:"Fluxx Vault", s:note+" · Just now", a:-amt, c:"FV"});
-      msg.style.color="var(--ok)"; msg.textContent=`⚡ Moved ${eur(amt)} to your savings vault.`;
-    } else {
-      balance -= amt; spending += amt; cashback += amt*0.015;
-      txs.unshift({w:who, s:note+" · Just now", a:-amt, c:who.split(" ").map(x=>x[0]).join("")});
-      msg.style.color="var(--ok)"; msg.textContent=`⚡ Sent ${eur(amt)} to ${who} in 0.4s. Earned €${(amt*0.015).toFixed(2)} cashback.`;
-    }
-    lastTx = { to: who, amt: amt, note: note || "—", when: new Date(),
-               ref: "FLX-" + Date.now().toString(36).toUpperCase().slice(-8) };
-    msg.innerHTML = msg.textContent + ' &nbsp;<button class="btn ghost" style="padding:7px 14px;font-size:.78rem" onclick="showReceipt()">🧾 Print receipt</button>';
-    document.getElementById("pAmt").value=""; document.getElementById("pNote").value="";
-    renderAll();
-    return false;
   }
 
   /* ------- printable receipt ------- */
@@ -715,55 +671,85 @@
   }
   count("st1", 2400000, "+", 1800); count("st2", 190, "", 1800);
 
-  /* ------- modal ------- */
+  /* ------- modal & auth ------- */
   const bg = document.getElementById("modalBg");
   function openModal(){ bg.classList.add("show"); }
   function closeModal(){ bg.classList.remove("show"); }
   const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
   const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-  in to your Fluxxbank account.";
+  let sb = null;
+  if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+  let authMode = "login";
+  const eur2 = n => "€" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  function switchAuthMode(e){
+    e.preventDefault();
+    authMode = authMode === "login" ? "signup" : "login";
+    const sign = authMode === "signup";
+    
+    document.getElementById("signupFields").style.display = sign ? "block" : "none";
+    document.getElementById("authTitle").textContent = sign ? "Create your account ⚡" : "Welcome back ⚡";
+    document.getElementById("authSub").textContent = sign ? "Join 2.4 million people banking in motion. Free forever." : "Log in to your Fluxxbank account.";
     document.getElementById("authBtn").textContent = sign ? "Create account" : "Log in";
-    document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in \u2192" : "New here? Create a free account \u2192";
+    document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in →" : "New here? Create a free account →";
     document.getElementById("authErr").textContent = "";
   }
 
   async function submitAuth(){
     const em = document.getElementById("loginEmail").value.trim();
     const pw = document.getElementById("loginPass").value;
-    const nm = document.getElementById("authName").value.trim();
+    const nm = document.getElementById("authName") ? document.getElementById("authName").value.trim() : "";
+    const ph = document.getElementById("authPhone") ? document.getElementById("authPhone").value.trim() : "";
+    const dob = document.getElementById("authDob") ? document.getElementById("authDob").value : null;
+    const cur = document.getElementById("authCurrency") ? document.getElementById("authCurrency").value : 'EUR';
+    
     const err = document.getElementById("authErr");
     err.style.color = "var(--bad)";
+    
     if(!em.includes("@")){ err.textContent = "Please enter a valid email address."; return; }
-    if(!sb){ // fallback: no key yet -> pretend (site still works)
+    if(authMode === "signup" && (!nm || !ph || !dob)) { err.textContent = "Please fill in all fields."; return; }
+    if(!sb){ 
       closeModal();
-      document.getElementById("authArea").innerHTML = '<button class="btn ghost" onclick="openModal()">\uD83D\uDC4B ' + (nm || em.split("@")[0]) + '</button>';
+      document.getElementById("authArea").innerHTML = '<button class="btn ghost" onclick="openModal()">👋 ' + (nm || em.split("@")[0]) + '</button>';
       document.getElementById("dashboard").scrollIntoView({behavior:"smooth"});
       return;
     }
     try{
       if(authMode === "signup"){
         if(pw.length < 6){ err.textContent = "Password needs at least 6 characters."; return; }
-        const { error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm || "Customer" } } });
+        const { data: su, error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm } } });
         if(error) throw error;
+        
+        if(su.user){
+          await sb.from("profiles").insert({
+            id: su.user.id, 
+            name: nm, 
+            email: em, 
+            balance: 0, 
+            currency: cur,
+            dob: dob,
+            phone: ph,
+            status: "Pending"
+          });
+        }
         err.style.color = "var(--ok)";
-        err.textContent = "\u2705 Account created! Confirm the email, then wait for admin activation \u2014 usually minutes.\uD83D\uDE80";
+        err.textContent = "✅ Account created! Confirm the email, then wait for admin activation — usually minutes! 🚀";
       } else {
-        const { error } = await sb.auth.signInWithPassword({ email: em, password: pw });
+        const { data: authData, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
         if(error) throw error;
-        // APPROVAL GATE: check account status before allowing access
-        const { data: u } = await sb.auth.getUser();
-        const { data: prof } = await sb.from("profiles").select("status").eq("id", u.user.id).single();
-        if(prof && prof.status === "Pending"){
-          await sb.auth.signOut();
-          throw new Error("\u23F3 Account awaiting approval \u2014 an admin must activate it first. Usually takes minutes!");
+        
+        const { data: profile, error: pError } = await sb.from("profiles").select("status, name").eq("id", authData.user.id).single();
+        if(pError) throw pError;
+        
+        if (profile.status !== "active") {
+          await sb.auth.signOut(); 
+          throw new Error("⏳ Account awaiting approval — an admin must activate it first.");
         }
-        if(prof && prof.status === "Frozen"){
-          await sb.auth.signOut();
-          throw new Error("\uD83E\uDD76 This account is frozen. Contact Fluxxbank support.");
-        }
+        
         closeModal();
-        await refreshAuthUI();
-        document.getElementById("dashboard").scrollIntoView({behavior:"smooth"});
+        window.location.href = "app.html";
       }
     }catch(e){
       err.textContent = e.message || "Something went wrong. Try again.";
@@ -774,33 +760,61 @@
     if(!sb) return;
     const { data: { session } } = await sb.auth.getSession();
     const area = document.getElementById("authArea");
+    
     if(session && session.user){
-      let name = session.user.email.split("@")[0];
-      const { data: p } = await sb.from("profiles").select("name,balance").eq("id", session.user.id).single();
+      const { data: p } = await sb.from("profiles").select("name, balance, currency").eq("id", session.user.id).single();
+      
       if(p){
-        name = p.name;
-        document.getElementById("dashBal").textContent = eur2(p.balance);
-        document.getElementById("phBal").textContent = eur2(p.balance);
-        document.getElementById("dashHello").textContent = "Good to see you, " + name.split(" ")[0] + " \uD83D\uDC4B";
+        const curSymbol = p.currency === 'USD' ? '$' : p.currency === 'GBP' ? '£' : '€';
+        document.getElementById("dashBal").textContent = curSymbol + Number(p.balance).toFixed(2);
+        document.getElementById("phBal").textContent = curSymbol + Number(p.balance).toFixed(2);
+        document.getElementById("dashHello").textContent = "Good to see you, " + p.name.split(" ")[0] + " 👋";
       }
-      area.innerHTML = '<button class="btn ghost" onclick="doLogout()" title="Log out">\u23FB ' + name.split(" ")[0] + '</button>';
+      
+      area.innerHTML = '<button class="btn ghost" onclick="doLogout()" title="Log out">⏻ ' + (p ? p.name.split(" ")[0] : "User") + '</button>';
     } else {
       area.innerHTML = '<button class="btn ghost" onclick="openModal()">Log in</button>';
     }
   }
+  
   async function doLogout(){ if(sb) await sb.auth.signOut(); location.reload(); }
 
+  async function doPay(e){
+    e.preventDefault();
+    const who = document.getElementById("pWho").value;
+    const amt = parseFloat(document.getElementById("pAmt").value);
+    const note = document.getElementById("pNote").value || "FluxxPay";
+    const msg = document.getElementById("paymsg");
+    
+    const { data: { session } } = await sb.auth.getSession();
+    if(!session) { msg.style.color="var(--bad)"; msg.textContent="Please log in to send money."; return false; }
+
+    const { data: p } = await sb.from("profiles").select("balance").eq("id", session.user.id).single();
+    if(p.balance < amt) {
+      msg.style.color = "var(--bad)";
+      msg.textContent = "Insufficient funds! Balance: " + eur2(p.balance);
+      return false;
+    }
+
+    await sb.from("profiles").update({ balance: p.balance - amt }).eq("id", session.user.id);
+    await sb.from("transactions").insert({ user_id: session.user.id, type: 'transfer', amount: amt, description: `Sent to ${who} (${note})` });
+
+    msg.style.color="var(--ok)"; 
+    msg.innerHTML = `⚡ Sent ${eur(amt)} to ${who}. <button class="btn ghost" style="padding:7px 14px;font-size:.78rem" onclick="showReceipt()">🧾 Print receipt</button>`;
+    
+    lastTx = { to: who, amt: amt, note: note, when: new Date(), ref: "FLX-" + Date.now().toString(36).toUpperCase().slice(-8) };
+    
+    document.getElementById("pAmt").value=""; document.getElementById("pNote").value="";
+    await refreshAuthUI(); 
+    return false;
+  }
 
   /* ------- reviews slideshow ------- */
   const reviews = [
-    {img:"review 1.png", name:"Amira Saleh", role:"Fluxx Plus member · Berlin",
-     quote:"\u201CI opened my account on the train and was paying friends before my stop. I've never seen a bank move this fast.\u201D"},
-    {img:"review 2.png", name:"Daniel Kovač", role:"Small business owner · Prague",
-     quote:"\u201CFluxxbank replaced three apps for my café — payments, savings and my metal card all live in one place. Game changer.\u201D"},
-    {img:"review 3.png", name:"Sofia Marchetti", role:"Digital nomad · Lisbon",
-     quote:"\u201CI get paid in dollars, spend in euros, and save in vaults at 4.1%. Zero FX surprises. It just works, everywhere.\u201D"},
-    {img:"review 4.png", name:"Henrik Larsen", role:"Retired teacher · Aarhus",
-     quote:"\u201CI was skeptical of online banks, but Fluxx support walked me through everything on the phone. My pension is in good hands.\u201D"},
+    {img:"review 1.png", name:"Amira Saleh", role:"Fluxx Plus member · Berlin", quote:"\u201CI opened my account on the train and was paying friends before my stop. I've never seen a bank move this fast.\u201D"},
+    {img:"review 2.png", name:"Daniel Kovač", role:"Small business owner · Prague", quote:"\u201CFluxxbank replaced three apps for my café — payments, savings and my metal card all live in one place. Game changer.\u201D"},
+    {img:"review 3.png", name:"Sofia Marchetti", role:"Digital nomad · Lisbon", quote:"\u201CI get paid in dollars, spend in euros, and save in vaults at 4.1%. Zero FX surprises. It just works, everywhere.\u201D"},
+    {img:"review 4.png", name:"Henrik Larsen", role:"Retired teacher · Aarhus", quote:"\u201CI was skeptical of online banks, but Fluxx support walked me through everything on the phone. My pension is in good hands.\u201D"},
   ];
   let cur = 0, revTimer;
   const slides = document.querySelectorAll(".rev-slide");
@@ -821,8 +835,6 @@
   function goRev(i){ clearInterval(revTimer); showRev(i); revTimer = setInterval(()=>showRev(cur+1), 5200); }
   showRev(0);
   revTimer = setInterval(()=>showRev(cur+1), 5200);
-
-
 
   /* ------- showcase gallery ------- */
   const gallery = [
@@ -874,9 +886,9 @@
     if(!em.includes("@")){ msg.style.color="var(--bad)"; msg.textContent="Please enter a valid email address."; return false; }
     if(sb){
       const { error } = await sb.from("subscribers").insert({ email: em });
-      if(error && error.code === "23505"){ msg.style.color="var(--warn)"; msg.textContent="You\u2019re already on the list! \u26A1"; }
-      else if(error){ msg.style.color="var(--bad)"; msg.textContent="Something went wrong \u2014 try again."; }
-      else { msg.style.color="var(--ok)"; msg.textContent="\u26A1 Welcome aboard! You\u2019re subscribed."; document.getElementById("newsEmail").value=""; }
+      if(error && error.code === "23505"){ msg.style.color="var(--warn)"; msg.textContent="You’re already on the list! ⚡"; }
+      else if(error){ msg.style.color="var(--bad)"; msg.textContent="Something went wrong — try again."; }
+      else { msg.style.color="var(--ok)"; msg.textContent="⚡ Welcome aboard! You’re subscribed."; document.getElementById("newsEmail").value=""; }
       return false;
     }
     msg.style.color="var(--ok)"; msg.textContent="⚡ Welcome aboard! Check " + em + " to confirm your subscription.";
@@ -888,7 +900,7 @@
   });
 
   window.addEventListener("resize", drawChart);
-  renderAll();
+  drawChart();
   refreshAuthUI();
 </script>
 </body>
