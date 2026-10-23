@@ -1,171 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FluxxBank Admin Console</title>
-  <style>
-    :root { --bg: #080e1c; --panel: #101a2e; --border: #263653; --text: #edf3ff; --muted: #98a8c2; --orange: #f58220; --green: #32c997; --red: #ff7070; }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: sans-serif; }
-    .hidden { display: none !important; }
-    #loginScreen { min-height: 100vh; display: grid; place-items: center; }
-    .login-box { width: 100%; max-width: 410px; padding: 32px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; }
-    .brand { color: var(--orange); font-size: 25px; font-weight: 800; }
-    input { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; margin-bottom: 12px; }
-    .btn { border: 0; border-radius: 8px; padding: 11px 15px; font-weight: 700; background: var(--orange); color: #111827; cursor: pointer; }
-    .layout { display: grid; grid-template-columns: 235px 1fr; min-height: 100vh; }
-    .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
-    .side-btn { display: block; width: 100%; margin: 5px 0; padding: 12px; text-align: left; border-radius: 8px; background: transparent; color: #b9c7dd; cursor: pointer; border: none;}
-    .side-btn.on { background: #172742; color: white; box-shadow: inset 3px 0 var(--orange); }
-    .topbar { padding: 20px 28px; border-bottom: 1px solid var(--border); background: #0c1526; display: flex; justify-content: space-between;}
-    .content { padding: 28px; }
-    .view { display: none; } .view.on { display: block; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--panel); border-radius: 12px; overflow: hidden;}
-    th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); }
-    .status { padding: 5px 8px; border-radius: 6px; font-size: 11px; }
-    .status.active { background: #103a32; color: #72e4bb; }
-    .status.pending { background: #49341b; color: #ffd18c; }
-    #toast { position: fixed; right: 20px; bottom: 20px; padding: 13px; background: #15223b; color: white; border-radius: 9px; display: none; z-index: 99;}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxxbank — Banking in Motion</title>
+<style>
+  :root{ --ink:#0b1020; --card:#161f3d; --accent:#4f7cff; --accent2:#22d3ee; --gold:#f5c451; --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08); --ok:#34d399; --bad:#f87171; }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,sans-serif}
+  body{background:var(--ink);color:var(--txt);overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;cursor:pointer;border:none}
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:rgba(11,16,32,.75);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem}
+  .logo .mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;font-weight:600;font-size:.95rem;background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;transition:transform .15s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+  .btn.gold{background:linear-gradient(135deg,#f5c451,#e8a020);color:#241a02}
+  .hero{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:140px 5% 80px}
+  h1{font-size:clamp(2.4rem,5vw,4rem);line-height:1.08;font-weight:800}
+  h1 .grad{background:linear-gradient(90deg,var(--accent),var(--accent2),var(--gold));-webkit-background-clip:text;color:transparent}
+  .hero p.lead{margin:22px 0 30px;color:var(--mut);font-size:1.1rem;max-width:520px;line-height:1.7}
+  .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200}
+  .modal-bg.show{display:grid}
+  .modal{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:34px;width:min(400px,92vw)}
+  .modal input{width:100%;background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);margin-bottom:12px;outline:none}
+  .modal .btn{width:100%;justify-content:center}
+  @media(max-width:900px){ .hero{grid-template-columns:1fr;} }
+</style>
 </head>
 <body>
-  <section id="loginScreen">
-    <div class="login-box">
-      <div class="brand">FluxxBank</div>
-      <p style="color:var(--muted);font-size:13px;margin:10px 0 20px;">Admin Access</p>
-      <form id="loginForm">
-        <input type="email" id="aEmail" placeholder="Admin email" required>
-        <input type="password" id="aPass" placeholder="Password" required>
-        <div id="loginErr" style="color:var(--red);font-size:13px;margin-bottom:10px;"></div>
-        <button class="btn" style="width:100%" id="loginBtn" type="submit">Sign in</button>
-      </form>
-    </div>
-  </section>
 
-  <div id="app" class="hidden">
-    <div class="layout">
-      <aside class="sidebar">
-        <div class="brand" style="padding:0 10px 20px">FluxxBank</div>
-        <button class="side-btn on" data-view="dash">Overview</button>
-        <button class="side-btn" data-view="cust">Customers</button>
-        <button class="side-btn" data-view="appr">Approvals</button>
-      </aside>
-      <main>
-        <header class="topbar">
-          <h1 id="pageTitle" style="margin:0;font-size:20px;">Overview</h1>
-          <button class="btn" style="background:var(--panel);color:white;border:1px solid var(--border)" id="logoutBtn">Sign out</button>
-        </header>
-        <div class="content">
-          <section id="view-dash" class="view on">
-            <h2>Customers: <span id="kCustomers">—</span></h2>
-            <br>
-            <div id="recentBody">Loading...</div>
-          </section>
-          <section id="view-cust" class="view">
-             <div id="custBody">Loading...</div>
-          </section>
-          <section id="view-appr" class="view">
-            <div id="apprList">Loading...</div>
-          </section>
-        </div>
-      </main>
-    </div>
+<nav>
+  <a class="logo" href="#top">
+    <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+    Fluxxbank
+  </a>
+  <div style="display:flex;gap:10px">
+    <span id="authArea"><button class="btn ghost" onclick="openModal()">Log in</button></span>
+    <a class="btn gold" href="#open">Get Started</a>
   </div>
-  <div id="toast"></div>
+</nav>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const sb = supabase.createClient("https://jthmxuecjbyvltvjfhyj.supabase.co", "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L");
-    let customers = [];
-    
-    function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.style.display = "block"; setTimeout(()=>t.style.display="none", 3000); }
-    
-    document.getElementById("loginForm").onsubmit = async (e) => {
-      e.preventDefault();
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({ email: document.getElementById("aEmail").value, password: document.getElementById("aPass").value });
-        if (error) throw error;
-        await boot(data.user);
-      } catch (err) { document.getElementById("loginErr").textContent = err.message; }
-    };
+<header class="hero" id="top">
+  <div>
+    <h1>Banking that's<br>always <span class="grad">in motion.</span></h1>
+    <p class="lead">Fluxxbank is the standard for modern money — instant payments, fee-free accounts, and real-time insights, all from one beautiful app.</p>
+    <a class="btn gold" href="#open" style="padding:16px 36px;font-size:1.05rem" onclick="openModal()">Open your account →</a>
+  </div>
+</header>
 
-    document.getElementById("logoutBtn").onclick = async () => { await sb.auth.signOut(); location.reload(); };
-    
-    document.querySelectorAll(".side-btn").forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
-        btn.classList.add("on");
-        document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
-        document.getElementById("view-" + btn.dataset.view).classList.add("on");
-        document.getElementById("pageTitle").textContent = btn.textContent;
-      };
-    });
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="authTitle" style="margin-bottom:20px">Welcome back ⚡</h3>
+    <input type="text" placeholder="Full name" id="authName" style="display:none">
+    <input type="email" placeholder="Email address" id="loginEmail">
+    <input type="password" placeholder="Password" id="loginPass">
+    <div id="authErr" style="color:var(--bad);font-size:.83rem;min-height:18px;margin-bottom:8px"></div>
+    <button class="btn" id="authBtn" onclick="submitAuth()">Log in</button>
+    <p style="margin-top:16px;font-size:.82rem;text-align:center"><a href="#" id="authSwitch" style="color:var(--accent2)" onclick="switchAuthMode(event)">New here? Create a free account →</a></p>
+  </div>
+</div>
 
-    document.addEventListener("click", async (e) => {
-      if (e.target.classList.contains("approve-btn")) {
-        const index = e.target.getAttribute("data-index");
-        const customer = customers[index];
-        e.target.disabled = true; e.target.textContent = "Approving...";
-        
-        const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
-        if (error) {
-          toast("Error: " + error.message);
-          e.target.disabled = false; e.target.textContent = "Approve";
-        } else {
-          await sb.functions.invoke('send-approval-email', { body: { email: customer.email, name: customer.name } });
-          toast("Approved & email sent! 🚀");
-          await loadAll();
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const bg = document.getElementById("modalBg");
+  function openModal(){ bg.classList.add("show"); }
+  function closeModal(){ bg.classList.remove("show"); }
+  
+  const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  let authMode = "login";
+
+  function switchAuthMode(e){
+    e.preventDefault();
+    authMode = authMode === "login" ? "signup" : "login";
+    const sign = authMode === "signup";
+    document.getElementById("authName").style.display = sign ? "block" : "none";
+    document.getElementById("authTitle").textContent = sign ? "Create your account ⚡" : "Welcome back ⚡";
+    document.getElementById("authBtn").textContent = sign ? "Create account" : "Log in";
+    document.getElementById("authErr").textContent = "";
+  }
+
+  async function submitAuth(){
+    const em = document.getElementById("loginEmail").value.trim();
+    const pw = document.getElementById("loginPass").value;
+    const nm = document.getElementById("authName").value.trim();
+    const err = document.getElementById("authErr");
+    err.style.color = "var(--bad)";
+    if(!em.includes("@")){ err.textContent = "Enter a valid email."; return; }
+    
+    try{
+      if(authMode === "signup"){
+        const { data: su, error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm || "Customer" } } });
+        if(error) throw error;
+        if(su.user){
+          await sb.from("profiles").insert({ id: su.user.id, name: nm || "Customer", email: em, balance: 0, status: "pending" });
         }
+        err.style.color = "var(--ok)";
+        err.textContent = "✅ Account created! Wait for admin approval.";
+      } else {
+        const { data: authData, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
+        if(error) throw error;
+        
+        const { data: profile } = await sb.from("profiles").select("status").eq("id", authData.user.id).single();
+        if (profile.status !== "active") {
+          await sb.auth.signOut(); 
+          throw new Error("⏳ Account awaiting approval.");
+        }
+        
+        // This sends them to the interior app!
+        window.location.href = "app.html"; 
       }
-    });
+    }catch(e){ err.textContent = e.message; }
+  }
 
-    async function boot(user) {
-      const { data: profile } = await sb.from("profiles").select("role, status").eq("id", user.id).single();
-      if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
-        await sb.auth.signOut(); throw new Error("Not an active admin.");
-      }
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("app").classList.remove("hidden");
-      await loadAll();
+  async function refreshAuthUI(){
+    const { data: { session } } = await sb.auth.getSession();
+    if(session && session.user){
+      document.getElementById("authArea").innerHTML = '<button class="btn ghost" onclick="window.location.href=\'app.html\'">Go to App</button>';
     }
-
-    async function loadAll() {
-      const { data } = await sb.from("profiles").select("*").order("created_at", { ascending: false });
-      customers = data || [];
-      render();
-    }
-
-    function render() {
-      document.getElementById("kCustomers").textContent = customers.length;
-      
-      document.getElementById("recentBody").innerHTML = `<table><tr><th>Name</th><th>Status</th></tr>${customers.slice(0,5).map(c => `<tr><td>${c.name}</td><td><span class="status ${c.status === 'active' ? 'active' : 'pending'}">${c.status}</span></td></tr>`).join("")}</table>`;
-      
-      document.getElementById("custBody").innerHTML = `<table><tr><th>Name</th><th>Balance</th><th>Action</th></tr>${customers.map((c, i) => `<tr><td>${c.name}<br><small>${c.email}</small></td><td>$${Number(c.balance||0).toFixed(2)}</td><td><button class="btn" style="padding:5px 10px;font-size:12px" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button></td></tr>`).join("")}</table>`;
-      
-      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => item.customer.status.toLowerCase() === 'pending');
-      document.getElementById("apprList").innerHTML = pending.map(({ customer, index }) => `<div style="background:var(--panel);padding:15px;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;"><div><b>${customer.name}</b><br><small>${customer.email}</small></div><button class="btn small approve-btn" data-index="${index}">Approve</button></div>`).join("") || '<p>No pending applications.</p>';
-    }
-
-    async function depositMoney(userId, userName) {
-      const amountStr = prompt(`How much to deposit for ${userName}?`);
-      if (!amountStr) return;
-      const amount = parseFloat(amountStr);
-      if (isNaN(amount) || amount <= 0) return;
-
-      const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
-      const newBalance = Number(profile.balance || 0) + amount;
-
-      const { error } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
-      if (error) return toast(error.message);
-
-      await sb.from("transactions").insert({ user_id: userId, type: 'deposit', amount: amount, description: 'Admin deposit' });
-      toast(`Deposited $${amount} to ${userName}`);
-      await loadAll();
-    }
-
-    // Auto boot on load
-    sb.auth.getSession().then(({data}) => { if(data.session) boot(data.session.user); });
-  </script>
+  }
+  refreshAuthUI();
+</script>
 </body>
 </html>
