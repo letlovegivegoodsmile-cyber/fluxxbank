@@ -127,7 +127,10 @@
           <button class="side-btn" data-view="cust" type="button">Customers</button>
           <button class="side-btn" data-view="appr" type="button">Approvals</button>
         </nav>
-        <div class="sidebar-note">Restricted administrator area.<br>Access is checked against your Supabase profile.</div>
+        <div class="sidebar-note" id="sidebarNote">
+          Restricted administrator area.<br>
+          Access is checked against your Supabase profile.
+        </div>
       </aside>
 
       <main>
@@ -178,14 +181,9 @@
   <script>
     "use strict";
 
-    // SUPABASE SETTINGS — confirm this URL in Project Settings.
+    // --- 1. CONFIGURATION ---
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-
-    // PUBLISHABLE KEY LINE: use an sb_publishable_ key only.
-    // NEVER place an sb_secret_ or service_role key in browser code.
     const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-
-    // Must also be listed under Supabase Auth > URL Configuration > Redirect URLs.
     const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
 
     let sb = null;
@@ -193,9 +191,79 @@
     let toastTimer = null;
     const $ = id => document.getElementById(id);
 
+    // --- 2. INITIALIZATION ---
+    document.addEventListener("DOMContentLoaded", async () => {
+      if (!window.supabase) {
+        alert("Supabase library failed to load. Check your internet connection.");
+        return;
+      }
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
+      // Check if user is already logged in
+      const { data } = await sb.auth.getSession();
+      if (data.session) {
+        boot(data.session.user);
+      } else {
+        $("loginScreen").classList.remove("hidden");
+      }
+
+      // Attach Event Listeners
+      $("loginForm").addEventListener("submit", tryLogin);
+      $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);
+      $("newPasswordForm").addEventListener("submit", saveNewPassword);
+      $("backToLoginBtn").addEventListener("click", () => showSignInForm());
+      
+      $("logoutBtn").addEventListener("click", async () => {
+        await sb.auth.signOut();
+        location.reload();
+      });
+
+      // Sidebar Navigation Logic
+      document.querySelectorAll(".side-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
+          btn.classList.add("on");
+          document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
+          $("view-" + btn.dataset.view).classList.add("on");
+          $("pageTitle").textContent = btn.textContent;
+        });
+      });
+
+      // Approve Button Logic (Event Delegation)
+      document.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("approve-btn")) {
+          const index = e.target.getAttribute("data-index");
+          const customer = customers[index];
+          
+          e.target.disabled = true;
+          e.target.textContent = "Approving...";
+          
+          // 1. Update status in Supabase
+          const { error } = await sb
+            .from("profiles")
+            .update({ status: "active" })
+            .eq("id", customer.id);
+            
+          if (error) {
+            toast("Error: " + error.message);
+            e.target.disabled = false;
+            e.target.textContent = "Approve";
+          } else {
+            toast("✅ Customer approved successfully!");
+            // 2. Reload data and re-render all views
+            await loadAll();
+            renderOverview();
+            renderCustomers();
+            renderApprovals();
+          }
+        }
+      });
+    });
+
+    // --- 3. UTILITIES ---
     function showLoginError(message) { $("loginErr").textContent = message || ""; }
     function showPageError(message) { $("pageErr").textContent = message || ""; }
-
+    
     function showLoginMessage(message, success = false) {
       const element = $("loginMessage");
       element.textContent = message || "";
@@ -203,6 +271,32 @@
       element.classList.toggle("error", !success);
     }
 
+    function toast(message) {
+      const element = $("toast");
+      element.textContent = message;
+      element.classList.remove("hidden");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => element.classList.add("hidden"), 3500);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[ch]);
+    }
+
+    function isPending(status) {
+      return String(status ?? "").toLowerCase().includes("pending");
+    }
+
+    function statusBadge(status) {
+      const value = String(status ?? "Unknown");
+      const lower = value.toLowerCase();
+      const css = lower === "active" ? "active" : lower.includes("pending") ? "pending" : "";
+      return `<span class="status ${css}">${escapeHtml(value)}</span>`;
+    }
+
+    // --- 4. AUTHENTICATION FLOW ---
     function showRecoveryForm() {
       $("loginForm").classList.add("hidden");
       $("forgotWrap").classList.add("hidden");
@@ -222,6 +316,88 @@
       showLoginMessage(message, success);
     }
 
+    async function tryLogin(event) {
+      event.preventDefault();
+      showLoginError("");
+      const email = $("aEmail").value.trim();
+      const password = $("aPass").value;
+      const button = $("loginBtn");
+      button.disabled = true;
+      button.textContent = "Signing in…";
+
+      try {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        await boot(data.user);
+      } catch (error) {
+        showLoginError(error.message || "Sign-in failed. Check your details and try again.");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Sign in";
+      }
+    }
+
+    async function boot(user) {
+      $("app").classList.add("hidden");
+      $("loginScreen").classList.remove("hidden");
+      showLoginError("");
+      showPageError("");
+
+      try {
+        if (!user) {
+          const { data, error } = await sb.auth.getUser();
+          if (error) throw error;
+          user = data.user;
+        }
+        if (!user) throw new Error("Please sign in to continue.");
+
+        // Check if the user is an admin and is active
+        const { data: profile, error: profileError } = await sb
+          .from("profiles")
+          .select("id, name, email, role, status")
+          .eq("id", user.id)
+          .maybeSingle();
+        if (profileError) throw profileError;
+
+        // THE SECURITY GATE
+        if (!profile || String(profile.role).toLowerCase() !== "admin" || String(profile.status).toLowerCase() !== "active") {
+          await sb.auth.signOut();
+          throw new Error("🚫 This account is not an active administrator.");
+        }
+
+        // Update UI with Admin info
+        $("adminIdentity").textContent = profile.name || profile.email || user.email || "Administrator";
+        
+        // Update the dynamic sidebar note
+        $("sidebarNote").innerHTML = 
+          `<strong style="color:#72e4bb">✔ Verified Admin</strong><br>` +
+          `Signed in as <strong>${escapeHtml(profile.name || profile.email)}</strong><br>` +
+          `Role: <strong>${escapeHtml(profile.role)}</strong> · Status: <strong>${escapeHtml(profile.status)}</strong>`;
+
+        // Load data and show the app
+        await loadAll();
+        $("loginScreen").classList.add("hidden");
+        $("app").classList.remove("hidden");
+        
+        renderOverview();
+        renderCustomers();
+        renderApprovals();
+      } catch (error) {
+        $("app").classList.add("hidden");
+        $("loginScreen").classList.remove("hidden");
+        showLoginError(error.message || "Unable to open the admin dashboard.");
+      }
+    }
+
+    async function loadAll() {
+      const { data, error } = await sb
+        .from("profiles")
+        .select("id, name, email, status, role, created_at")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      customers = data || [];
+    }
+
     async function requestPasswordReset() {
       showLoginError("");
       showLoginMessage("");
@@ -236,9 +412,7 @@
       button.disabled = true;
       button.textContent = "Sending…";
       try {
-        const { error } = await sb.auth.resetPasswordForEmail(email, {
-          redirectTo: PASSWORD_RESET_REDIRECT
-        });
+        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });
         if (error) throw error;
         showLoginMessage("If an account exists for that email, a reset link has been sent. Check your inbox and spam folder.", true);
       } catch (error) {
@@ -283,101 +457,7 @@
       }
     }
 
-    function toast(message) {
-      const element = $("toast");
-      element.textContent = message;
-      element.classList.remove("hidden");
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => element.classList.add("hidden"), 3500);
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "").replace(/[&<>"']/g, ch => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-      })[ch]);
-    }
-
-    function isPending(status) {
-      return String(status ?? "").toLowerCase().includes("pending");
-    }
-
-    function statusBadge(status) {
-      const value = String(status ?? "Unknown");
-      const lower = value.toLowerCase();
-      const css = lower === "active" ? "active" : lower.includes("pending") ? "pending" : "";
-      return `<span class="status ${css}">${escapeHtml(value)}</span>`;
-    }
-
-    async function tryLogin(event) {
-      event.preventDefault();
-      showLoginError("");
-      const email = $("aEmail").value.trim();
-      const password = $("aPass").value;
-      const button = $("loginBtn");
-      button.disabled = true;
-      button.textContent = "Signing in…";
-
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        await boot(data.user);
-      } catch (error) {
-        showLoginError(error.message || "Sign-in failed. Check your details and try again.");
-      } finally {
-        button.disabled = false;
-        button.textContent = "Sign in";
-      }
-    }
-
-    async function boot(user) {
-      $("app").classList.add("hidden");
-      $("loginScreen").classList.remove("hidden");
-      showLoginError("");
-      showPageError("");
-
-      try {
-        if (!user) {
-          const { data, error } = await sb.auth.getUser();
-          if (error) throw error;
-          user = data.user;
-        }
-        if (!user) throw new Error("Please sign in to continue.");
-
-        const { data: profile, error: profileError } = await sb
-          .from("profiles")
-          .select("id, name, email, role, status")
-          .eq("id", user.id)
-          .maybeSingle();
-        if (profileError) throw profileError;
-
-        if (!profile || String(profile.role).toLowerCase() !== "admin" || String(profile.status).toLowerCase() !== "active") {
-          await sb.auth.signOut();
-          throw new Error("This account is not an active administrator.");
-        }
-
-        $("adminIdentity").textContent = profile.name || profile.email || user.email || "Administrator";
-        await loadAll();
-        $("loginScreen").classList.add("hidden");
-        $("app").classList.remove("hidden");
-        renderOverview();
-        renderCustomers();
-        renderApprovals();
-      } catch (error) {
-        $("app").classList.add("hidden");
-        $("loginScreen").classList.remove("hidden");
-        showLoginError(error.message || "Unable to open the admin dashboard.");
-      }
-    }
-
-    async function loadAll() {
-      const { data, error } = await sb
-        .from("profiles")
-        .select("id, name, email, status, role, created_at")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      customers = data || [];
-    }
-
+    // --- 5. RENDERING ---
     function renderOverview() {
       $("kCustomers").textContent = customers.length;
       $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
@@ -406,116 +486,13 @@
       $("apprList").innerHTML = pending.map(({ customer, index }) => `
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--border)">
           <div style="min-width:0">
-            <strong>${escapeHtml(customer.name || "Unnamed customer")}</strong>
-            <small style="display:block;margin-top:5px;color:var(--muted);overflow-wrap:anywhere">${escapeHtml(customer.email || "")}</small>
-            <small style="display:block;margin-top:5px;color:var(--muted)">Status: ${escapeHtml(customer.status || "Pending")}</small>
+            <strong>${escapeHtml(customer.name || "Unnamed")}</strong>
+            <div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email || "")}</div>
           </div>
           <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
         </div>
-      `).join("") || '<div class="empty">There are no pending applications.</div>';
+      `).join("") || '<div class="empty">No pending applications.</div>';
     }
-
-    async function approve(index) {
-      const customer = customers[index];
-      if (!customer || !isPending(customer.status)) return;
-      const buttons = document.querySelectorAll(`.approve-btn[data-index="${index}"]`);
-      buttons.forEach(button => { button.disabled = true; button.textContent = "Updating…"; });
-
-      try {
-        const { data, error } = await sb
-          .from("profiles")
-          .update({ status: "Active" })
-          .eq("id", customer.id)
-          .select("id, status")
-          .maybeSingle();
-        if (error) throw error;
-        if (!data) throw new Error("The database did not confirm the update. Check your Row Level Security policies.");
-        customer.status = data.status;
-        renderOverview();
-        renderCustomers();
-        renderApprovals();
-        toast("Customer profile status updated.");
-      } catch (error) {
-        toast(error.message || "Could not update the customer status.");
-        buttons.forEach(button => { button.disabled = false; button.textContent = "Approve"; });
-      }
-    }
-
-    function nav(view, button) {
-      const section = $("view-" + view);
-      if (!section) return;
-      document.querySelectorAll(".view").forEach(el => el.classList.remove("on"));
-      section.classList.add("on");
-      document.querySelectorAll(".side-btn").forEach(el => el.classList.remove("on"));
-      button.classList.add("on");
-      $("pageTitle").textContent = view === "dash" ? "Overview" : view === "cust" ? "Customers" : "Approvals";
-      showPageError("");
-    }
-
-    async function logout() {
-      try {
-        const { error } = await sb.auth.signOut();
-        if (error) throw error;
-        customers = [];
-        $("app").classList.add("hidden");
-        $("loginScreen").classList.remove("hidden");
-        $("loginForm").reset();
-        showLoginError("");
-      } catch (error) {
-        toast(error.message || "Sign-out failed. Please try again.");
-      }
-    }
-
-    async function initAdmin() {
-      try {
-        if (!window.supabase) throw new Error("Supabase library did not load. Check your internet connection.");
-        if (!SUPABASE_URL.startsWith("https://") || SUPABASE_KEY.includes("PASTE_YOUR")) {
-          throw new Error("Add your Supabase Project URL and publishable key in admin.html.");
-        }
-
-        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-        });
-
-        $("loginForm").addEventListener("submit", tryLogin);
-        $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);
-        $("newPasswordForm").addEventListener("submit", saveNewPassword);
-        $("backToLoginBtn").addEventListener("click", () => {
-          $("newPasswordForm").reset();
-          showSignInForm();
-        });
-        $("logoutBtn").addEventListener("click", logout);
-        document.querySelectorAll(".side-btn").forEach(button => {
-          button.addEventListener("click", () => nav(button.dataset.view, button));
-        });
-        // Event delegation keeps approval buttons functional after rendering.
-        document.addEventListener("click", event => {
-          const button = event.target.closest(".approve-btn");
-          if (!button || button.disabled) return;
-          approve(Number(button.dataset.index));
-        });
-
-        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-        const recoveryLinkDetected = hashParams.get("type") === "recovery";
-        const authError = hashParams.get("error_description");
-
-        // Supabase emits PASSWORD_RECOVERY after handling a valid reset link.
-        sb.auth.onAuthStateChange((event) => {
-          if (event === "PASSWORD_RECOVERY") showRecoveryForm();
-        });
-
-        if (recoveryLinkDetected) showRecoveryForm();
-        if (authError) showLoginMessage(authError.replace(/\+/g, " "));
-
-        const { data, error } = await sb.auth.getSession();
-        if (error) throw error;
-        if (data.session && !recoveryLinkDetected) await boot(data.session.user);
-      } catch (error) {
-        showLoginError(error.message || "Unable to initialize the admin page.");
-      }
-    }
-
-    initAdmin();
   </script>
 </body>
 </html>
