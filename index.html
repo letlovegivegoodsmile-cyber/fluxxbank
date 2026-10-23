@@ -1,478 +1,912 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>FluxxBank Admin Console</title>
-  <style>
-    :root {
-      --bg: #080e1c; --panel: #101a2e; --panel2: #15223b; --border: #263653;
-      --text: #edf3ff; --muted: #98a8c2; --orange: #f58220; --green: #32c997; --red: #ff7070;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: Arial, Helvetica, sans-serif; }
-    button, input { font: inherit; }
-    button { cursor: pointer; }
-    .hidden { display: none !important; }
-    #loginScreen { min-height: 100vh; display: grid; place-items: center; padding: 20px; background: radial-gradient(ellipse at top, #192c4c 0%, var(--bg) 65%); }
-    .login-box { width: 100%; max-width: 410px; padding: 32px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 70px #0005; }
-    .brand { color: var(--orange); font-size: 25px; font-weight: 800; letter-spacing: .3px; }
-    .subtitle { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 9px 0 25px; }
-    label { display: block; margin: 16px 0 7px; font-size: 13px; color: #c8d5e9; }
-    input { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; outline: none; }
-    input:focus { border-color: var(--orange); }
-    .btn { border: 0; border-radius: 8px; padding: 11px 15px; font-weight: 700; background: var(--orange); color: #111827; }
-    .btn:disabled { opacity: .6; cursor: wait; }
-    .full { width: 100%; margin-top: 20px; }
-    .secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
-    .small { padding: 7px 10px; font-size: 12px; }
-    .error { color: var(--red); font-size: 13px; line-height: 1.5; margin-top: 12px; overflow-wrap: anywhere; }
-    .success { color: var(--green); }
-    .login-links { display: flex; justify-content: flex-end; margin-top: 12px; }
-    .text-btn { padding: 4px 0; border: 0; background: transparent; color: #ffb16f; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
-    .text-btn:hover { color: #ffd0a5; }
-    #app { min-height: 100vh; }
-    .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
-    .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
-    .sidebar .brand { padding: 0 10px 27px; font-size: 22px; }
-    .side-label { padding: 12px 10px; color: var(--muted); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
-    .side-btn { display: block; width: 100%; margin: 5px 0; padding: 12px; text-align: left; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #b9c7dd; }
-    .side-btn:hover, .side-btn.on { background: #172742; border-color: #293d5e; color: white; }
-    .side-btn.on { box-shadow: inset 3px 0 var(--orange); }
-    .sidebar-note { margin: 28px 10px 0; color: var(--muted); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
-    main { min-width: 0; }
-    .topbar { min-height: 82px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border-bottom: 1px solid var(--border); background: #0c1526; }
-    .topbar h1 { margin: 0; font-size: 21px; }
-    .topbar small { display: block; margin-top: 6px; color: var(--muted); }
-    .content { padding: 28px; }
-    .view { display: none; }
-    .view.on { display: block; }
-    .section-title { margin: 0 0 8px; font-size: 20px; }
-    .section-desc { margin: 0 0 23px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-    .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 25px; }
-    .stat, .panel { min-width: 0; padding: 21px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
-    .stat-label { color: var(--muted); font-size: 13px; }
-    .stat-value { margin-top: 12px; font-size: 30px; font-weight: 800; overflow-wrap: anywhere; }
-    .panel h2 { margin: 0 0 17px; font-size: 16px; }
-    .table-wrap { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    th { color: var(--muted); font-weight: 600; white-space: nowrap; }
-    td small { display: block; margin-top: 5px; color: var(--muted); overflow-wrap: anywhere; }
-    .status { display: inline-block; padding: 5px 8px; border-radius: 6px; background: #26344c; color: #dce7f8; font-size: 11px; white-space: nowrap; }
-    .status.active { background: #103a32; color: #72e4bb; }
-    .status.pending { background: #49341b; color: #ffd18c; }
-    .empty { padding: 25px 10px; color: var(--muted); text-align: center; font-size: 13px; }
-    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; overflow-wrap: anywhere; }
-    @media (max-width: 760px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar { padding: 15px; border-right: 0; border-bottom: 1px solid var(--border); }
-      .sidebar .brand { padding: 4px 5px 14px; }
-      .side-label, .sidebar-note { display: none; }
-      .side-nav { display: flex; gap: 7px; overflow-x: auto; }
-      .side-btn { width: auto; min-width: max-content; margin: 0; }
-      .content { padding: 18px 14px; }
-      .topbar { padding: 16px; }
-      .stats { gap: 10px; }
-      .stat, .panel { padding: 15px; }
-      .stat-value { font-size: 24px; }
-      .login-box { padding: 24px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Fluxxbank — the digital bank that's always in motion. Free accounts, instant FluxxPay, 5.0 rated.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fluxxbank.netlify.app/">
+<meta property="og:title" content="Fluxxbank — Banking in Motion">
+<meta property="og:description" content="Free accounts, instant payments, smart savings. Rated 5.0 by 310,000+ customers.">
+<meta property="og:image" content="https://fluxxbank.netlify.app/og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Fluxxbank — Banking in Motion">
+<meta name="twitter:image" content="https://fluxxbank.netlify.app/og-cover.png">
+<meta name="theme-color" content="#0b1020">
+<link rel="icon" type="image/png" href="favicon.png">
+<title>Fluxxbank — Banking in Motion</title>
+<style>
+  :root{
+    --ink:#0b1020; --ink2:#131a33; --card:#161f3d;
+    --accent:#4f7cff; --accent2:#22d3ee; --accent3:#a855f7;
+    --gold:#f5c451;
+    --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08);
+    --ok:#34d399; --bad:#f87171;
+    --r:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}
+  html{scroll-behavior:smooth}
+  body{background:var(--ink);color:var(--txt);overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;cursor:pointer;border:none}
+
+  /* ---------- NAV ---------- */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+      padding:16px 5%;background:rgba(11,16,32,.75);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;letter-spacing:.5px}
+  .logo .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 22px rgba(79,124,255,.55)}
+  .logo .mark svg{width:20px;height:20px}
+  .navlinks{display:flex;gap:26px;font-size:.95rem;color:var(--mut)}
+  .navlinks a:hover{color:var(--txt)}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;font-weight:600;font-size:.95rem;
+      background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;box-shadow:0 6px 22px rgba(79,124,255,.35);
+      transition:transform .15s, box-shadow .15s}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,124,255,.5)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--txt)}
+  .btn.gold{background:linear-gradient(135deg,#f5c451,#e8a020);color:#241a02;box-shadow:0 6px 22px rgba(245,196,81,.3)}
+
+  /* ---------- HERO ---------- */
+  .hero{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:140px 5% 80px;position:relative}
+  .hero::before{content:"";position:absolute;inset:0;
+      background:radial-gradient(600px 400px at 80% 20%,rgba(79,124,255,.18),transparent 60%),
+                 radial-gradient(500px 400px at 10% 90%,rgba(168,85,247,.12),transparent 60%);pointer-events:none}
+  .eyebrow{display:inline-block;padding:6px 14px;border:1px solid var(--line);border-radius:999px;color:var(--accent2);
+      font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;background:rgba(34,211,238,.06)}
+  h1{font-size:clamp(2.4rem,5vw,4rem);line-height:1.08;font-weight:800}
+  h1 .grad{background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lead{margin:22px 0 30px;color:var(--mut);font-size:1.1rem;max-width:520px;line-height:1.7}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .stats{display:flex;gap:40px;margin-top:48px}
+  .stat b{font-size:1.6rem;display:block}
+  .stat span{color:var(--mut);font-size:.85rem}
+
+  /* phone mock */
+  .phone-wrap{display:flex;justify-content:center}
+  .phone{width:300px;border-radius:36px;border:1px solid var(--line);background:linear-gradient(160deg,var(--ink2),#0d1330);
+      padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 6px #05070f}
+  .ph-top{display:flex;justify-content:space-between;color:var(--mut);font-size:.75rem;margin-bottom:18px}
+  .ph-bal{background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:20px;padding:20px;margin-bottom:16px}
+  .ph-bal small{opacity:.85;font-size:.75rem}
+  .ph-bal b{font-size:1.5rem;display:block;margin-top:6px}
+  .ph-bal .chip{width:34px;height:24px;border-radius:6px;background:linear-gradient(135deg,#ffe9a8,#f5c451);margin-top:12px}
+  .ph-row{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
+      border-radius:14px;padding:12px 14px;margin-bottom:10px;font-size:.85rem}
+  .ph-row span:last-child{font-weight:700}
+  .up{color:var(--ok)} .dn{color:var(--bad)}
+  .ph-actions{display:flex;gap:10px;margin-top:14px}
+  .ph-actions div{flex:1;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 0;font-size:.8rem;color:var(--mut)}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:90px 5%}
+  .sec-head{text-align:center;max-width:640px;margin:0 auto 56px}
+  .sec-head h2{font-size:2.2rem;margin-bottom:14px}
+  .sec-head p{color:var(--mut);line-height:1.7}
+
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px;transition:transform .2s,border-color .2s}
+  .card:hover{transform:translateY(-6px);border-color:rgba(79,124,255,.4)}
+  .card .icon{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;margin-bottom:18px;
+      background:rgba(79,124,255,.12);color:var(--accent)}
+  .card h3{margin-bottom:10px;font-size:1.15rem}
+  .card p{color:var(--mut);font-size:.92rem;line-height:1.65}
+
+  /* accounts */
+  .acc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .acc{position:relative;overflow:hidden;border-radius:var(--r);padding:30px;border:1px solid var(--line);background:var(--card)}
+  .acc.pop{border-color:var(--gold)}
+  .acc .tag{position:absolute;top:18px;right:18px;background:var(--gold);color:#241a02;font-size:.7rem;font-weight:700;
+      padding:4px 10px;border-radius:999px;letter-spacing:1px}
+  .acc h3{font-size:1.3rem;margin-bottom:6px}
+  .acc .price{font-size:2.2rem;font-weight:800;margin:14px 0 4px}
+  .acc .price small{font-size:.85rem;color:var(--mut);font-weight:400}
+  .acc ul{list-style:none;margin:18px 0 24px;color:var(--mut);font-size:.9rem}
+  .acc li{padding:7px 0;border-bottom:1px dashed var(--line)}
+  .acc li::before{content:"✓  ";color:var(--ok);font-weight:700}
+
+  /* rates ticker */
+  .ticker{display:flex;gap:16px;overflow-x:auto;padding:8px 0 4px;scrollbar-width:none}
+  .ticker::-webkit-scrollbar{display:none}
+  .tick{flex:0 0 auto;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
+      border-radius:999px;padding:10px 20px;font-size:.9rem}
+  .tick b{font-weight:700}
+
+  /* dashboard demo */
+  .dash{background:var(--ink2);border:1px solid var(--line);border-radius:22px;padding:28px;max-width:1100px;margin:0 auto}
+  .dash-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+  .dash-top h3{font-size:1.3rem}
+  .bal-big{font-size:2.4rem;font-weight:800;background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .kpi small{color:var(--mut)}
+  .kpi b{font-size:1.25rem;display:block;margin-top:6px}
+  .dash-body{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .panel h4{margin-bottom:14px;font-size:.95rem;color:var(--mut);text-transform:uppercase;letter-spacing:1px}
+  canvas#chart{width:100%;height:220px}
+  .tx{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+  .tx:last-child{border:none}
+  .tx .who{display:flex;gap:10px;align-items:center}
+  .tx .dot{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:.8rem;font-weight:700;background:rgba(79,124,255,.15);color:var(--accent)}
+  .tx small{display:block;color:var(--mut)}
+  .payform{display:grid;gap:10px;margin-top:6px}
+  .payform input,.payform select{background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);font-size:.9rem;outline:none}
+  .payform input:focus{border-color:var(--accent)}
+  .paymsg{font-size:.85rem;min-height:18px}
+
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;counter-reset:s}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px;position:relative}
+  .step::before{counter-increment:s;content:counter(s);position:absolute;top:-16px;left:24px;width:36px;height:36px;border-radius:12px;
+      display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 6px 18px rgba(79,124,255,.4)}
+  .step h3{margin:14px 0 8px}
+  .step p{color:var(--mut);font-size:.9rem;line-height:1.6}
+
+  footer{border-top:1px solid var(--line);padding:50px 5% 30px;color:var(--mut);font-size:.88rem}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;margin-bottom:36px}
+  footer h4{color:var(--txt);margin-bottom:14px}
+  footer a{display:block;padding:4px 0}
+  footer a:hover{color:var(--txt)}
+  .foot-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid var(--line);padding-top:22px}
+
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200}
+  .modal-bg.show{display:grid}
+  .modal{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:34px;width:min(400px,92vw)}
+  .modal h3{margin-bottom:6px}
+  .modal p{color:var(--mut);font-size:.88rem;margin-bottom:20px}
+  .modal input{width:100%;background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);margin-bottom:12px;outline:none}
+  .modal .btn{width:100%;justify-content:center}
+
+
+
+  /* ---------- TRUST STRIP ---------- */
+  .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:34px 5%;text-align:center}
+  .trust p{color:var(--mut);font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+  .trust-row{display:flex;justify-content:center;gap:44px;flex-wrap:wrap;align-items:center}
+  .trust-row span{font-weight:800;font-size:1.15rem;color:rgba(255,255,255,.45);letter-spacing:.5px;transition:color .2s}
+  .trust-row span:hover{color:var(--txt)}
+
+  /* ---------- STATS BAND ---------- */
+  .band{background:linear-gradient(135deg,#1a2b6d,#0e1a45);padding:64px 5%;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .band-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;max-width:1100px;margin:0 auto;text-align:center}
+  .band-grid b{font-size:clamp(1.8rem,3.4vw,2.6rem);display:block;background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .band-grid span{color:var(--mut);font-size:.9rem}
+
+  /* ---------- FAQ ---------- */
+  .faq{max-width:760px;margin:0 auto}
+  .qa{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+  .qa button{width:100%;background:none;border:none;color:var(--txt);text-align:left;padding:20px 24px;font-size:1rem;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:16px}
+  .qa .chev{transition:transform .3s;color:var(--accent2);font-size:1.2rem;flex:0 0 auto}
+  .qa.open .chev{transform:rotate(180deg)}
+  .qa .ans{max-height:0;overflow:hidden;transition:max-height .35s ease;color:var(--mut);font-size:.92rem;line-height:1.65}
+  .qa .ans div{padding:0 24px 20px}
+  .qa.open .ans{max-height:220px}
+
+  /* ---------- CTA + NEWSLETTER ---------- */
+  .cta{background:radial-gradient(700px 300px at 50% 0%,rgba(79,124,255,.25),transparent 70%),var(--ink2);text-align:center;padding:90px 5%;border-top:1px solid var(--line)}
+  .cta h2{font-size:clamp(1.9rem,4vw,2.8rem);margin-bottom:14px}
+  .cta p{color:var(--mut);margin-bottom:30px}
+  .news{display:flex;gap:10px;max-width:480px;margin:0 auto}
+  .news input{flex:1;background:#0d1330;border:1px solid var(--line);border-radius:12px;padding:14px 18px;color:var(--txt);font-size:.95rem;outline:none}
+  .news input:focus{border-color:var(--accent)}
+  .news-msg{margin-top:14px;font-size:.88rem;min-height:20px}
+
+  /* ---------- BACK TO TOP ---------- */
+  #toTop{position:fixed;right:24px;bottom:24px;width:46px;height:46px;border-radius:50%;z-index:150;
+      background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;font-size:1.2rem;box-shadow:0 8px 24px rgba(79,124,255,.45);
+      opacity:0;pointer-events:none;transition:opacity .3s, transform .3s;transform:translateY(10px)}
+  #toTop.show{opacity:1;pointer-events:auto;transform:translateY(0)}
+  #toTop:hover{transform:translateY(-3px)}
+
+
+  /* ---------- 5 STAR RATING ---------- */
+  .rating-badge{display:inline-flex;align-items:center;gap:12px;margin-top:34px;background:rgba(245,196,81,.08);
+      border:1px solid rgba(245,196,81,.35);border-radius:999px;padding:10px 22px}
+  .rating-badge .stars-big{color:var(--gold);font-size:1.15rem;letter-spacing:3px;text-shadow:0 0 14px rgba(245,196,81,.6)}
+  .rating-badge b{font-size:1.05rem}
+  .rating-badge span{color:var(--mut);font-size:.85rem}
+
+
+  /* ---------- SHOWCASE GALLERY ---------- */
+  .gallery-stage{position:relative;max-width:1000px;margin:0 auto;border-radius:22px;overflow:hidden;
+      border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);aspect-ratio:16/9;background:#0a0e1c}
+  .gal-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.1s ease;transform:scale(1.04)}
+  .gal-slide.active{opacity:1;transform:scale(1);transition:opacity 1.1s ease, transform 5.5s linear}
+  .gal-slide img{width:100%;height:100%;object-fit:cover;display:block}
+  .gal-slide.cardish img{object-fit:contain;padding:6%;background:radial-gradient(600px 300px at 50% 30%,rgba(79,124,255,.18),transparent 70%),#0a0e1c}
+  .gal-cap{position:absolute;left:0;right:0;bottom:0;padding:40px 28px 18px;z-index:2;
+      background:linear-gradient(transparent,rgba(5,7,15,.85));font-weight:600;font-size:1.02rem}
+  .gal-cap small{display:block;font-weight:400;color:var(--accent2);font-size:.8rem;margin-top:3px}
+  .gal-nav{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;
+      background:rgba(11,16,32,.6);border:1px solid var(--line);color:#fff;font-size:1.05rem;backdrop-filter:blur(6px)}
+  .gal-nav:hover{background:rgba(79,124,255,.65)}
+  .gal-prev{left:14px}.gal-next{right:14px}
+  .gal-thumbs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+  .gal-thumbs button{width:64px;height:44px;border-radius:9px;overflow:hidden;padding:0;border:2px solid transparent;
+      opacity:.5;transition:all .25s;background:#0a0e1c}
+  .gal-thumbs button img{width:100%;height:100%;object-fit:cover;display:block}
+  .gal-thumbs button.on{border-color:var(--accent2);opacity:1;transform:translateY(-3px)}
+  .gal-count{position:absolute;z-index:3;top:16px;right:18px;font-size:.8rem;color:rgba(255,255,255,.85);
+      background:rgba(11,16,32,.55);border:1px solid var(--line);border-radius:999px;padding:5px 13px;backdrop-filter:blur(6px)}
+
+
+  /* ---------- PRINTABLE RECEIPT ---------- */
+  #receiptWrap{position:fixed;inset:0;z-index:300;display:none;place-items:center;background:rgba(5,7,15,.78);backdrop-filter:blur(4px)}
+  #receiptWrap.on{display:grid}
+  #receipt{background:#fff;color:#141824;width:min(430px,92vw);border-radius:16px;padding:34px 32px 26px;font-size:.9rem;
+      box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .r-logo{font-weight:800;font-size:1.35rem;color:#1a2b6d;display:flex;align-items:center;gap:8px}
+  .r-logo .bolt{width:26px;height:26px;border-radius:7px;display:inline-grid;place-items:center;background:#4f7cff;color:#fff;font-size:.9rem}
+  .r-sub{color:#8a90a3;font-size:.78rem;letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+  .r-rule{border:none;border-top:2px dashed #d8dbe6;margin:18px 0}
+  .r-table{width:100%;border-collapse:collapse}
+  .r-table td{padding:7px 0;vertical-align:top}
+  .r-table td:first-child{color:#8a90a3;width:42%}
+  .r-table td:last-child{font-weight:600;text-align:right}
+  .r-total{text-align:center;margin:18px 0 6px}
+  .r-total small{display:block;color:#8a90a3;letter-spacing:2px;font-size:.7rem}
+  .r-total b{font-size:1.7rem;color:#141824}
+  .r-bar{height:42px;margin:16px 0 10px;
+      background:repeating-linear-gradient(90deg,#141824 0 2px,transparent 2px 5px,#141824 5px 6px,transparent 6px 11px)}
+  .r-foot{text-align:center;color:#8a90a3;font-size:.72rem;line-height:1.6}
+  .r-actions{display:flex;gap:10px;justify-content:center;margin-top:18px}
+  .r-actions button{padding:10px 22px;border-radius:10px;font-weight:700}
+  .r-print{background:#4f7cff;color:#fff}
+  .r-close{background:#eef0f6;color:#141824}
+  @media print{
+    body *{visibility:hidden}
+    #receiptWrap,#receiptWrap *{visibility:visible}
+    #receiptWrap{position:absolute;inset:0;display:grid;background:#fff;padding:20px}
+    .r-actions{display:none}
+  }
+
+  /* ---------- REVIEWS SLIDESHOW ---------- */
+  .reviews{position:relative;min-height:78vh;display:grid;place-items:center;overflow:hidden;padding:0}
+  .rev-bg{position:absolute;inset:0}
+  .rev-slide{position:absolute;inset:0;background-size:cover;background-position:center 25%;opacity:0;
+      transform:scale(1.06);transition:opacity 1.2s ease, transform 6s linear}
+  .rev-slide.active{opacity:1;transform:scale(1)}
+  .rev-slide::after{content:"";position:absolute;inset:0;
+      background:linear-gradient(180deg,rgba(11,16,32,.55),rgba(11,16,32,.35) 45%,rgba(11,16,32,.75))}
+  .rev-content{position:relative;z-index:2;text-align:center;max-width:760px;padding:80px 24px}
+  .rev-content .stars{color:var(--gold);font-size:1.3rem;letter-spacing:6px;margin-bottom:18px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+  .rev-quote{font-size:clamp(1.3rem,2.6vw,1.9rem);font-weight:600;line-height:1.5;text-shadow:0 2px 20px rgba(0,0,0,.55)}
+  .rev-person{margin-top:26px;display:flex;align-items:center;justify-content:center;gap:14px}
+  .rev-person img{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.7);box-shadow:0 4px 16px rgba(0,0,0,.5)}
+  .rev-person .nm{font-weight:700;text-align:left}
+  .rev-person .rl{font-size:.82rem;color:var(--accent2);text-align:left}
+  .rev-nav{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;
+      background:rgba(11,16,32,.55);border:1px solid var(--line);color:#fff;font-size:1.1rem;backdrop-filter:blur(6px);transition:background .2s}
+  .rev-nav:hover{background:rgba(79,124,255,.6)}
+  .rev-prev{left:22px}.rev-next{right:22px}
+  .rev-dots{position:absolute;z-index:3;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
+  .rev-dots button{width:10px;height:10px;border-radius:999px;border:none;background:rgba(255,255,255,.35);transition:all .3s;padding:0}
+  .rev-dots button.on{width:30px;background:var(--accent2)}
+  .rev-count{position:absolute;z-index:3;top:24px;right:28px;font-size:.85rem;color:rgba(255,255,255,.75);
+      background:rgba(11,16,32,.5);border:1px solid var(--line);border-radius:999px;padding:6px 14px;backdrop-filter:blur(6px)}
+
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;padding-top:120px}
+    .grid3,.acc-grid,.steps{grid-template-columns:1fr}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .dash-body{grid-template-columns:1fr}
+    .navlinks{display:none}
+    .foot-grid{grid-template-columns:1fr 1fr}
+  }
+</style>
 </head>
 <body>
-  <section id="loginScreen">
-    <div class="login-box">
-      <div class="brand">FluxxBank</div>
-      <p class="subtitle" id="loginSubtitle">Administrator access. Sign in using your authorized Supabase account.</p>
-      <form id="loginForm">
-        <label for="aEmail">Administrator email</label>
-        <input type="email" id="aEmail" autocomplete="username" placeholder="Enter your email" required>
-        <label for="aPass">Password</label>
-        <input type="password" id="aPass" autocomplete="current-password" placeholder="Enter your password" required>
-        <div id="loginErr" class="error" role="alert"></div>
-        <button class="btn full" id="loginBtn" type="submit">Sign in</button>
-      </form>
-      <div class="login-links" id="forgotWrap">
-        <button class="text-btn" id="forgotPasswordBtn" type="button">Forgot password?</button>
-      </div>
-      <div id="loginMessage" class="error" role="status" aria-live="polite"></div>
-      <form id="newPasswordForm" class="hidden">
-        <label for="newPassword">New password</label>
-        <input type="password" id="newPassword" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
-        <label for="confirmNewPassword">Confirm new password</label>
-        <input type="password" id="confirmNewPassword" autocomplete="new-password" minlength="8" required placeholder="Enter the new password again">
-        <div id="passwordResetErr" class="error" role="alert"></div>
-        <button class="btn full" id="saveNewPasswordBtn" type="submit">Save new password</button>
-        <button class="btn secondary full" id="backToLoginBtn" type="button">Back to sign in</button>
-      </form>
+
+<nav>
+  <a class="logo" href="#top">
+    <span class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/>
+      </svg>
+    </span>
+    Fluxxbank
+  </a>
+  <div class="navlinks">
+    <a href="#features">Features</a>
+    <a href="#accounts">Accounts</a>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#showcase">Showcase</a>
+    <a href="#open">Open Account</a>
+  </div>
+  <div style="display:flex;gap:10px">
+    <span id="authArea"><button class="btn ghost" onclick="openModal()">Log in</button></span>
+    <a class="btn" href="#open">Get Started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div>
+    <span class="eyebrow">◆ Digital-first banking</span>
+    <h1>Banking that's<br>always <span class="grad">in motion.</span></h1>
+    <p class="lead">Fluxxbank is the standard for modern money — instant payments, fee-free accounts, and real-time insights, all from one beautiful app.</p>
+    <div class="hero-cta">
+      <a class="btn gold" href="#open">Open your account →</a>
+      <a class="btn ghost" href="#dashboard">Try the live demo</a>
     </div>
-  </section>
-
-  <div id="app" class="hidden">
-    <div class="layout">
-      <aside class="sidebar">
-        <div class="brand">FluxxBank</div>
-        <div class="side-label">Administration</div>
-        <nav class="side-nav" aria-label="Admin navigation">
-          <button class="side-btn on" data-view="dash" type="button">Overview</button>
-          <button class="side-btn" data-view="cust" type="button">Customers</button>
-          <button class="side-btn" data-view="appr" type="button">Approvals</button>
-        </nav>
-        <div class="sidebar-note">Restricted administrator area.<br>Access is checked against your Supabase profile.</div>
-      </aside>
-
-      <main>
-        <header class="topbar">
-          <div><h1 id="pageTitle">Overview</h1><small id="adminIdentity">Administrator</small></div>
-          <button class="btn secondary" id="logoutBtn" type="button">Sign out</button>
-        </header>
-
-        <div class="content">
-          <section id="view-dash" class="view on">
-            <h2 class="section-title">Overview</h2>
-            <p class="section-desc">Customer profile and application status from your database.</p>
-            <div class="stats">
-              <div class="stat"><div class="stat-label">Customer profiles</div><div class="stat-value" id="kCustomers">—</div></div>
-              <div class="stat"><div class="stat-label">Pending applications</div><div class="stat-value" id="kAppr">—</div></div>
-            </div>
-            <div class="panel">
-              <h2>Recent customer profiles</h2>
-              <div class="table-wrap"><table>
-                <thead><tr><th>Customer</th><th>Status</th><th>Role</th></tr></thead>
-                <tbody id="recentBody"><tr><td colspan="3">Loading records…</td></tr></tbody>
-              </table></div>
-            </div>
-          </section>
-
-          <section id="view-cust" class="view">
-            <h2 class="section-title">Customers</h2>
-            <p class="section-desc">View customer profiles and their current account status.</p>
-            <div class="panel"><div class="table-wrap"><table>
-              <thead><tr><th>Customer</th><th>Status</th><th>Role</th><th>Action</th></tr></thead>
-              <tbody id="custBody"><tr><td colspan="4">Loading records…</td></tr></tbody>
-            </table></div></div>
-          </section>
-
-          <section id="view-appr" class="view">
-            <h2 class="section-title">Approvals</h2>
-            <p class="section-desc">Review pending customer profiles. Approval changes the profile status in Supabase.</p>
-            <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading applications…</div></div></div>
-          </section>
-          <div id="pageErr" class="error" role="alert"></div>
-        </div>
-      </main>
+    <div class="rating-badge">
+      <span class="stars-big">★★★★★</span>
+      <div style="text-align:left"><b>5.0 Rated Excellent</b><br><span>310,000+ verified customer reviews</span></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="st1">0</b><span>Customers</span></div>
+      <div class="stat"><b id="st2">0</b><span>Countries</span></div>
+      <div class="stat"><b>€0</b><span>Monthly fees</span></div>
     </div>
   </div>
-  <div id="toast" class="hidden" role="status" aria-live="polite"></div>
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="ph-top"><span>9:41</span><span>⚡ FluxxPay</span></div>
+      <div class="ph-bal">
+        <small>Total balance</small>
+        <b id="phBal">€24,806.12</b>
+        <div class="chip"></div>
+      </div>
+      <div class="ph-row"><span>Nordwind Salary</span><span class="up">+€3,850</span></div>
+      <div class="ph-row"><span>Blue Bottle Coffee</span><span class="dn">−€4.80</span></div>
+      <div class="ph-row"><span>Metro Transit</span><span class="dn">−€2.40</span></div>
+      <div class="ph-actions">
+        <div>⇄ Send</div><div>＋ Top up</div><div>◔ Stats</div>
+      </div>
+    </div>
+  </div>
+</header>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    "use strict";
+<!-- FEATURES -->
+<section id="features">
+  <div class="sec-head">
+    <h2>Everything money should do</h2>
+    <p>Built for people who move fast. Fluxxbank combines everyday banking, savings, and investing in one seamless experience.</p>
+  </div>
+  <div class="grid3">
+    <div class="card"><div class="icon">⚡</div><h3>Instant FluxxPay</h3><p>Send and receive money in under a second, 24/7 — even across borders, with zero hidden FX markup.</p></div>
+    <div class="card"><div class="icon">🛡️</div><h3>Bank-grade security</h3><p>Biometric login, disposable virtual cards, and real-time fraud detection on every single transaction.</p></div>
+    <div class="card"><div class="icon">📈</div><h3>Smart savings</h3><p>Auto-roundups, vaults with up to 4.1% interest, and AI-powered budgets that adapt to your lifestyle.</p></div>
+    <div class="card"><div class="icon">🌍</div><h3>Global by default</h3><p>Hold 30+ currencies, spend like a local in 190 countries, and get paid like you never left home.</p></div>
+    <div class="card"><div class="icon">💳</div><h3>Cards that keep up</h3><p>Physical and virtual cards with instant freeze, per-merchant limits, and cashback on every tap.</p></div>
+    <div class="card"><div class="icon">🤖</div><h3>Fluxx AI insights</h3><p>A personal finance copilot that spots subscriptions you forgot and finds savings you didn't know existed.</p></div>
+  </div>
+</section>
 
-    // --- 1. CONFIGURATION ---
-    const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-    const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
+<!-- LIVE RATES -->
+<section style="padding-top:0">
+  <div class="ticker" id="ticker"></div>
+</section>
 
-    let sb = null;
-    let customers = [];
-    let toastTimer = null;
-    const $ = id => document.getElementById(id);
+<!-- TRUST STRIP -->
+<div class="trust">
+  <p>Powered by trusted networks worldwide</p>
+  <div class="trust-row">
+    <span>VISA</span><span>Mastercard</span><span>Apple Pay</span><span>Google Pay</span><span>SEPA</span><span>SWIFT</span>
+  </div>
+</div>
 
-    // --- 2. INITIALIZATION ---
-    document.addEventListener("DOMContentLoaded", async () => {
-      if (!window.supabase) {
-        alert("Supabase library failed to load.");
-        return;
-      }
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      
-      // Check if user is already logged in
-      const { data } = await sb.auth.getSession();
-      if (data.session) {
-        boot(data.session.user);
-      } else {
-        $("loginScreen").classList.remove("hidden");
-      }
+<!-- ACCOUNTS -->
+<section id="accounts">
+  <div class="sec-head">
+    <h2>Pick your Fluxx</h2>
+    <p>Transparent pricing. No maintenance fees, no minimum balance, no asterisks.</p>
+  </div>
+  <div class="acc-grid">
+    <div class="acc">
+      <h3>Fluxx Basic</h3><p style="color:var(--mut);font-size:.9rem">Everyday banking, done right.</p>
+      <div class="price">€0<small>/month</small></div>
+      <ul><li>Free EUR account & IBAN</li><li>1 virtual card</li><li>FluxxPay transfers</li><li>Standard support</li></ul>
+      <a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Basic</a>
+    </div>
+    <div class="acc pop">
+      <span class="tag">MOST POPULAR</span>
+      <h3>Fluxx Plus</h3><p style="color:var(--mut);font-size:.9rem">For people whose money moves.</p>
+      <div class="price">€4.99<small>/month</small></div>
+      <ul><li>Everything in Basic</li><li>Metal card + 3 virtuals</li><li>1.5% cashback worldwide</li><li>4.1% savings vaults</li><li>Priority 24/7 support</li></ul>
+      <a class="btn gold" href="#open" style="width:100%;justify-content:center">Choose Plus</a>
+    </div>
+    <div class="acc">
+      <h3>Fluxx Metal</h3><p style="color:var(--mut);font-size:.9rem">Premium banking without the premium attitude.</p>
+      <div class="price">€12.99<small>/month</small></div>
+      <ul><li>Everything in Plus</li><li>Obsidian metal card</li><li>3% cashback + lounge access</li><li>Free global transfers</li><li>Dedicated banker</li></ul>
+      <a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Metal</a>
+    </div>
+  </div>
+</section>
 
-      // Attach Event Listeners
-      $("loginForm").addEventListener("submit", tryLogin);
-      $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);
-      $("newPasswordForm").addEventListener("submit", saveNewPassword);
-      $("backToLoginBtn").addEventListener("click", () => showSignInForm());
-      $("logoutBtn").addEventListener("click", async () => {
-        await sb.auth.signOut();
-        location.reload();
-      });
+<!-- STATS BAND -->
+<div class="band">
+  <div class="band-grid">
+    <div><b>€8.2B+</b><span>Deposits protected up to €100,000</span></div>
+    <div><b>99.99%</b><span>Uptime — banking that never sleeps</span></div>
+    <div><b>1,200/s</b><span>Transactions processed per second</span></div>
+    <div><b>5.0 ★</b><span>Average rating from 310k reviews</span></div>
+  </div>
+</div>
 
-      // Sidebar Navigation Logic
-      document.querySelectorAll(".side-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
-          btn.classList.add("on");
-          document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
-          $("view-" + btn.dataset.view).classList.add("on");
-          $("pageTitle").textContent = btn.textContent;
-        });
-      });
+<!-- DASHBOARD DEMO -->
+<section id="dashboard" style="background:linear-gradient(180deg,transparent,rgba(79,124,255,.05),transparent)">
+  <div class="sec-head">
+    <h2>Try the dashboard — it's live</h2>
+    <p>This demo runs entirely in your browser. Send a payment, watch your balance and chart update in real time.</p>
+  </div>
+  <div class="dash">
+    <div class="dash-top">
+      <div><h3 id="dashHello">Good afternoon, Alex 👋</h3><small style="color:var(--mut)">Everyday Account · DE89 3704 0044 0532 0130 00</small></div>
+      <div style="text-align:right"><small style="color:var(--mut)">Available balance</small><div class="bal-big" id="dashBal">€24,806.12</div></div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><small>Income this month</small><b class="up" id="kpiIn">€5,850.00</b></div>
+      <div class="kpi"><small>Spending this month</small><b class="dn" id="kpiOut">€1,932.45</b></div>
+      <div class="kpi"><small>Savings vault (4.1%)</small><b>€8,120.00</b></div>
+      <div class="kpi"><small>Cashback earned</small><b id="kpiCb" style="color:var(--gold)">€86.40</b></div>
+    </div>
+    <div class="dash-body">
+      <div class="panel">
+        <h4>Spending — last 12 weeks</h4>
+        <canvas id="chart"></canvas>
+      </div>
+      <div class="panel">
+        <h4>Send money (demo)</h4>
+        <form class="payform" onsubmit="return doPay(event)">
+          <select id="pWho" required>
+            <option value="" disabled selected>Choose recipient</option>
+            <option>Maya Chen</option><option>Jonas Weber</option><option>Luna Ortiz</option><option>Fluxx Vault</option>
+          </select>
+          <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="Amount (€)" required>
+          <input id="pNote" type="text" placeholder="Note (optional)">
+          <button class="btn" type="submit">⚡ Send instantly</button>
+          <div class="paymsg" id="paymsg"></div>
+        </form>
+        <h4 style="margin-top:22px">Recent activity</h4>
+        <div id="txlist"></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-      // Approve Button Logic (Event Delegation)
-      document.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("approve-btn")) {
-          const index = e.target.getAttribute("data-index");
-          const customer = customers[index];
-          
-          e.target.disabled = true;
-          e.target.textContent = "Approving...";
-          
-          const { error } = await sb
-            .from("profiles")
-            .update({ status: "active" })
-            .eq("id", customer.id);
-            
-          if (error) {
-            toast("Error: " + error.message);
-            e.target.disabled = false;
-            e.target.textContent = "Approve";
-          } else {
-            toast("Customer approved successfully!");
-            await loadAll();
-            renderOverview();
-            renderCustomers();
-            renderApprovals();
-          }
-        }
-      });
+
+<!-- CUSTOMER REVIEWS SLIDESHOW -->
+<section class="reviews" id="reviews">
+  <div class="rev-bg" id="revBg">
+    <div class="rev-slide active" style="background-image:url('review 1.png')"></div>
+    <div class="rev-slide" style="background-image:url('review 2.png')"></div>
+    <div class="rev-slide" style="background-image:url('review 3.png')"></div>
+    <div class="rev-slide" style="background-image:url('review 4.png')"></div>
+  </div>
+  <div class="rev-content">
+    <div class="stars">★★★★★</div>
+    <p class="rev-quote" id="revQuote"></p>
+    <div class="rev-person">
+      <img id="revAva" src="review 1.png" alt="customer">
+      <div><div class="nm" id="revName"></div><div class="rl" id="revRole"></div></div>
+    </div>
+  </div>
+  <button class="rev-nav rev-prev" onclick="goRev(cur-1)">‹</button>
+  <button class="rev-nav rev-next" onclick="goRev(cur+1)">›</button>
+  <div class="rev-dots" id="revDots"></div>
+  <div class="rev-count" id="revCount">1 / 4</div>
+</section>
+
+<!-- STEPS -->
+<section id="open">
+  <div class="sec-head"><h2>Open your account in minutes</h2><p>No paperwork, no branch visits, no waiting. Your card exists before your coffee gets cold.</p></div>
+  <div class="steps">
+    <div class="step"><h3>Verify in seconds</h3><p>Snap a photo of your ID and take a quick selfie. Our AI verifies you in under two minutes.</p></div>
+    <div class="step"><h3>Fund your account</h3><p>Top up instantly from any bank, card, or Apple/Google Pay. Your IBAN is ready immediately.</p></div>
+    <div class="step"><h3>Start Fluxxing</h3><p>Create virtual cards, set up vaults, and send your first FluxxPay transfer — all before lunch.</p></div>
+  </div>
+  <div style="text-align:center;margin-top:50px"><button class="btn gold" style="padding:16px 36px;font-size:1.05rem" onclick="openModal()">Open my Fluxxbank account →</button></div>
+</section>
+
+
+<!-- SHOWCASE GALLERY -->
+<section id="showcase">
+  <div class="sec-head">
+    <h2>Fluxxbank, in pictures</h2>
+    <p>Our cards, our buildings, our world — a look at the bank in motion. Auto-plays, or tap a thumbnail to explore.</p>
+  </div>
+  <div class="gallery-stage" id="galStage">
+    <div class="gal-count" id="galCount">1 / 10</div>
+    <div class="gal-cap" id="galCap"></div>
+    <button class="gal-nav gal-prev" onclick="goGal(galCur-1)">‹</button>
+    <button class="gal-nav gal-next" onclick="goGal(galCur+1)">›</button>
+  </div>
+  <div class="gal-thumbs" id="galThumbs"></div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="sec-head"><h2>Questions? Answers.</h2><p>Everything people usually ask before making the switch to Fluxxbank.</p></div>
+  <div class="faq">
+    <div class="qa"><button onclick="toggleQa(this)">Is Fluxxbank a real bank?<span class="chev">▾</span></button>
+      <div class="ans"><div>Yes — Fluxxbank is a fully licensed European bank. Your deposits are protected up to €100,000 per person under the EU deposit guarantee scheme, just like any traditional bank.</div></div></div>
+    <div class="qa"><button onclick="toggleQa(this)">How long does it take to open an account?<span class="chev">▾</span></button>
+      <div class="ans"><div>Most customers finish in under 5 minutes. Verify with your ID and a quick selfie, fund your account, and you're ready to go — no branch visits, no paperwork.</div></div></div>
+    <div class="qa"><button onclick="toggleQa(this)">Are there really no fees?<span class="chev">▾</span></button>
+      <div class="ans"><div>Fluxx Basic is free forever — no maintenance fees, no minimum balance. Plus and Metal are optional upgrades that add cashback, metal cards, and premium perks.</div></div></div>
+    <div class="qa"><button onclick="toggleQa(this)">Can I use Fluxxbank in other countries?<span class="chev">▾</span></button>
+      <div class="ans"><div>Absolutely. Spend like a local in 190 countries with 30+ supported currencies and zero hidden exchange markups on Fluxx Plus and Metal.</div></div></div>
+    <div class="qa"><button onclick="toggleQa(this)">What if I lose my phone or card?<span class="chev">▾</span></button>
+      <div class="ans"><div>Freeze your card instantly from any device, or call our 24/7 support line. Biometric login and real-time fraud monitoring protect your account around the clock.</div></div></div>
+  </div>
+</section>
+
+<!-- CTA + NEWSLETTER -->
+<div class="cta">
+  <h2>Join <span style="background:linear-gradient(90deg,var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent">2.4 million</span> people banking in motion</h2>
+  <p style="color:var(--gold);letter-spacing:4px;margin-bottom:8px">★★★★★</p>
+  <p>Get product updates, money tips, and early access to new features. No spam, ever.</p>
+  <form class="news" onsubmit="return subscribe(event)">
+    <input type="email" id="newsEmail" placeholder="you@example.com" required>
+    <button class="btn" type="submit">Subscribe</button>
+  </form>
+  <div class="news-msg" id="newsMsg"></div>
+</div>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <a class="logo" href="#top" style="margin-bottom:14px">
+        <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+        Fluxxbank
+      </a>
+      <p style="max-width:280px;line-height:1.6">Banking in motion. Licensed European bank — deposits protected up to €100,000.</p>
+    </div>
+    <div><h4>Bank</h4><a href="#accounts">Accounts</a><a href="#features">Cards</a><a href="#features">Savings</a><a href="#features">Business</a></div>
+    <div><h4>Company</h4><a href="#top">About</a><a href="#top">Careers</a><a href="#top">Press</a><a href="#top">Blog</a></div>
+    <div><h4>Support</h4><a href="#top">Help center</a><a href="#top">Contact</a><a href="#top">Security</a><a href="#top">Status</a></div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Fluxxbank AG. All rights reserved.</span>
+    <span>Privacy · Terms · Imprint · Cookie settings</span>
+  </div>
+</footer>
+
+<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
+
+
+<!-- PRINTABLE RECEIPT -->
+<div id="receiptWrap" onclick="if(event.target===this)closeReceipt()">
+  <div id="receipt">
+    <div class="r-logo"><span class="bolt">⚡</span> FLUXXBANK</div>
+    <div class="r-sub">Official Transaction Receipt</div>
+    <hr class="r-rule">
+    <table class="r-table">
+      <tr><td>Date</td><td id="rDate">–</td></tr>
+      <tr><td>Time</td><td id="rTime">–</td></tr>
+      <tr><td>From</td><td>Fluxx Everyday<br><span style="font-weight:400;color:#8a90a3;font-size:.78rem">DE89 3704 0044 0532 0130 00</span></td></tr>
+      <tr><td>To</td><td id="rTo">–</td></tr>
+      <tr><td>Note</td><td id="rNote">–</td></tr>
+      <tr><td>Reference</td><td id="rRef">–</td></tr>
+      <tr><td>Status</td><td style="color:#059669">✔ Completed</td></tr>
+    </table>
+    <hr class="r-rule">
+    <div class="r-total"><small>Amount sent</small><b id="rAmt">–</b></div>
+    <div class="r-bar"></div>
+    <div class="r-foot">Fluxxbank AG · fluxxbank.netlify.app<br>Thank you for banking in motion ⚡</div>
+    <div class="r-actions">
+      <button class="r-print" onclick="window.print()">🖨️ Print receipt</button>
+      <button class="r-close" onclick="closeReceipt()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h3 id="authTitle">Welcome back ⚡</h3>
+    <p id="authSub">Log in to your Fluxxbank account.</p>
+    <input type="text" placeholder="Full name" id="authName" style="display:none" autocomplete="off">
+    <input type="email" placeholder="Email address" id="loginEmail">
+    <input type="password" placeholder="Password (min. 6 characters)" id="loginPass">
+    <div id="authErr" style="color:var(--bad);font-size:.83rem;min-height:18px;margin-bottom:8px"></div>
+    <button class="btn" id="authBtn" onclick="submitAuth()">Log in</button>
+    <p style="margin-top:16px;font-size:.82rem"><a href="#" id="authSwitch" style="color:var(--accent2)" onclick="switchAuthMode(event)">New here? Create a free account →</a></p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  /* ------- state ------- */
+  let balance = 24806.12, income = 5850, spending = 1932.45, cashback = 86.40;
+  const txs = [
+    {w:"Nordwind GmbH", s:"Salary · Today", a:3850, c:"NW"},
+    {w:"Blue Bottle Coffee", s:"Card · Today", a:-4.80, c:"BB"},
+    {w:"Metro Transit", s:"Card · Yesterday", a:-2.40, c:"MT"},
+    {w:"Fluxx Vault", s:"Auto-save · Yesterday", a:-250, c:"FV"},
+    {w:"Spotify", s:"Subscription · Oct 8", a:-9.99, c:"SP"},
+    {w:"Maya Chen", s:"FluxxPay · Oct 7", a:120, c:"MC"},
+  ];
+  const spend = [420,380,510,460,300,390,450,340,410,380,290,340];
+  const eur = n => "€" + n.toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  /* ------- renderers ------- */
+  function renderAll(){
+    document.getElementById("dashBal").textContent = eur(balance);
+    document.getElementById("phBal").textContent = eur(balance);
+    document.getElementById("kpiIn").textContent = eur(income);
+    document.getElementById("kpiOut").textContent = eur(spending);
+    document.getElementById("kpiCb").textContent = eur(cashback);
+    const el = document.getElementById("txlist");
+    el.innerHTML = txs.slice(0,6).map(t=>`
+      <div class="tx">
+        <div class="who"><div class="dot">${t.c}</div><div>${t.w}<small>${t.s}</small></div></div>
+        <span class="${t.a>=0?'up':'dn'}" style="font-weight:700">${t.a>=0?'+':'−'}${eur(Math.abs(t.a))}</span>
+      </div>`).join("");
+    drawChart();
+  }
+
+  function drawChart(){
+    const cv = document.getElementById("chart"), ctx = cv.getContext("2d");
+    const dpr = window.devicePixelRatio||1;
+    cv.width = cv.offsetWidth*dpr; cv.height = 220*dpr; ctx.scale(dpr,dpr);
+    const W = cv.offsetWidth, H = 220, pad = 8, max = Math.max(...spend)*1.15, n = spend.length;
+    ctx.clearRect(0,0,W,H);
+    // area
+    const pts = spend.map((v,i)=>[pad+i*(W-2*pad)/(n-1), H-pad-(v/max)*(H-2*pad)]);
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,"rgba(79,124,255,.45)"); grad.addColorStop(1,"rgba(79,124,255,0)");
+    ctx.beginPath(); ctx.moveTo(pts[0][0],H-pad);
+    pts.forEach(p=>ctx.lineTo(p[0],p[1])); ctx.lineTo(pts[n-1][0],H-pad); ctx.closePath();
+    ctx.fillStyle = grad; ctx.fill();
+    // line
+    ctx.beginPath(); pts.forEach((p,i)=> i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));
+    ctx.strokeStyle="#4f7cff"; ctx.lineWidth=2.5; ctx.lineJoin="round"; ctx.stroke();
+    // dots
+    pts.forEach((p,i)=>{ ctx.beginPath(); ctx.arc(p[0],p[1],i===n-1?5:3,0,7);
+      ctx.fillStyle = i===n-1 ? "#22d3ee" : "#4f7cff"; ctx.fill(); });
+  }
+
+  /* ------- payment ------- */
+  function doPay(e){
+    e.preventDefault();
+    const who = document.getElementById("pWho").value;
+    const amt = parseFloat(document.getElementById("pAmt").value);
+    const note = document.getElementById("pNote").value || "FluxxPay";
+    const msg = document.getElementById("paymsg");
+    if(who==="Fluxx Vault"){
+      balance -= amt; spending -= 0; cashback += 0;
+      txs.unshift({w:"Fluxx Vault", s:note+" · Just now", a:-amt, c:"FV"});
+      msg.style.color="var(--ok)"; msg.textContent=`⚡ Moved ${eur(amt)} to your savings vault.`;
+    } else {
+      balance -= amt; spending += amt; cashback += amt*0.015;
+      txs.unshift({w:who, s:note+" · Just now", a:-amt, c:who.split(" ").map(x=>x[0]).join("")});
+      msg.style.color="var(--ok)"; msg.textContent=`⚡ Sent ${eur(amt)} to ${who} in 0.4s. Earned €${(amt*0.015).toFixed(2)} cashback.`;
+    }
+    lastTx = { to: who, amt: amt, note: note || "—", when: new Date(),
+               ref: "FLX-" + Date.now().toString(36).toUpperCase().slice(-8) };
+    msg.innerHTML = msg.textContent + ' &nbsp;<button class="btn ghost" style="padding:7px 14px;font-size:.78rem" onclick="showReceipt()">🧾 Print receipt</button>';
+    document.getElementById("pAmt").value=""; document.getElementById("pNote").value="";
+    renderAll();
+    return false;
+  }
+
+  /* ------- printable receipt ------- */
+  let lastTx = null;
+  function showReceipt(){
+    if(!lastTx) return;
+    const e = new Intl.NumberFormat("en-IE",{style:"currency",currency:"EUR"});
+    document.getElementById("rDate").textContent = lastTx.when.toLocaleDateString("en-IE",{day:"2-digit",month:"long",year:"numeric"});
+    document.getElementById("rTime").textContent = lastTx.when.toLocaleTimeString("en-IE",{hour:"2-digit",minute:"2-digit"});
+    document.getElementById("rTo").textContent = lastTx.to;
+    document.getElementById("rNote").textContent = lastTx.note;
+    document.getElementById("rRef").textContent = lastTx.ref;
+    document.getElementById("rAmt").textContent = e.format(lastTx.amt);
+    document.getElementById("receiptWrap").classList.add("on");
+  }
+  function closeReceipt(){ document.getElementById("receiptWrap").classList.remove("on"); }
+
+  /* ------- ticker ------- */
+  const rates = [["EUR/USD","1.087","+0.12%"],["BTC","$98,420","+2.4%"],["ETH","$3,910","+1.1%"],["S&P 500","6,842","+0.6%"],["Gold","$2,915","−0.3%"],["NASDAQ","22,410","+0.9%"],["GBP/EUR","1.174","−0.08%"]];
+  document.getElementById("ticker").innerHTML = rates.map(r=>`
+    <div class="tick"><span style="color:var(--mut)">${r[0]}</span><b>${r[1]}</b>
+    <span class="${r[2].startsWith("+")?"up":"dn"}">${r[2]}</span></div>`).join("");
+
+  /* ------- counters ------- */
+  function count(id, target, suffix, dur){
+    const el = document.getElementById(id), t0 = performance.now();
+    (function f(t){ const p = Math.min((t-t0)/dur,1), e = 1-Math.pow(1-p,3);
+      el.textContent = Math.round(target*e).toLocaleString()+suffix;
+      if(p<1) requestAnimationFrame(f); })(t0);
+  }
+  count("st1", 2400000, "+", 1800); count("st2", 190, "", 1800);
+
+  /* ------- modal ------- */
+  const bg = document.getElementById("modalBg");
+  function openModal(){ bg.classList.add("show"); }
+  function closeModal(){ bg.classList.remove("show"); }
+  const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+let sb = null;
+if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+  let authMode = "login";
+  const eur2 = n => "\u20AC" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  function switchAuthMode(e){
+    e.preventDefault();
+    authMode = authMode === "login" ? "signup" : "login";
+    const sign = authMode === "signup";
+    document.getElementById("authName").style.display = sign ? "block" : "none";
+    document.getElementById("authTitle").textContent = sign ? "Create your account \u26A1" : "Welcome back \u26A1";
+    document.getElementById("authSub").textContent = sign ? "Join 2.4 million people banking in motion. Free forever." : "Log in to your Fluxxbank account.";
+    document.getElementById("authBtn").textContent = sign ? "Create account" : "Log in";
+    document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in \u2192" : "New here? Create a free account \u2192";
+    document.getElementById("authErr").textContent = "";
+  }
+
+  async function submitAuth(){
+    const em = document.getElementById("loginEmail").value.trim();
+    const pw = document.getElementById("loginPass").value;
+    const nm = document.getElementById("authName").value.trim();
+    const err = document.getElementById("authErr");
+    err.style.color = "var(--bad)";
+    if(!em.includes("@")){ err.textContent = "Please enter a valid email address."; return; }
+    if(!sb){ // fallback: no key yet -> pretend (site still works)
+      closeModal();
+      document.getElementById("authArea").innerHTML = '<button class="btn ghost" onclick="openModal()">\uD83D\uDC4B ' + (nm || em.split("@")[0]) + '</button>';
+      document.getElementById("dashboard").scrollIntoView({behavior:"smooth"});
+      return;
+    }
+    try{
+      if(authMode === "signup"){
+  if(pw.length < 6){ err.textContent = "Password needs at least 6 characters."; return; }
+  const { data: su, error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm || "Customer" } } });
+  if(error) throw error;
+  if(su.user){
+    await sb.from("profiles").insert({
+      id: su.user.id,
+      name: nm || "Customer",
+      email: em,
+      balance: 0,
+      plan: "Basic",
+      status: "Pending",
+      color: "#34d399"
     });
-
-    // --- 3. UTILITIES ---
-    function showLoginError(message) { $("loginErr").textContent = message || ""; }
-    function showPageError(message) { $("pageErr").textContent = message || ""; }
-    
-    function showLoginMessage(message, success = false) {
-      const element = $("loginMessage");
-      element.textContent = message || "";
-      element.classList.toggle("success", Boolean(success));
-      element.classList.toggle("error", !success);
-    }
-
-    function toast(message) {
-      const element = $("toast");
-      element.textContent = message;
-      element.classList.remove("hidden");
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => element.classList.add("hidden"), 3500);
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "").replace(/[&<>"']/g, ch => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-      })[ch]);
-    }
-
-    function isPending(status) {
-      return String(status ?? "").toLowerCase().includes("pending");
-    }
-
-    function statusBadge(status) {
-      const value = String(status ?? "Unknown");
-      const lower = value.toLowerCase();
-      const css = lower === "active" ? "active" : lower.includes("pending") ? "pending" : "";
-      return `<span class="status ${css}">${escapeHtml(value)}</span>`;
-    }
-
-    // --- 4. AUTHENTICATION FLOW ---
-    function showRecoveryForm() {
-      $("loginForm").classList.add("hidden");
-      $("forgotWrap").classList.add("hidden");
-      $("loginMessage").textContent = "";
-      $("newPasswordForm").classList.remove("hidden");
-      $("loginSubtitle").textContent = "Choose a new password for your administrator account.";
-      showLoginError("");
-    }
-
-    function showSignInForm(message = "", success = false) {
-      $("loginForm").classList.remove("hidden");
-      $("forgotWrap").classList.remove("hidden");
-      $("newPasswordForm").classList.add("hidden");
-      $("loginSubtitle").textContent = "Administrator access. Sign in using your authorized Supabase account.";
-      $("passwordResetErr").textContent = "";
-      showLoginError("");
-      showLoginMessage(message, success);
-    }
-
-    async function tryLogin(event) {
-      event.preventDefault();
-      showLoginError("");
-      const email = $("aEmail").value.trim();
-      const password = $("aPass").value;
-      const button = $("loginBtn");
-      button.disabled = true;
-      button.textContent = "Signing in…";
-
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        await boot(data.user);
-      } catch (error) {
-        showLoginError(error.message || "Sign-in failed. Check your details and try again.");
-      } finally {
-        button.disabled = false;
-        button.textContent = "Sign in";
-      }
-    }
-
-    async function boot(user) {
-      $("app").classList.add("hidden");
-      $("loginScreen").classList.remove("hidden");
-      showLoginError("");
-      showPageError("");
-
-      try {
-        if (!user) {
-          const { data, error } = await sb.auth.getUser();
-          if (error) throw error;
-          user = data.user;
-        }
-        if (!user) throw new Error("Please sign in to continue.");
-
-        // Check if the user is an admin
-        const { data: profile, error: profileError } = await sb
-          .from("profiles")
-          .select("id, name, email, role, status")
-          .eq("id", user.id)
-          .maybeSingle();
-        if (profileError) throw profileError;
-
-        if (!profile || String(profile.role).toLowerCase() !== "admin" || String(profile.status).toLowerCase() !== "active") {
-          await sb.auth.signOut();
-          throw new Error("This account is not an active administrator.");
-        }
-
-        $("adminIdentity").textContent = profile.name || profile.email || user.email || "Administrator";
-        await loadAll();
+  }
+  err.style.color = "var(--ok)";
+  err.textContent = "✅ Account created! Confirm the email, then wait for admin activation — usually minutes! 🚀";
+      } else {
+        const { error } = await sb.auth.signInWithPassword({ email: em, password: pw });
+        if(error) throw error;
+        // APPROVAL GATE: check account status before allowing access
         
-        // Show App
-        $("loginScreen").classList.add("hidden");
-        $("app").classList.remove("hidden");
+          throw new Error("\u23F3 Account awaiting approval \u2014 an admin must activate it first. Usually takes minutes!");
         
-        // Render Views
-        renderOverview();
-        renderCustomers();
-        renderApprovals();
-      } catch (error) {
-        $("app").classList.add("hidden");
-        $("loginScreen").classList.remove("hidden");
-        showLoginError(error.message || "Unable to open the admin dashboard.");
+        closeModal();
+        await refreshAuthUI();
+        document.getElementById("dashboard").scrollIntoView({behavior:"smooth"});
       }
+    }catch(e){
+      err.textContent = e.message || "Something went wrong. Try again.";
     }
+  }
 
-    async function loadAll() {
-      const { data, error } = await sb
-        .from("profiles")
-        .select("id, name, email, status, role, created_at")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      customers = data || [];
-    }
-
-    async function requestPasswordReset() {
-      showLoginError("");
-      showLoginMessage("");
-      const email = $("aEmail").value.trim();
-      if (!email) {
-        showLoginMessage("Enter your administrator email above, then click Forgot password? again.");
-        $("aEmail").focus();
-        return;
+  async function refreshAuthUI(){
+    if(!sb) return;
+    const { data: { session } } = await sb.auth.getSession();
+    const area = document.getElementById("authArea");
+    if(session && session.user){
+      let name = session.user.email.split("@")[0];
+      const { data: p } = await sb.from("profiles").select("name,balance").eq("id", session.user.id).single();
+      if(p){
+        name = p.name;
+        document.getElementById("dashBal").textContent = eur2(p.balance);
+        document.getElementById("phBal").textContent = eur2(p.balance);
+        document.getElementById("dashHello").textContent = "Good to see you, " + name.split(" ")[0] + " \uD83D\uDC4B";
       }
-
-      const button = $("forgotPasswordBtn");
-      button.disabled = true;
-      button.textContent = "Sending…";
-      try {
-        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });
-        if (error) throw error;
-        showLoginMessage("If an account exists for that email, a reset link has been sent. Check your inbox and spam folder.", true);
-      } catch (error) {
-        showLoginMessage(error.message || "Unable to send the password reset email.");
-      } finally {
-        button.disabled = false;
-        button.textContent = "Forgot password?";
-      }
+      area.innerHTML = '<button class="btn ghost" onclick="doLogout()" title="Log out">\u23FB ' + name.split(" ")[0] + '</button>';
+    } else {
+      area.innerHTML = '<button class="btn ghost" onclick="openModal()">Log in</button>';
     }
+  }
+  async function doLogout(){ if(sb) await sb.auth.signOut(); location.reload(); }
 
-    async function saveNewPassword(event) {
-      event.preventDefault();
-      $("passwordResetErr").textContent = "";
-      const password = $("newPassword").value;
-      const confirmation = $("confirmNewPassword").value;
-      const button = $("saveNewPasswordBtn");
 
-      if (password.length < 8) {
-        $("passwordResetErr").textContent = "Use at least 8 characters for the new password.";
-        return;
-      }
-      if (password !== confirmation) {
-        $("passwordResetErr").textContent = "The passwords do not match.";
-        return;
-      }
+  /* ------- reviews slideshow ------- */
+  const reviews = [
+    {img:"review 1.png", name:"Amira Saleh", role:"Fluxx Plus member · Berlin",
+     quote:"\u201CI opened my account on the train and was paying friends before my stop. I've never seen a bank move this fast.\u201D"},
+    {img:"review 2.png", name:"Daniel Kovač", role:"Small business owner · Prague",
+     quote:"\u201CFluxxbank replaced three apps for my café — payments, savings and my metal card all live in one place. Game changer.\u201D"},
+    {img:"review 3.png", name:"Sofia Marchetti", role:"Digital nomad · Lisbon",
+     quote:"\u201CI get paid in dollars, spend in euros, and save in vaults at 4.1%. Zero FX surprises. It just works, everywhere.\u201D"},
+    {img:"review 4.png", name:"Henrik Larsen", role:"Retired teacher · Aarhus",
+     quote:"\u201CI was skeptical of online banks, but Fluxx support walked me through everything on the phone. My pension is in good hands.\u201D"},
+  ];
+  let cur = 0, revTimer;
+  const slides = document.querySelectorAll(".rev-slide");
+  const dotsEl = document.getElementById("revDots");
+  dotsEl.innerHTML = reviews.map((_,i)=>'<button onclick="goRev('+i+')" aria-label="review '+(i+1)+'"></button>').join("");
+  const dots = dotsEl.querySelectorAll("button");
+  function showRev(i){
+    cur = (i + reviews.length) % reviews.length;
+    slides.forEach((s,k)=>s.classList.toggle("active", k===cur));
+    dots.forEach((d,k)=>d.classList.toggle("on", k===cur));
+    const r = reviews[cur];
+    document.getElementById("revQuote").textContent = r.quote;
+    document.getElementById("revName").textContent = r.name;
+    document.getElementById("revRole").textContent = r.role;
+    document.getElementById("revAva").src = r.img;
+    document.getElementById("revCount").textContent = (cur+1) + " / " + reviews.length;
+  }
+  function goRev(i){ clearInterval(revTimer); showRev(i); revTimer = setInterval(()=>showRev(cur+1), 5200); }
+  showRev(0);
+  revTimer = setInterval(()=>showRev(cur+1), 5200);
 
-      button.disabled = true;
-      button.textContent = "Saving…";
-      try {
-        const { error } = await sb.auth.updateUser({ password });
-        if (error) throw error;
-        await sb.auth.signOut();
-        window.history.replaceState({}, document.title, window.location.pathname);
-        $("newPasswordForm").reset();
-        $("loginForm").reset();
-        showSignInForm("Password updated. Sign in with your new password.", true);
-      } catch (error) {
-        $("passwordResetErr").textContent = error.message || "Unable to update the password. Reopen the latest reset link and try again.";
-      } finally {
-        button.disabled = false;
-        button.textContent = "Save new password";
-      }
+
+
+  /* ------- showcase gallery ------- */
+  const gallery = [
+    {src:"show 1.png", cap:"Fluxx Debit · Visa", sub:"Your everyday card — free with every account", card:true},
+    {src:"show 2.png", cap:"Fluxx Credit", sub:"Up to 5,000 \u20AC limit · cashback on everything", card:true},
+    {src:"show 3.png", cap:"Fluxx Obsidian Metal", sub:"Our flagship 18g metal card for Metal members", card:true},
+    {src:"show 4.png", cap:"Fluxxbank HQ by night", sub:"Where the magic happens \u2014 Frankfurt flagship"},
+    {src:"show 5.png", cap:"Our flagship lobby", sub:"Marble, brass and zero queues"},
+    {src:"show 6.png", cap:"Inside the vault", sub:"\u20AC8.2 billion in deposits, protected"},
+    {src:"show 7.png", cap:"One tap, done", sub:"Contactless payments in under a second"},
+    {src:"show 8.png", cap:"Always nearby", sub:"12,000+ fee-free ATMs across Europe"},
+    {src:"show 9.png", cap:"San Francisco · Market St", sub:"Our first office outside Europe"},
+    {src:"show 10.png", cap:"Hong Kong at dusk", sub:"Serving customers in 190 countries"},
+  ];
+  let galCur = 0, galTimer;
+  const galStage = document.getElementById("galStage");
+  gallery.forEach((g,i)=>{
+    const s = document.createElement("div");
+    s.className = "gal-slide" + (i===0 ? " active" : "") + (g.card ? " cardish" : "");
+    s.innerHTML = '<img src="'+g.src+'" alt="'+g.cap+'" loading="lazy">';
+    galStage.insertBefore(s, galStage.firstChild);
+  });
+  const galSlides = galStage.querySelectorAll(".gal-slide");
+  document.getElementById("galThumbs").innerHTML = gallery.map((g,i)=>
+    '<button onclick="goGal('+i+')" class="'+(i===0?"on":"")+'"><img src="'+g.src+'" alt="thumb" loading="lazy"></button>').join("");
+  const galThumbBtns = document.querySelectorAll("#galThumbs button");
+  function showGal(i){
+    galCur = (i + gallery.length) % gallery.length;
+    galSlides.forEach((s,k)=>s.classList.toggle("active", k===galCur));
+    galThumbBtns.forEach((b,k)=>b.classList.toggle("on", k===galCur));
+    const g = gallery[galCur];
+    document.getElementById("galCap").innerHTML = g.cap + "<small>" + g.sub + "</small>";
+    document.getElementById("galCount").textContent = (galCur+1) + " / " + gallery.length;
+  }
+  function goGal(i){ clearInterval(galTimer); showGal(i); galTimer = setInterval(()=>showGal(galCur+1), 4500); }
+  showGal(0);
+  galTimer = setInterval(()=>showGal(galCur+1), 4500);
+
+  /* ------- faq / newsletter / back-to-top ------- */
+  function toggleQa(btn){
+    const qa = btn.parentElement, wasOpen = qa.classList.contains("open");
+    document.querySelectorAll(".qa").forEach(q=>q.classList.remove("open"));
+    if(!wasOpen) qa.classList.add("open");
+  }
+  async function subscribe(e){
+    e.preventDefault();
+    const em = document.getElementById("newsEmail").value.trim();
+    const msg = document.getElementById("newsMsg");
+    if(!em.includes("@")){ msg.style.color="var(--bad)"; msg.textContent="Please enter a valid email address."; return false; }
+    if(sb){
+      const { error } = await sb.from("subscribers").insert({ email: em });
+      if(error && error.code === "23505"){ msg.style.color="var(--warn)"; msg.textContent="You\u2019re already on the list! \u26A1"; }
+      else if(error){ msg.style.color="var(--bad)"; msg.textContent="Something went wrong \u2014 try again."; }
+      else { msg.style.color="var(--ok)"; msg.textContent="\u26A1 Welcome aboard! You\u2019re subscribed."; document.getElementById("newsEmail").value=""; }
+      return false;
     }
+    msg.style.color="var(--ok)"; msg.textContent="⚡ Welcome aboard! Check " + em + " to confirm your subscription.";
+    document.getElementById("newsEmail").value = "";
+    return false;
+  }
+  window.addEventListener("scroll", ()=>{
+    document.getElementById("toTop").classList.toggle("show", window.scrollY > 600);
+  });
 
-    // --- 5. RENDERING ---
-    function renderOverview() {
-      $("kCustomers").textContent = customers.length;
-      $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
-      $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
-        <tr>
-          <td>${escapeHtml(c.name || "Unnamed customer")}<small>${escapeHtml(c.email || "")}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role || "customer")}</td>
-        </tr>
-      `).join("") || '<tr><td colspan="3">No customer profiles found.</td></tr>';
-    }
-
-    function renderCustomers() {
-      $("custBody").innerHTML = customers.map((c, i) => `
-        <tr>
-          <td>${escapeHtml(c.name || "Unnamed customer")}<small>${escapeHtml(c.email || "")}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role || "customer")}</td>
-          <td>${isPending(c.status) ? `<button class="btn small approve-btn" type="button" data-index="${i}">Approve</button>` : "—"}</td>
-        </tr>
-      `).join("") || '<tr><td colspan="4">No customer profiles found.</td></tr>';
-    }
-
-    function renderApprovals() {
-      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
-      $("apprList").innerHTML = pending.map(({ customer, index }) => `
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--border)">
-          <div style="min-width:0">
-            <strong>${escapeHtml(customer.name || "Unnamed")}</strong>
-            <div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email || "")}</div>
-          </div>
-          <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
-        </div>
-      `).join("") || '<div class="empty">No pending applications.</div>';
-    }
-  </script>
+  window.addEventListener("resize", drawChart);
+  renderAll();
+  refreshAuthUI();
+</script>
 </body>
 </html>
