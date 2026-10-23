@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxxbank | Secure App</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+  :root{
+    --bg:#070b14; --panel:#0f172a; --border:#1e293b;
+    --txt:#f8fafc; --mut:#94a3b8; --accent:#3b82f6;
+    --ok:#10b981; --bad:#ef4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;}
+  body{background:var(--bg);color:var(--txt);min-height:100vh;display:flex;}
+  
+  /* Sidebar */
+  .sidebar{width:260px;background:var(--panel);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;}
+  .logo{font-size:1.5rem;font-weight:800;color:var(--accent);margin-bottom:40px;display:flex;align-items:center;gap:10px;}
+  .nav-item{padding:12px 16px;border-radius:8px;color:var(--mut);cursor:pointer;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+  .nav-item:hover, .nav-item.active{background:rgba(59,130,246,0.1);color:var(--accent);}
+  .logout-btn{margin-top:auto;background:transparent;border:1px solid var(--border);color:var(--txt);padding:10px;border-radius:8px;cursor:pointer;}
+  .logout-btn:hover{background:var(--border);}
+
+  /* Main Content */
+  .main{flex:1;padding:40px;overflow-y:auto;}
+  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;}
+  .header h1{font-size:1.5rem;font-weight:600;}
+  .user-profile{display:flex;align-items:center;gap:12px;}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:bold;}
+
+  /* Cards */
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;}
+  .card-title{color:var(--mut);font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+  
+  /* Balance */
+  .balance-amount{font-size:3rem;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;color:transparent;}
+  .account-num{color:var(--mut);font-family:monospace;font-size:0.9rem;}
+
+  /* Send Money Form */
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-size:0.85rem;color:var(--mut);margin-bottom:6px;}
+  .form-group input, .form-group select{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:1rem;outline:none;}
+  .form-group input:focus, .form-group select:focus{border-color:var(--accent);}
+  .btn-send{width:100%;padding:14px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:1rem;cursor:pointer;transition:background 0.2s;}
+  .btn-send:hover{background:#2563eb;}
+
+  /* Transaction List */
+  .tx-list{display:flex;flex-direction:column;gap:16px;}
+  .tx-item{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border);}
+  .tx-item:last-child{border-bottom:none;padding-bottom:0;}
+  .tx-info h4{font-size:0.95rem;font-weight:500;margin-bottom:4px;}
+  .tx-info p{font-size:0.8rem;color:var(--mut);}
+  .tx-amount{font-weight:700;font-size:1rem;}
+  .tx-in{color:var(--ok);}
+  .tx-out{color:var(--txt);}
+
+  .msg{padding:12px;border-radius:8px;font-size:0.9rem;margin-top:12px;display:none;}
+  .msg.success{background:rgba(16,185,129,0.1);color:var(--ok);border:1px solid var(--ok);display:block;}
+  .msg.error{background:rgba(239,68,68,0.1);color:var(--bad);border:1px solid var(--bad);display:block;}
+</style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">⚡ Fluxxbank</div>
+    <div class="nav-item active">🏠 Dashboard</div>
+    <div class="nav-item">💳 Cards</div>
+    <div class="nav-item">📊 Analytics</div>
+    <div class="nav-item">⚙️ Settings</div>
+    <button class="logout-btn" onclick="doLogout()">Sign out securely</button>
+  </aside>
+
+  <!-- Main App Area -->
+  <main class="main">
+    <div class="header">
+      <h1>Welcome back, <span id="userName">Loading...</span></h1>
+      <div class="user-profile">
+        <div class="avatar" id="userInitial">U</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Left Column -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Balance Card -->
+        <div class="card">
+          <div class="card-title">Total Available Balance</div>
+          <div class="balance-amount" id="mainBalance">€0.00</div>
+          <div class="account-num">IBAN: DE89 3704 0044 0532 0130 00</div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-title">Recent Activity</div>
+          <div class="tx-list" id="txList">
+            <div style="color:var(--mut);font-size:0.9rem;">Loading transactions...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Send Money Card -->
+        <div class="card">
+          <div class="card-title">Send Money</div>
+          <form onsubmit="return handleSend(event)">
+            <div class="form-group">
+              <label>Recipient</label>
+              <select id="sendTo" required>
+                <option value="" disabled selected>Select recipient</option>
+                <option value="Maya Chen">Maya Chen</option>
+                <option value="Jonas Weber">Jonas Weber</option>
+                <option value="Luna Ortiz">Luna Ortiz</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Amount (€)</label>
+              <input type="number" id="sendAmt" min="0.01" step="0.01" placeholder="0.00" required>
+            </div>
+            <button type="submit" class="btn-send">Send Instantly</button>
+            <div id="sendMsg" class="msg"></div>
+          </form>
+        </div>
+
+        <!-- Virtual Card -->
+        <div class="card" style="background:linear-gradient(135deg,#1e293b,#0f172a);">
+          <div class="card-title">Virtual Debit Card</div>
+          <div style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;margin:20px 0;">•••• •••• •••• 4021</div>
+          <div style="display:flex;justify-content:space-between;color:var(--mut);font-size:0.8rem;">
+            <span id="userNameCard">USER NAME</span>
+            <span>12/28</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const eur = n => "€" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+    let currentBalance = 0;
+
+    // Load data on page start
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { window.location.href = "index.html"; return; }
+
+      // Fetch profile
+      const { data: profile } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
+      if (profile) {
+        const firstName = profile.name.split(" ")[0];
+        document.getElementById("userName").textContent = firstName;
+        document.getElementById("userInitial").textContent = firstName[0].toUpperCase();
+        document.getElementById("userNameCard").textContent = profile.name.toUpperCase();
+        document.getElementById("mainBalance").textContent = eur(profile.balance);
+        currentBalance = profile.balance;
+      }
+
+      loadTransactions(session.user.id);
+    }
+
+    // Fetch real transactions
+    async function loadTransactions(userId) {
+      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(5);
+      const list = document.getElementById("txList");
+      
+      if (!txs || txs.length === 0) {
+        list.innerHTML = '<div style="color:var(--mut);font-size:0.9rem;">No recent activity.</div>';
+        return;
+      }
+
+      list.innerHTML = txs.map(t => {
+        const isIncoming = t.type === 'deposit';
+        return `
+          <div class="tx-item">
+            <div class="tx-info">
+              <h4>${t.description}</h4>
+              <p>${new Date(t.created_at).toLocaleDateString()}</p>
+            </div>
+            <div class="tx-amount ${isIncoming ? 'tx-in' : 'tx-out'}">
+              ${isIncoming ? '+' : '−'}${eur(t.amount)}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Handle sending money
+    async function handleSend(e) {
+      e.preventDefault();
+      const to = document.getElementById("sendTo").value;
+      const amt = parseFloat(document.getElementById("sendAmt").value);
+      const msg = document.getElementById("sendMsg");
+      
+      if (amt > currentBalance) {
+        msg.className = "msg error";
+        msg.textContent = "Insufficient funds.";
+        return false;
+      }
+
+      const { data: { session } } = await sb.auth.getSession();
+      
+      // Deduct balance
+      const newBal = currentBalance - amt;
+      const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", session.user.id);
+      
+      if (err1) {
+        msg.className = "msg error";
+        msg.textContent = "Error: " + err1.message;
+        return false;
+      }
+
+      // Add transaction record
+      await sb.from("transactions").insert({
+        user_id: session.user.id,
+        type: 'transfer',
+        amount: amt,
+        description: `Sent to ${to}`
+      });
+
+      // Update UI without reloading page
+      currentBalance = newBal;
+      document.getElementById("mainBalance").textContent = eur(newBal);
+      document.getElementById("sendAmt").value = "";
+      
+      msg.className = "msg success";
+      msg.textContent = `Successfully sent ${eur(amt)} to ${to}`;
+      
+      loadTransactions(session.user.id); // Refresh list
+      return false;
+    }
+
+    async function doLogout() {
+      await sb.auth.signOut();
+      window.location.href = "index.html";
+    }
+
+    init();
+  </script>
+</body>
+</html>
