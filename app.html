@@ -66,9 +66,9 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="logo">⚡ Fluxxbank</div>
-    <div class="nav-item active">🏠 Dashboard</div>
+    <div class="nav-item active" onclick="switchView('dash', this)">🏠 Dashboard</div>
+    <div class="nav-item" onclick="switchView('history', this)">📊 Transaction History</div>
     <div class="nav-item">💳 Cards</div>
-    <div class="nav-item">📊 Analytics</div>
     <div class="nav-item">⚙️ Settings</div>
     <button class="logout-btn" onclick="doLogout()">Sign out securely</button>
   </aside>
@@ -82,17 +82,15 @@
       </div>
     </div>
 
-    <div class="grid">
+    <!-- DASHBOARD VIEW -->
+    <div id="view-dash" class="grid">
       <!-- Left Column -->
       <div style="display:flex;flex-direction:column;gap:24px;">
-        <!-- Balance Card -->
         <div class="card">
           <div class="card-title">Total Available Balance</div>
           <div class="balance-amount" id="mainBalance">€0.00</div>
           <div class="account-num">IBAN: DE89 3704 0044 0532 0130 00</div>
         </div>
-
-        <!-- Recent Activity -->
         <div class="card">
           <div class="card-title">Recent Activity</div>
           <div class="tx-list" id="txList">
@@ -103,7 +101,6 @@
 
       <!-- Right Column -->
       <div style="display:flex;flex-direction:column;gap:24px;">
-        <!-- Send Money Card -->
         <div class="card">
           <div class="card-title">Send Money</div>
           <form onsubmit="return handleSend(event)">
@@ -117,7 +114,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label>Amount (€)</label>
+              <label>Amount</label>
               <input type="number" id="sendAmt" min="0.01" step="0.01" placeholder="0.00" required>
             </div>
             <button type="submit" class="btn-send">Send Instantly</button>
@@ -125,7 +122,6 @@
           </form>
         </div>
 
-        <!-- Virtual Card -->
         <div class="card" style="background:linear-gradient(135deg,#1e293b,#0f172a);">
           <div class="card-title">Virtual Debit Card</div>
           <div style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;margin:20px 0;">•••• •••• •••• 4021</div>
@@ -136,6 +132,16 @@
         </div>
       </div>
     </div>
+
+    <!-- HISTORY VIEW -->
+    <div id="view-history" style="display:none;">
+      <div class="card">
+        <div class="card-title">Full Transaction History</div>
+        <div class="tx-list" id="fullHistoryList">
+          <div style="color:var(--mut);">Loading history...</div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -143,30 +149,45 @@
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const eur = n => "€" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+    
     let currentBalance = 0;
+    let userCurrency = 'EUR';
 
-    // Load data on page start
+    const formatMoney = n => new Intl.NumberFormat('en-IE', { style: 'currency', currency: userCurrency }).format(n);
+
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = "index.html"; return; }
 
-      // Fetch profile
-      const { data: profile } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
+      const { data: profile } = await sb.from("profiles").select("name, balance, currency").eq("id", session.user.id).single();
       if (profile) {
         const firstName = profile.name.split(" ")[0];
         document.getElementById("userName").textContent = firstName;
         document.getElementById("userInitial").textContent = firstName[0].toUpperCase();
         document.getElementById("userNameCard").textContent = profile.name.toUpperCase();
-        document.getElementById("mainBalance").textContent = eur(profile.balance);
-        currentBalance = profile.balance;
+        
+        userCurrency = profile.currency || 'EUR';
+        currentBalance = profile.balance || 0;
+        
+        document.getElementById("mainBalance").textContent = formatMoney(currentBalance);
       }
 
-      loadTransactions(session.user.id);
+      loadRecentTransactions(session.user.id);
     }
 
-    // Fetch real transactions
-    async function loadTransactions(userId) {
+    function switchView(viewName, btn) {
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+      
+      document.getElementById('view-dash').style.display = viewName === 'dash' ? 'grid' : 'none';
+      document.getElementById('view-history').style.display = viewName === 'history' ? 'block' : 'none';
+      
+      if (viewName === 'history') {
+        loadFullHistory();
+      }
+    }
+
+    async function loadRecentTransactions(userId) {
       const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(5);
       const list = document.getElementById("txList");
       
@@ -184,14 +205,41 @@
               <p>${new Date(t.created_at).toLocaleDateString()}</p>
             </div>
             <div class="tx-amount ${isIncoming ? 'tx-in' : 'tx-out'}">
-              ${isIncoming ? '+' : '−'}${eur(t.amount)}
+              ${isIncoming ? '+' : '−'}${formatMoney(t.amount)}
             </div>
           </div>
         `;
       }).join("");
     }
 
-    // Handle sending money
+    async function loadFullHistory() {
+      const { data: { session } } = await sb.auth.getSession();
+      if(!session) return;
+      
+      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false });
+      const list = document.getElementById("fullHistoryList");
+      
+      if (!txs || txs.length === 0) {
+        list.innerHTML = '<div style="color:var(--mut);font-size:0.9rem;">No transactions found.</div>';
+        return;
+      }
+
+      list.innerHTML = txs.map(t => {
+        const isIncoming = t.type === 'deposit';
+        return `
+          <div class="tx-item" style="padding: 20px 0;">
+            <div class="tx-info">
+              <h4 style="font-size: 1.1rem;">${t.description}</h4>
+              <p>${new Date(t.created_at).toLocaleString()}</p>
+            </div>
+            <div class="tx-amount ${isIncoming ? 'tx-in' : 'tx-out'}" style="font-size: 1.2rem;">
+              ${isIncoming ? '+' : '−'}${formatMoney(t.amount)}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
     async function handleSend(e) {
       e.preventDefault();
       const to = document.getElementById("sendTo").value;
@@ -206,7 +254,6 @@
 
       const { data: { session } } = await sb.auth.getSession();
       
-      // Deduct balance
       const newBal = currentBalance - amt;
       const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", session.user.id);
       
@@ -216,7 +263,6 @@
         return false;
       }
 
-      // Add transaction record
       await sb.from("transactions").insert({
         user_id: session.user.id,
         type: 'transfer',
@@ -224,15 +270,14 @@
         description: `Sent to ${to}`
       });
 
-      // Update UI without reloading page
       currentBalance = newBal;
-      document.getElementById("mainBalance").textContent = eur(newBal);
+      document.getElementById("mainBalance").textContent = formatMoney(newBal);
       document.getElementById("sendAmt").value = "";
       
       msg.className = "msg success";
-      msg.textContent = `Successfully sent ${eur(amt)} to ${to}`;
+      msg.textContent = `Successfully sent ${formatMoney(amt)} to ${to}`;
       
-      loadTransactions(session.user.id); // Refresh list
+      loadRecentTransactions(session.user.id);
       return false;
     }
 
