@@ -35,6 +35,10 @@
     .secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
     .small { padding: 7px 10px; font-size: 12px; }
     .error { color: var(--red); font-size: 13px; line-height: 1.5; margin-top: 12px; overflow-wrap: anywhere; }
+    .success { color: var(--green); }
+    .login-links { display: flex; justify-content: flex-end; margin-top: 12px; }
+    .text-btn { padding: 4px 0; border: 0; background: transparent; color: #ffb16f; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+    .text-btn:hover { color: #ffd0a5; }
     #app { min-height: 100vh; }
     .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
     .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
@@ -88,7 +92,7 @@
   <section id="loginScreen">
     <div class="login-box">
       <div class="brand">FluxxBank</div>
-      <p class="subtitle">Administrator access. Sign in using your authorized Supabase account.</p>
+      <p class="subtitle" id="loginSubtitle">Administrator access. Sign in using your authorized Supabase account.</p>
       <form id="loginForm">
         <label for="aEmail">Administrator email</label>
         <input type="email" id="aEmail" autocomplete="username" placeholder="Enter your email" required>
@@ -96,6 +100,19 @@
         <input type="password" id="aPass" autocomplete="current-password" placeholder="Enter your password" required>
         <div id="loginErr" class="error" role="alert"></div>
         <button class="btn full" id="loginBtn" type="submit">Sign in</button>
+      </form>
+      <div class="login-links" id="forgotWrap">
+        <button class="text-btn" id="forgotPasswordBtn" type="button">Forgot password?</button>
+      </div>
+      <div id="loginMessage" class="error" role="status" aria-live="polite"></div>
+      <form id="newPasswordForm" class="hidden">
+        <label for="newPassword">New password</label>
+        <input type="password" id="newPassword" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
+        <label for="confirmNewPassword">Confirm new password</label>
+        <input type="password" id="confirmNewPassword" autocomplete="new-password" minlength="8" required placeholder="Enter the new password again">
+        <div id="passwordResetErr" class="error" role="alert"></div>
+        <button class="btn full" id="saveNewPasswordBtn" type="submit">Save new password</button>
+        <button class="btn secondary full" id="backToLoginBtn" type="button">Back to sign in</button>
       </form>
     </div>
   </section>
@@ -164,9 +181,12 @@
     // SUPABASE SETTINGS — confirm this URL in Project Settings.
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
 
-    // PUBLISHABLE KEY LINE: this is the only key line to edit if it changes.
-    // Use an sb_publishable_ key only. NEVER place an sb_secret_ key here.
+    // PUBLISHABLE KEY LINE: use an sb_publishable_ key only.
+    // NEVER place an sb_secret_ or service_role key in browser code.
     const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+
+    // Must also be listed under Supabase Auth > URL Configuration > Redirect URLs.
+    const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
 
     let sb = null;
     let customers = [];
@@ -175,6 +195,93 @@
 
     function showLoginError(message) { $("loginErr").textContent = message || ""; }
     function showPageError(message) { $("pageErr").textContent = message || ""; }
+
+    function showLoginMessage(message, success = false) {
+      const element = $("loginMessage");
+      element.textContent = message || "";
+      element.classList.toggle("success", Boolean(success));
+      element.classList.toggle("error", !success);
+    }
+
+    function showRecoveryForm() {
+      $("loginForm").classList.add("hidden");
+      $("forgotWrap").classList.add("hidden");
+      $("loginMessage").textContent = "";
+      $("newPasswordForm").classList.remove("hidden");
+      $("loginSubtitle").textContent = "Choose a new password for your administrator account.";
+      showLoginError("");
+    }
+
+    function showSignInForm(message = "", success = false) {
+      $("loginForm").classList.remove("hidden");
+      $("forgotWrap").classList.remove("hidden");
+      $("newPasswordForm").classList.add("hidden");
+      $("loginSubtitle").textContent = "Administrator access. Sign in using your authorized Supabase account.";
+      $("passwordResetErr").textContent = "";
+      showLoginError("");
+      showLoginMessage(message, success);
+    }
+
+    async function requestPasswordReset() {
+      showLoginError("");
+      showLoginMessage("");
+      const email = $("aEmail").value.trim();
+      if (!email) {
+        showLoginMessage("Enter your administrator email above, then click Forgot password? again.");
+        $("aEmail").focus();
+        return;
+      }
+
+      const button = $("forgotPasswordBtn");
+      button.disabled = true;
+      button.textContent = "Sending…";
+      try {
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+          redirectTo: PASSWORD_RESET_REDIRECT
+        });
+        if (error) throw error;
+        showLoginMessage("If an account exists for that email, a reset link has been sent. Check your inbox and spam folder.", true);
+      } catch (error) {
+        showLoginMessage(error.message || "Unable to send the password reset email.");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Forgot password?";
+      }
+    }
+
+    async function saveNewPassword(event) {
+      event.preventDefault();
+      $("passwordResetErr").textContent = "";
+      const password = $("newPassword").value;
+      const confirmation = $("confirmNewPassword").value;
+      const button = $("saveNewPasswordBtn");
+
+      if (password.length < 8) {
+        $("passwordResetErr").textContent = "Use at least 8 characters for the new password.";
+        return;
+      }
+      if (password !== confirmation) {
+        $("passwordResetErr").textContent = "The passwords do not match.";
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Saving…";
+      try {
+        const { error } = await sb.auth.updateUser({ password });
+        if (error) throw error;
+        await sb.auth.signOut();
+        window.history.replaceState({}, document.title, window.location.pathname);
+        $("newPasswordForm").reset();
+        $("loginForm").reset();
+        showSignInForm("Password updated. Sign in with your new password.", true);
+      } catch (error) {
+        $("passwordResetErr").textContent = error.message || "Unable to update the password. Reopen the latest reset link and try again.";
+      } finally {
+        button.disabled = false;
+        button.textContent = "Save new password";
+      }
+    }
 
     function toast(message) {
       const element = $("toast");
@@ -371,6 +478,12 @@
         });
 
         $("loginForm").addEventListener("submit", tryLogin);
+        $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);
+        $("newPasswordForm").addEventListener("submit", saveNewPassword);
+        $("backToLoginBtn").addEventListener("click", () => {
+          $("newPasswordForm").reset();
+          showSignInForm();
+        });
         $("logoutBtn").addEventListener("click", logout);
         document.querySelectorAll(".side-btn").forEach(button => {
           button.addEventListener("click", () => nav(button.dataset.view, button));
@@ -382,9 +495,21 @@
           approve(Number(button.dataset.index));
         });
 
+        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        const recoveryLinkDetected = hashParams.get("type") === "recovery";
+        const authError = hashParams.get("error_description");
+
+        // Supabase emits PASSWORD_RECOVERY after handling a valid reset link.
+        sb.auth.onAuthStateChange((event) => {
+          if (event === "PASSWORD_RECOVERY") showRecoveryForm();
+        });
+
+        if (recoveryLinkDetected) showRecoveryForm();
+        if (authError) showLoginMessage(authError.replace(/\+/g, " "));
+
         const { data, error } = await sb.auth.getSession();
         if (error) throw error;
-        if (data.session) await boot(data.session.user);
+        if (data.session && !recoveryLinkDetected) await boot(data.session.user);
       } catch (error) {
         showLoginError(error.message || "Unable to initialize the admin page.");
       }
