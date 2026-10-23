@@ -150,8 +150,8 @@
             <h2 class="section-title">Customers</h2>
             <p class="section-desc">View customer profiles, balances, and manage their accounts.</p>
             <div class="panel"><div class="table-wrap"><table>
-              <thead><tr><th>Customer</th><th>Status</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead>
-              <tbody id="custBody"><tr><td colspan="5">Loading records…</td></tr></tbody>
+              <thead><tr><th>Customer</th><th>Status</th><th>Balance</th><th>Action</th></tr></thead>
+              <tbody id="custBody"><tr><td colspan="4">Loading records…</td></tr></tbody>
             </table></div></div>
           </section>
 
@@ -286,7 +286,7 @@
     }
 
     async function loadAll() {
-      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, created_at").order("created_at", { ascending: false });
+      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, currency, dob, phone, created_at").order("created_at", { ascending: false });
       if (error) throw error;
       customers = data || [];
     }
@@ -325,17 +325,19 @@
     }
 
     function renderCustomers() {
-      $("custBody").innerHTML = customers.map((c, i) => `
+      $("custBody").innerHTML = customers.map((c, i) => {
+        const curSymbol = c.currency === 'USD' ? '$' : c.currency === 'GBP' ? '£' : '€';
+        return `
         <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
+          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)} | ${c.phone || 'No phone'}</small></td>
           <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role)}</td>
-          <td style="font-weight:bold; color:var(--green);">$${Number(c.balance || 0).toFixed(2)}</td>
+          <td style="font-weight:bold; color:var(--green);">${curSymbol}${Number(c.balance || 0).toFixed(2)}</td>
           <td>
             ${isPending(c.status) ? `<button class="btn small approve-btn" type="button" data-index="${i}">Approve</button>` : ""}
-            <button class="btn small" style="background:var(--orange); color:#000; margin-left:5px;" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button>
+            <button class="btn small" style="background:var(--orange); color:#000; margin-left:5px;" onclick="depositMoney('${c.id}', '${c.name}', '${c.currency || 'EUR'}')">+ Deposit</button>
           </td>
-        </tr>`).join("") || '<tr><td colspan="5">No profiles.</td></tr>';
+        </tr>`;
+      }).join("") || '<tr><td colspan="4">No profiles.</td></tr>';
     }
 
     function renderApprovals() {
@@ -347,7 +349,7 @@
         </div>`).join("") || '<div class="empty">No pending applications.</div>';
     }
 
-    async function depositMoney(userId, userName) {
+    async function depositMoney(userId, userName, currency) {
       const amountStr = prompt(`How much to deposit for ${userName}? (e.g. 500)`);
       if (!amountStr) return;
       const amount = parseFloat(amountStr);
@@ -361,7 +363,8 @@
 
       await sb.from("transactions").insert({ user_id: userId, type: 'deposit', amount: amount, description: 'Admin manual deposit' });
       
-      toast(`✅ Deposited $${amount} to ${userName}`);
+      const sym = currency === 'USD' ? '$' : currency === 'GBP' ? '£' : '€';
+      toast(`✅ Deposited ${sym}${amount} to ${userName}`);
       await loadAll(); renderCustomers();
     }
   </script>
