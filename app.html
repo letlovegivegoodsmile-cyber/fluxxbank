@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fluxxbank | Secure Portal</title>
 <link rel="icon" type="image/png" href="favicon.png">
+<!-- jsPDF Library for downloading real PDF statements -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
 <style>
   :root{
-    --bg:#070b14; --panel:#0f172a; --border:#1e293b;
+    --bg:#070b14; --panel:#0f172a; --panel-light:#1e293b; --border:#1e293b;
     --txt:#f8fafc; --mut:#94a3b8; --accent:#3b82f6;
     --ok:#10b981; --bad:#ef4444; --warn:#f59e0b;
   }
@@ -16,57 +20,60 @@
   
   /* Sidebar */
   .sidebar{width:260px;background:var(--panel);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;}
-  .logo{font-size:1.5rem;font-weight:800;color:var(--accent);margin-bottom:40px;display:flex;align-items:center;gap:10px;}
-  .nav-item{padding:12px 16px;border-radius:8px;color:var(--mut);cursor:pointer;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;gap:12px;font-weight:500;}
+  .logo{font-size:1.5rem;font-weight:800;color:var(--accent);margin-bottom:40px;display:flex;align-items:center;gap:10px;letter-spacing:-0.5px;}
+  .nav-item{padding:12px 16px;border-radius:8px;color:var(--mut);cursor:pointer;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;gap:12px;font-weight:500;font-size:0.95rem;}
   .nav-item:hover, .nav-item.active{background:rgba(59,130,246,0.1);color:var(--accent);}
-  .logout-btn{margin-top:auto;background:transparent;border:1px solid var(--border);color:var(--txt);padding:10px;border-radius:8px;cursor:pointer;}
+  .logout-btn{margin-top:auto;background:transparent;border:1px solid var(--border);color:var(--txt);padding:10px;border-radius:8px;cursor:pointer;transition:0.2s;}
   .logout-btn:hover{background:var(--border);}
 
   /* Main Content */
   .main{flex:1;padding:40px;overflow-y:auto;}
   .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;}
-  .header h1{font-size:1.5rem;font-weight:600;}
+  .header h1{font-size:1.6rem;font-weight:600;letter-spacing:-0.5px;}
+  .header p{color:var(--mut);font-size:0.9rem;margin-top:4px;}
   .user-profile{display:flex;align-items:center;gap:12px;}
-  .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:bold;}
+  .avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#2563eb);display:grid;place-items:center;font-weight:bold;font-size:1.1rem;box-shadow:0 4px 12px rgba(59,130,246,0.3);}
 
-  .view{display:none;}
+  .view{display:none;animation:fadeIn 0.3s ease;}
   .view.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
   .grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
   .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;}
-  .card-title{color:var(--mut);font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+  .card-title{color:var(--mut);font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;font-weight:600;}
   
   /* Overview Specifics */
-  .balance-amount{font-size:3rem;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;color:transparent;}
-  .account-num{color:var(--mut);font-family:monospace;font-size:0.9rem;}
+  .balance-amount{font-size:3.5rem;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;color:transparent;letter-spacing:-1px;}
+  .account-num{color:var(--mut);font-family:monospace;font-size:0.9rem;letter-spacing:1px;}
   .quick-actions{display:flex;gap:12px;margin-top:24px;}
-  .qa-btn{flex:1;padding:12px;background:rgba(59,130,246,0.1);color:var(--accent);border:1px solid rgba(59,130,246,0.2);border-radius:8px;font-weight:600;cursor:pointer;text-align:center;}
-  .qa-btn:hover{background:rgba(59,130,246,0.2);}
+  .qa-btn{flex:1;padding:14px;background:rgba(59,130,246,0.1);color:var(--accent);border:1px solid rgba(59,130,246,0.2);border-radius:12px;font-weight:600;cursor:pointer;text-align:center;transition:0.2s;}
+  .qa-btn:hover{background:rgba(59,130,246,0.2);transform:translateY(-2px);}
 
   /* Forms */
   .form-group{margin-bottom:16px;}
-  .form-group label{display:block;font-size:0.85rem;color:var(--mut);margin-bottom:6px;}
-  .form-group input, .form-group select{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:1rem;outline:none;}
-  .btn-primary{width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;}
+  .form-group label{display:block;font-size:0.85rem;color:var(--mut);margin-bottom:6px;font-weight:500;}
+  .form-group input, .form-group select{width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:1rem;outline:none;transition:0.2s;}
+  .form-group input:focus, .form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,0.1);}
+  .btn-primary{width:100%;padding:14px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:1rem;cursor:pointer;transition:0.2s;}
+  .btn-primary:hover{background:#2563eb;}
   
   /* Transactions Table */
   .table-wrap{overflow-x:auto;}
   table{width:100%;border-collapse:collapse;text-align:left;}
-  th{color:var(--mut);font-size:0.8rem;text-transform:uppercase;padding:12px;border-bottom:1px solid var(--border);}
+  th{color:var(--mut);font-size:0.75rem;text-transform:uppercase;padding:12px;border-bottom:1px solid var(--border);font-weight:600;}
   td{padding:16px 12px;border-bottom:1px solid var(--border);font-size:0.9rem;}
-  .tx-amt{font-weight:700;}
+  .tx-amt{font-weight:700;font-family:monospace;font-size:0.95rem;}
   .tx-amt.neg{color:var(--txt);}
   .tx-amt.pos{color:var(--ok);}
-  .status-badge{font-size:0.75rem;padding:4px 8px;border-radius:4px;font-weight:600;}
-  .status-completed{background:rgba(16,185,129,0.1);color:var(--ok);}
-  .status-pending{background:rgba(245,158,11,0.1);color:var(--warn);}
-  .tx-desc{font-weight:500;}
-  .tx-ref{font-family:monospace;color:var(--mut);font-size:0.8rem;}
+  .status-badge{font-size:0.75rem;padding:4px 8px;border-radius:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+  .status-completed{background:rgba(16,185,129,0.1);color:var(--ok);border:1px solid rgba(16,185,129,0.2);}
+  .tx-desc{font-weight:500;color:var(--txt);}
+  .tx-ref{font-family:monospace;color:var(--mut);font-size:0.75rem;margin-top:4px;}
 
   /* Accounts Grid */
-  .acc-detail{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+  .acc-detail{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
   .acc-detail span:first-child{color:var(--mut);}
-  .acc-detail span:last-child{font-weight:600;font-family:monospace;}
+  .acc-detail span:last-child{font-weight:600;font-family:monospace;letter-spacing:0.5px;}
 
   .msg{padding:12px;border-radius:8px;font-size:0.9rem;margin-top:12px;display:none;}
   .msg.success{background:rgba(16,185,129,0.1);color:var(--ok);border:1px solid var(--ok);display:block;}
@@ -74,8 +81,10 @@
   
   .btn-receipt{background:rgba(59,130,246,0.1);color:var(--accent);border:1px solid rgba(59,130,246,0.3);padding:6px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;font-weight:600;transition:0.2s;}
   .btn-receipt:hover{background:var(--accent);color:white;}
-  
-  #liveToast{position:fixed;top:20px;right:20px;background:var(--ok);color:white;padding:12px 20px;border-radius:8px;font-weight:bold;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:opacity 0.3s;opacity:0;}
+  .btn-pdf{background:var(--panel-light);color:var(--txt);border:1px solid var(--border);padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:0.2s;}
+  .btn-pdf:hover{background:#334155;}
+
+  #liveToast{position:fixed;top:20px;right:20px;background:var(--ok);color:white;padding:14px 24px;border-radius:8px;font-weight:bold;z-index:9999;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:opacity 0.3s;opacity:0;font-size:0.9rem;}
 </style>
 </head>
 <body>
@@ -92,7 +101,10 @@
 
   <main class="main">
     <div class="header">
-      <h1>Welcome back, <span id="userName">Loading...</span></h1>
+      <div>
+        <h1>Welcome back, <span id="userName">Loading...</span></h1>
+        <p id="currentDate"></p>
+      </div>
       <div class="user-profile"><div class="avatar" id="userInitial">U</div></div>
     </div>
 
@@ -123,15 +135,15 @@
           <div class="card">
             <div class="card-title">Money Received & Spent</div>
             <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
-              <span style="color:var(--mut)">Received</span><span style="color:var(--ok);font-weight:bold;" id="totalReceived">+€0.00</span>
+              <span style="color:var(--mut)">Received</span><span style="color:var(--ok);font-weight:bold;font-family:monospace;" id="totalReceived">+€0.00</span>
             </div>
             <div style="display:flex;justify-content:space-between;">
-              <span style="color:var(--mut)">Spent</span><span style="color:var(--txt);font-weight:bold;" id="totalSpent">-€0.00</span>
+              <span style="color:var(--mut)">Spent</span><span style="color:var(--txt);font-weight:bold;font-family:monospace;" id="totalSpent">-€0.00</span>
             </div>
           </div>
           <div class="card">
             <div class="card-title">Notifications</div>
-            <p style="font-size:0.9rem;color:var(--mut);line-height:1.5;">Your account is fully verified. Welcome to Fluxxbank Premium.</p>
+            <p style="font-size:0.9rem;color:var(--mut);line-height:1.6;">Your account is fully verified. Welcome to Fluxxbank Premium.</p>
           </div>
         </div>
       </div>
@@ -170,10 +182,6 @@
             <div id="sendMsg" class="msg"></div>
           </form>
         </div>
-        <div class="card">
-          <div class="card-title">Manage Recipients</div>
-          <p style="color:var(--mut);font-size:0.9rem;">No saved recipients yet. Transfers will appear in your history.</p>
-        </div>
       </div>
     </div>
 
@@ -183,8 +191,8 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <div class="card-title" style="margin:0;">Full Ledger</div>
           <div style="display:flex;gap:10px;">
-            <input type="text" id="searchTx" placeholder="Search..." onkeyup="filterHistory()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:white;width:200px;">
-            <button class="btn-primary" style="width:auto; padding:8px 16px;" onclick="window.print()">🖨️ Statement</button>
+            <input type="text" id="searchTx" placeholder="Search transactions..." onkeyup="filterHistory()" style="padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:white;width:250px;outline:none;">
+            <button class="btn-pdf" onclick="generatePDF()">📄 Download PDF Statement</button>
           </div>
         </div>
         <div class="table-wrap">
@@ -209,10 +217,11 @@
           <div class="acc-detail"><span>IBAN</span><span>DE89 3704 0044 0532 0130 00</span></div>
           <div class="acc-detail"><span>BIC / SWIFT</span><span>FLUXXDEFFXXX</span></div>
         </div>
-        <div class="card" style="background:linear-gradient(135deg,#1e293b,#0f172a);">
+        <div class="card" style="background:linear-gradient(135deg,#1e293b,#0f172a); position:relative; overflow:hidden;">
+          <div style="position:absolute; top:-50px; right:-50px; width:150px; height:150px; background:rgba(59,130,246,0.2); border-radius:50%; filter:blur(30px);"></div>
           <div class="card-title">Virtual Debit Card</div>
-          <div style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;margin:20px 0;">•••• •••• •••• 4021</div>
-          <div style="display:flex;justify-content:space-between;color:var(--mut);font-size:0.8rem;">
+          <div style="font-family:monospace;font-size:1.4rem;letter-spacing:3px;margin:30px 0;">•••• •••• •••• 4021</div>
+          <div style="display:flex;justify-content:space-between;color:var(--mut);font-size:0.8rem;font-weight:600;letter-spacing:1px;">
             <span id="userNameCard">USER NAME</span>
             <span>12/28</span>
           </div>
@@ -225,17 +234,17 @@
       <div class="grid">
         <div class="card">
           <div class="card-title">Personal Details</div>
-          <div class="form-group"><label>Full Name</label><input type="text" id="profName" disabled></div>
-          <div class="form-group"><label>Email</label><input type="email" id="profEmail" disabled></div>
-          <div class="form-group"><label>Phone</label><input type="tel" id="profPhone" disabled></div>
-          <div class="form-group"><label>Date of Birth</label><input type="text" id="profDob" disabled></div>
+          <div class="form-group"><label>Full Name</label><input type="text" id="profName" disabled style="background:var(--panel-light);"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="profEmail" disabled style="background:var(--panel-light);"></div>
+          <div class="form-group"><label>Phone</label><input type="tel" id="profPhone" disabled style="background:var(--panel-light);"></div>
+          <div class="form-group"><label>Date of Birth</label><input type="text" id="profDob" disabled style="background:var(--panel-light);"></div>
         </div>
         <div class="card">
           <div class="card-title">Security Settings</div>
           <div class="acc-detail"><span>Two-Factor Auth (2FA)</span><span style="color:var(--ok)">Enabled</span></div>
           <div class="acc-detail"><span>Active Devices</span><span>1 (This browser)</span></div>
           <div class="acc-detail"><span>Last Login</span><span>Just now</span></div>
-          <button class="btn-primary" style="margin-top:20px;background:transparent;border:1px solid var(--bad);color:var(--bad);">Report Lost/Stolen Card</button>
+          <button class="btn-primary" style="margin-top:24px;background:transparent;border:1px solid var(--bad);color:var(--bad);">Report Lost/Stolen Card</button>
         </div>
       </div>
     </div>
@@ -252,9 +261,13 @@
     let currentBalance = 0;
     let userCurrency = 'EUR';
     let currentUserName = '';
+    let currentUserEmail = '';
     let allTransactions = [];
 
     const formatMoney = n => new Intl.NumberFormat('en-IE', { style: 'currency', currency: userCurrency }).format(n);
+
+    // Set Current Date in Header
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
     function switchView(viewName, btn) {
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -277,7 +290,9 @@
       const { data: profile } = await sb.from("profiles").select("*").eq("id", session.user.id).single();
       if (profile) {
         currentUserName = profile.name;
+        currentUserEmail = profile.email;
         const firstName = profile.name.split(" ")[0];
+        
         document.getElementById("userName").textContent = firstName;
         document.getElementById("userInitial").textContent = firstName[0].toUpperCase();
         document.getElementById("userNameCard").textContent = profile.name.toUpperCase();
@@ -361,7 +376,6 @@
           counterpartyHtml = `<strong>${t.sender_name}</strong><br><small style="color:var(--mut)">${t.sender_account}</small>`;
           detailHtml = `<div class="tx-desc">${t.purpose || 'Incoming Transfer'}</div><div class="tx-ref">${t.reference}</div>`;
         } else if (t.type === 'transfer') {
-          // Extract receiver from description (e.g. "Transfer to Maya Chen")
           counterpartyHtml = `<strong>${t.description.replace('Transfer to ', '')}</strong><br><small style="color:var(--mut)">Outgoing SEPA</small>`;
           detailHtml = `<div class="tx-desc">${t.purpose || 'Transfer'}</div><div class="tx-ref">${t.reference}</div>`;
         }
@@ -373,7 +387,7 @@
             <td>${counterpartyHtml}</td>
             <td style="text-transform:capitalize">${t.type}</td>
             <td class="tx-amt ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}${formatMoney(t.amount)}</td>
-            <td>${formatMoney(t.balance_after)}</td>
+            <td class="tx-amt">${formatMoney(t.balance_after)}</td>
             <td><span class="status-badge status-${t.status}">${t.status}</span></td>
             <td><button class="btn-receipt" onclick="downloadReceipt(${index})">⬇ PDF</button></td>
           </tr>
@@ -392,6 +406,82 @@
       renderFullTable(filtered);
     }
 
+    // --- REAL PDF GENERATION USING JSPDF ---
+    function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // Header
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(22);
+      doc.setTextColor(59, 130, 246); // FluxxBlue
+      doc.text("FluxxBank", 14, 22);
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont("helvetica", "normal");
+      doc.text("Official Account Statement", 14, 28);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 34);
+      
+      // User Details
+      doc.setTextColor(0, 0, 0);
+      doc.setFont("helvetica", "bold");
+      doc.text("Account Holder:", 14, 48);
+      doc.setFont("helvetica", "normal");
+      doc.text(currentUserName, 48, 48);
+      
+      doc.setFont("helvetica", "bold");
+      doc.text("Email:", 14, 54);
+      doc.setFont("helvetica", "normal");
+      doc.text(currentUserEmail, 48, 54);
+      
+      doc.setFont("helvetica", "bold");
+      doc.text("IBAN:", 14, 60);
+      doc.setFont("helvetica", "normal");
+      doc.text("DE89 3704 0044 0532 0130 00", 48, 60);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Available Balance:", 14, 66);
+      doc.setFont("helvetica", "normal");
+      doc.text(formatMoney(currentBalance), 48, 66);
+
+      // Table Data
+      const tableData = allTransactions.map(t => [
+        new Date(t.created_at).toLocaleDateString(),
+        t.reference,
+        t.purpose || t.description,
+        formatMoney(t.amount),
+        formatMoney(t.balance_after)
+      ]);
+
+      doc.autoTable({
+        startY: 75,
+        head: [['Date', 'Reference', 'Description', 'Amount', 'Balance']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [59, 130, 246], textColor: 255 },
+        styles: { fontSize: 9, cellPadding: 4 },
+        columnStyles: {
+          3: { halign: 'right' },
+          4: { halign: 'right' }
+        }
+      });
+
+      // Footer
+      const pageCount = doc.internal.getNumberOfPages();
+      for(let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text("This is a computer-generated statement. FluxxBank AG.", 14, doc.internal.pageSize.height - 10);
+        doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.width - 30, doc.internal.pageSize.height - 10);
+      }
+
+      doc.save(`FluxxBank_Statement_${new Date().toISOString().split('T')[0]}.pdf`);
+      showLiveToast("📄 PDF Statement downloaded successfully!");
+    }
+
+    // --- SIMPLE TEXT RECEIPT DOWNLOAD ---
     function downloadReceipt(index) {
       const t = allTransactions[index];
       const dateObj = new Date(t.created_at);
@@ -473,7 +563,6 @@ For support, visit fluxxbank.org.uk
         return false;
       }
 
-      // Save transaction with Sender and Purpose details
       await sb.from("transactions").insert({
         user_id: session.user.id,
         reference: txRef,
@@ -486,9 +575,20 @@ For support, visit fluxxbank.org.uk
         account_number: '•••• 4021',
         balance_after: newBal,
         sender_name: currentUserName,
-        sender_account: iban, // Using the new input as the receiver's account in DB context
+        sender_account: iban, 
         purpose: purpose
       });
+
+      // SEND EMAIL NOTIFICATION
+      // We will set up the actual Edge Function in the next step!
+      sb.functions.invoke('send-transfer-email', {
+        body: { 
+          email: currentUserEmail, 
+          amount: formatMoney(amt), 
+          recipient: to, 
+          reference: txRef 
+        }
+      }).catch(err => console.log("Email function not deployed yet", err));
 
       currentBalance = newBal;
       document.getElementById("mainBalance").textContent = formatMoney(newBal);
