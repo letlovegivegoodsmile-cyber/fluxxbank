@@ -185,7 +185,7 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>Date & Time</th><th>Description / Ref</th><th>Type</th><th>Account</th><th>Amount</th><th>Balance After</th><th>Status</th><th>Receipt</th></tr>
+              <tr><th>Date & Time</th><th>Details</th><th>Sender</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Status</th><th>Receipt</th></tr>
             </thead>
             <tbody id="fullTxList"><tr><td colspan="8">Loading...</td></tr></tbody>
           </table>
@@ -321,12 +321,21 @@
       
       list.innerHTML = data.map((t, index) => {
         const isPos = t.amount > 0;
+        
+        let detailHtml = `<div class="tx-desc">${t.description}</div><div class="tx-ref">${t.reference}</div>`;
+        let senderHtml = "-";
+        
+        if (t.type === 'deposit' && t.sender_name) {
+          senderHtml = `<strong>${t.sender_name}</strong><br><small style="color:var(--mut)">${t.sender_account}</small>`;
+          detailHtml = `<div class="tx-desc">${t.purpose || 'Incoming Transfer'}</div><div class="tx-ref">${t.reference}</div>`;
+        }
+
         return `
           <tr>
             <td>${new Date(t.created_at).toLocaleString()}</td>
-            <td><div class="tx-desc">${t.description}</div><div class="tx-ref">${t.reference}</div></td>
+            <td>${detailHtml}</td>
+            <td>${senderHtml}</td>
             <td style="text-transform:capitalize">${t.type}</td>
-            <td>${t.account_name}<br><small style="color:var(--mut)">${t.account_number}</small></td>
             <td class="tx-amt ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}${formatMoney(t.amount)}</td>
             <td>${formatMoney(t.balance_after)}</td>
             <td><span class="status-badge status-${t.status}">${t.status}</span></td>
@@ -341,7 +350,8 @@
       const filtered = allTransactions.filter(t => 
         t.description.toLowerCase().includes(query) || 
         t.reference.toLowerCase().includes(query) ||
-        t.type.toLowerCase().includes(query)
+        t.type.toLowerCase().includes(query) ||
+        (t.sender_name && t.sender_name.toLowerCase().includes(query))
       );
       renderFullTable(filtered);
     }
@@ -350,7 +360,7 @@
       const t = allTransactions[index];
       const date = new Date(t.created_at).toLocaleString();
       
-      const receiptContent = `
+      let receiptContent = `
 ========================================
            FLUXXBANK RECEIPT
 ========================================
@@ -362,7 +372,18 @@ Status: ${t.status.toUpperCase()}
 Type: ${t.type.toUpperCase()}
 Description: ${t.description}
 Account: ${t.account_name} (${t.account_number})
+`;
 
+      if (t.type === 'deposit' && t.sender_name) {
+        receiptContent += `
+--- SENDER DETAILS ---
+Sender Name: ${t.sender_name}
+Sender Account: ${t.sender_account}
+Purpose: ${t.purpose}
+`;
+      }
+
+      receiptContent += `
 --- FINANCIALS ---
 Amount: ${formatMoney(t.amount)}
 Currency: ${t.currency}
@@ -417,7 +438,8 @@ This is an official computer-generated receipt.
         status: 'completed',
         account_name: 'Everyday Account',
         account_number: '•••• 4021',
-        balance_after: newBal
+        balance_after: newBal,
+        purpose: ref
       });
 
       currentBalance = newBal;
