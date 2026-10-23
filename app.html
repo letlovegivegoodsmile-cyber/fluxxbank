@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fluxxbank | Secure App</title>
+<title>Fluxxbank | Secure Portal</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <style>
   :root{
     --bg:#070b14; --panel:#0f172a; --border:#1e293b;
     --txt:#f8fafc; --mut:#94a3b8; --accent:#3b82f6;
-    --ok:#10b981; --bad:#ef4444;
+    --ok:#10b981; --bad:#ef4444; --warn:#f59e0b;
   }
   *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;}
   body{background:var(--bg);color:var(--txt);min-height:100vh;display:flex;}
@@ -17,7 +17,7 @@
   /* Sidebar */
   .sidebar{width:260px;background:var(--panel);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;}
   .logo{font-size:1.5rem;font-weight:800;color:var(--accent);margin-bottom:40px;display:flex;align-items:center;gap:10px;}
-  .nav-item{padding:12px 16px;border-radius:8px;color:var(--mut);cursor:pointer;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+  .nav-item{padding:12px 16px;border-radius:8px;color:var(--mut);cursor:pointer;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;gap:12px;font-weight:500;}
   .nav-item:hover, .nav-item.active{background:rgba(59,130,246,0.1);color:var(--accent);}
   .logout-btn{margin-top:auto;background:transparent;border:1px solid var(--border);color:var(--txt);padding:10px;border-radius:8px;cursor:pointer;}
   .logout-btn:hover{background:var(--border);}
@@ -29,32 +29,44 @@
   .user-profile{display:flex;align-items:center;gap:12px;}
   .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:bold;}
 
-  /* Cards */
+  .view{display:none;}
+  .view.active{display:block;}
+
   .grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px;}
   .card-title{color:var(--mut);font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
   
-  /* Balance */
+  /* Overview Specifics */
   .balance-amount{font-size:3rem;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;color:transparent;}
   .account-num{color:var(--mut);font-family:monospace;font-size:0.9rem;}
+  .quick-actions{display:flex;gap:12px;margin-top:24px;}
+  .qa-btn{flex:1;padding:12px;background:rgba(59,130,246,0.1);color:var(--accent);border:1px solid rgba(59,130,246,0.2);border-radius:8px;font-weight:600;cursor:pointer;text-align:center;}
+  .qa-btn:hover{background:rgba(59,130,246,0.2);}
 
-  /* Send Money Form */
+  /* Forms */
   .form-group{margin-bottom:16px;}
   .form-group label{display:block;font-size:0.85rem;color:var(--mut);margin-bottom:6px;}
   .form-group input, .form-group select{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:1rem;outline:none;}
-  .form-group input:focus, .form-group select:focus{border-color:var(--accent);}
-  .btn-send{width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:1rem;cursor:pointer;transition:background 0.2s;}
-  .btn-send:hover{background:#2563eb;}
+  .btn-primary{width:100%;padding:12px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;}
+  
+  /* Transactions Table */
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;text-align:left;}
+  th{color:var(--mut);font-size:0.8rem;text-transform:uppercase;padding:12px;border-bottom:1px solid var(--border);}
+  td{padding:16px 12px;border-bottom:1px solid var(--border);font-size:0.9rem;}
+  .tx-amt{font-weight:700;}
+  .tx-amt.neg{color:var(--txt);}
+  .tx-amt.pos{color:var(--ok);}
+  .status-badge{font-size:0.75rem;padding:4px 8px;border-radius:4px;font-weight:600;}
+  .status-completed{background:rgba(16,185,129,0.1);color:var(--ok);}
+  .status-pending{background:rgba(245,158,11,0.1);color:var(--warn);}
+  .tx-desc{font-weight:500;}
+  .tx-ref{font-family:monospace;color:var(--mut);font-size:0.8rem;}
 
-  /* Transaction List */
-  .tx-list{display:flex;flex-direction:column;gap:16px;}
-  .tx-item{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border);}
-  .tx-item:last-child{border-bottom:none;padding-bottom:0;}
-  .tx-info h4{font-size:0.95rem;font-weight:500;margin-bottom:4px;}
-  .tx-info p{font-size:0.8rem;color:var(--mut);}
-  .tx-amount{font-weight:700;font-size:1rem;}
-  .tx-in{color:var(--ok);}
-  .tx-out{color:var(--txt);}
+  /* Accounts Grid */
+  .acc-detail{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+  .acc-detail span:first-child{color:var(--mut);}
+  .acc-detail span:last-child{font-weight:600;font-family:monospace;}
 
   .msg{padding:12px;border-radius:8px;font-size:0.9rem;margin-top:12px;display:none;}
   .msg.success{background:rgba(16,185,129,0.1);color:var(--ok);border:1px solid var(--ok);display:block;}
@@ -66,10 +78,11 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="logo">⚡ Fluxxbank</div>
-    <div class="nav-item active" onclick="switchView('dash', this)">🏠 Dashboard</div>
+    <div class="nav-item active" onclick="switchView('overview', this)">🏠 Overview</div>
+    <div class="nav-item" onclick="switchView('transfers', this)">💸 Transfers</div>
     <div class="nav-item" onclick="switchView('history', this)">📊 Transaction History</div>
-    <div class="nav-item">💳 Cards</div>
-    <div class="nav-item">⚙️ Settings</div>
+    <div class="nav-item" onclick="switchView('accounts', this)">🏦 Accounts</div>
+    <div class="nav-item" onclick="switchView('security', this)">⚙️ Profile & Security</div>
     <button class="logout-btn" onclick="doLogout()">Sign out securely</button>
   </aside>
 
@@ -77,51 +90,120 @@
   <main class="main">
     <div class="header">
       <h1>Welcome back, <span id="userName">Loading...</span></h1>
-      <div class="user-profile">
-        <div class="avatar" id="userInitial">U</div>
-      </div>
+      <div class="user-profile"><div class="avatar" id="userInitial">U</div></div>
     </div>
 
-    <!-- DASHBOARD VIEW -->
-    <div id="view-dash" class="grid">
-      <!-- Left Column -->
-      <div style="display:flex;flex-direction:column;gap:24px;">
-        <div class="card">
-          <div class="card-title">Total Available Balance</div>
-          <div class="balance-amount" id="mainBalance">€0.00</div>
-          <div class="account-num">IBAN: DE89 3704 0044 0532 0130 00</div>
+    <!-- 1. OVERVIEW VIEW -->
+    <div id="view-overview" class="view active">
+      <div class="grid">
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <div class="card">
+            <div class="card-title">Available Balance</div>
+            <div class="balance-amount" id="mainBalance">€0.00</div>
+            <div class="account-num" id="mainIBAN">IBAN: DE89 3704 0044 0532 0130 00</div>
+            <div class="quick-actions">
+              <div class="qa-btn" onclick="switchView('transfers', document.querySelectorAll('.nav-item')[1])">Send Money</div>
+              <div class="qa-btn" onclick="switchView('accounts', document.querySelectorAll('.nav-item')[3])">Account Details</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Recent Transactions</div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
+                <tbody id="recentTxList"><tr><td colspan="4">Loading...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <div class="card">
-          <div class="card-title">Recent Activity</div>
-          <div class="tx-list" id="txList">
-            <div style="color:var(--mut);font-size:0.9rem;">Loading transactions...</div>
+        <div style="display:flex;flex-direction:column;gap:24px;">
+          <div class="card">
+            <div class="card-title">Money Received & Spent</div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
+              <span style="color:var(--mut)">Received</span><span style="color:var(--ok);font-weight:bold;" id="totalReceived">+€0.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;">
+              <span style="color:var(--mut)">Spent</span><span style="color:var(--txt);font-weight:bold;" id="totalSpent">-€0.00</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Notifications</div>
+            <p style="font-size:0.9rem;color:var(--mut);line-height:1.5;">Your account is fully verified. Welcome to Fluxxbank Premium.</p>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Right Column -->
-      <div style="display:flex;flex-direction:column;gap:24px;">
+    <!-- 2. TRANSFERS VIEW -->
+    <div id="view-transfers" class="view">
+      <div class="grid">
         <div class="card">
-          <div class="card-title">Send Money</div>
+          <div class="card-title">Make a Transfer</div>
           <form onsubmit="return handleSend(event)">
             <div class="form-group">
-              <label>Recipient</label>
-              <select id="sendTo" required>
-                <option value="" disabled selected>Select recipient</option>
-                <option value="Maya Chen">Maya Chen</option>
-                <option value="Jonas Weber">Jonas Weber</option>
-                <option value="Luna Ortiz">Luna Ortiz</option>
+              <label>Transfer Type</label>
+              <select required>
+                <option>Bank Transfer (SEPA)</option>
+                <option>Internal FluxxPay</option>
               </select>
+            </div>
+            <div class="form-group">
+              <label>Recipient Name</label>
+              <input type="text" id="sendTo" placeholder="e.g. Maya Chen" required>
+            </div>
+            <div class="form-group">
+              <label>IBAN / Account Number</label>
+              <input type="text" id="sendIban" placeholder="DE89 3704..." required>
             </div>
             <div class="form-group">
               <label>Amount</label>
               <input type="number" id="sendAmt" min="0.01" step="0.01" placeholder="0.00" required>
             </div>
-            <button type="submit" class="btn-send">Send Instantly</button>
+            <div class="form-group">
+              <label>Reference</label>
+              <input type="text" id="sendRef" placeholder="e.g. Dinner split" required>
+            </div>
+            <button type="submit" class="btn-primary">Confirm Transfer</button>
             <div id="sendMsg" class="msg"></div>
           </form>
         </div>
+        <div class="card">
+          <div class="card-title">Manage Recipients</div>
+          <p style="color:var(--mut);font-size:0.9rem;">No saved recipients yet. Transfers will appear in your history.</p>
+        </div>
+      </div>
+    </div>
 
+    <!-- 3. TRANSACTION HISTORY VIEW -->
+    <div id="view-history" class="view">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <div class="card-title" style="margin:0;">Full Ledger</div>
+          <input type="text" id="searchTx" placeholder="Search transactions..." onkeyup="filterHistory()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:white;width:250px;">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Date & Time</th><th>Description / Ref</th><th>Type</th><th>Account</th><th>Amount</th><th>Balance After</th><th>Status</th></tr>
+            </thead>
+            <tbody id="fullTxList"><tr><td colspan="7">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. ACCOUNTS VIEW -->
+    <div id="view-accounts" class="view">
+      <div class="grid">
+        <div class="card">
+          <div class="card-title">Account Details</div>
+          <div class="acc-detail"><span>Account Holder</span><span id="accName">Loading...</span></div>
+          <div class="acc-detail"><span>Account Type</span><span>Everyday Current</span></div>
+          <div class="acc-detail"><span>Currency</span><span id="accCurrency">EUR</span></div>
+          <div class="acc-detail"><span>IBAN</span><span>DE89 3704 0044 0532 0130 00</span></div>
+          <div class="acc-detail"><span>BIC / SWIFT</span><span>FLUXXDEFFXXX</span></div>
+          <button class="btn-primary" style="margin-top:20px;background:transparent;border:1px solid var(--accent);color:var(--accent);">Download PDF Statement</button>
+        </div>
         <div class="card" style="background:linear-gradient(135deg,#1e293b,#0f172a);">
           <div class="card-title">Virtual Debit Card</div>
           <div style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;margin:20px 0;">•••• •••• •••• 4021</div>
@@ -133,15 +215,26 @@
       </div>
     </div>
 
-    <!-- HISTORY VIEW -->
-    <div id="view-history" style="display:none;">
-      <div class="card">
-        <div class="card-title">Full Transaction History</div>
-        <div class="tx-list" id="fullHistoryList">
-          <div style="color:var(--mut);">Loading history...</div>
+    <!-- 5. SECURITY VIEW -->
+    <div id="view-security" class="view">
+      <div class="grid">
+        <div class="card">
+          <div class="card-title">Personal Details</div>
+          <div class="form-group"><label>Full Name</label><input type="text" id="profName" disabled></div>
+          <div class="form-group"><label>Email</label><input type="email" id="profEmail" disabled></div>
+          <div class="form-group"><label>Phone</label><input type="tel" id="profPhone" disabled></div>
+          <div class="form-group"><label>Date of Birth</label><input type="text" id="profDob" disabled></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Security Settings</div>
+          <div class="acc-detail"><span>Two-Factor Auth (2FA)</span><span style="color:var(--ok)">Enabled</span></div>
+          <div class="acc-detail"><span>Active Devices</span><span>1 (This browser)</span></div>
+          <div class="acc-detail"><span>Last Login</span><span>Just now</span></div>
+          <button class="btn-primary" style="margin-top:20px;background:transparent;border:1px solid var(--bad);color:var(--bad);">Report Lost/Stolen Card</button>
         </div>
       </div>
     </div>
+
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -152,98 +245,115 @@
     
     let currentBalance = 0;
     let userCurrency = 'EUR';
+    let allTransactions = [];
 
     const formatMoney = n => new Intl.NumberFormat('en-IE', { style: 'currency', currency: userCurrency }).format(n);
+
+    // Switch Views
+    function switchView(viewName, btn) {
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+      document.getElementById('view-' + viewName).classList.add('active');
+    }
 
     async function init() {
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = "index.html"; return; }
 
-      const { data: profile } = await sb.from("profiles").select("name, balance, currency").eq("id", session.user.id).single();
+      // Fetch Profile
+      const { data: profile } = await sb.from("profiles").select("*").eq("id", session.user.id).single();
       if (profile) {
         const firstName = profile.name.split(" ")[0];
         document.getElementById("userName").textContent = firstName;
         document.getElementById("userInitial").textContent = firstName[0].toUpperCase();
         document.getElementById("userNameCard").textContent = profile.name.toUpperCase();
+        document.getElementById("accName").textContent = profile.name;
         
+        // Security View
+        document.getElementById("profName").value = profile.name;
+        document.getElementById("profEmail").value = profile.email;
+        document.getElementById("profPhone").value = profile.phone || 'Not provided';
+        document.getElementById("profDob").value = profile.dob || 'Not provided';
+
         userCurrency = profile.currency || 'EUR';
+        document.getElementById("accCurrency").textContent = userCurrency;
         currentBalance = profile.balance || 0;
-        
         document.getElementById("mainBalance").textContent = formatMoney(currentBalance);
       }
 
-      loadRecentTransactions(session.user.id);
+      await loadTransactions(session.user.id);
     }
 
-    function switchView(viewName, btn) {
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      btn.classList.add('active');
-      
-      document.getElementById('view-dash').style.display = viewName === 'dash' ? 'grid' : 'none';
-      document.getElementById('view-history').style.display = viewName === 'history' ? 'block' : 'none';
-      
-      if (viewName === 'history') {
-        loadFullHistory();
-      }
+    async function loadTransactions(userId) {
+      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false });
+      allTransactions = txs || [];
+
+      // Calculate Received / Spent
+      let received = 0, spent = 0;
+      allTransactions.forEach(t => {
+        if (t.amount > 0) received += t.amount;
+        else spent += Math.abs(t.amount);
+      });
+      document.getElementById("totalReceived").textContent = "+" + formatMoney(received);
+      document.getElementById("totalSpent").textContent = "-" + formatMoney(spent);
+
+      renderRecentTable(allTransactions.slice(0, 5));
+      renderFullTable(allTransactions);
     }
 
-    async function loadRecentTransactions(userId) {
-      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(5);
-      const list = document.getElementById("txList");
+    function renderRecentTable(data) {
+      const list = document.getElementById("recentTxList");
+      if (data.length === 0) return list.innerHTML = '<tr><td colspan="4">No recent activity.</td></tr>';
       
-      if (!txs || txs.length === 0) {
-        list.innerHTML = '<div style="color:var(--mut);font-size:0.9rem;">No recent activity.</div>';
-        return;
-      }
-
-      list.innerHTML = txs.map(t => {
-        const isIncoming = t.type === 'deposit';
+      list.innerHTML = data.map(t => {
+        const isPos = t.amount > 0;
         return `
-          <div class="tx-item">
-            <div class="tx-info">
-              <h4>${t.description}</h4>
-              <p>${new Date(t.created_at).toLocaleDateString()}</p>
-            </div>
-            <div class="tx-amount ${isIncoming ? 'tx-in' : 'tx-out'}">
-              ${isIncoming ? '+' : '−'}${formatMoney(t.amount)}
-            </div>
-          </div>
+          <tr>
+            <td>${new Date(t.created_at).toLocaleDateString()}</td>
+            <td class="tx-desc">${t.description}</td>
+            <td class="tx-amt ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}${formatMoney(t.amount)}</td>
+            <td><span class="status-badge status-${t.status}">${t.status}</span></td>
+          </tr>
         `;
       }).join("");
     }
 
-    async function loadFullHistory() {
-      const { data: { session } } = await sb.auth.getSession();
-      if(!session) return;
+    function renderFullTable(data) {
+      const list = document.getElementById("fullTxList");
+      if (data.length === 0) return list.innerHTML = '<tr><td colspan="7">No transactions found.</td></tr>';
       
-      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false });
-      const list = document.getElementById("fullHistoryList");
-      
-      if (!txs || txs.length === 0) {
-        list.innerHTML = '<div style="color:var(--mut);font-size:0.9rem;">No transactions found.</div>';
-        return;
-      }
-
-      list.innerHTML = txs.map(t => {
-        const isIncoming = t.type === 'deposit';
+      list.innerHTML = data.map(t => {
+        const isPos = t.amount > 0;
         return `
-          <div class="tx-item" style="padding: 20px 0;">
-            <div class="tx-info">
-              <h4 style="font-size: 1.1rem;">${t.description}</h4>
-              <p>${new Date(t.created_at).toLocaleString()}</p>
-            </div>
-            <div class="tx-amount ${isIncoming ? 'tx-in' : 'tx-out'}" style="font-size: 1.2rem;">
-              ${isIncoming ? '+' : '−'}${formatMoney(t.amount)}
-            </div>
-          </div>
+          <tr>
+            <td>${new Date(t.created_at).toLocaleString()}</td>
+            <td><div class="tx-desc">${t.description}</div><div class="tx-ref">${t.reference}</div></td>
+            <td style="text-transform:capitalize">${t.type}</td>
+            <td>${t.account_name}<br><small style="color:var(--mut)">${t.account_number}</small></td>
+            <td class="tx-amt ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}${formatMoney(t.amount)}</td>
+            <td>${formatMoney(t.balance_after)}</td>
+            <td><span class="status-badge status-${t.status}">${t.status}</span></td>
+          </tr>
         `;
       }).join("");
+    }
+
+    function filterHistory() {
+      const query = document.getElementById("searchTx").value.toLowerCase();
+      const filtered = allTransactions.filter(t => 
+        t.description.toLowerCase().includes(query) || 
+        t.reference.toLowerCase().includes(query) ||
+        t.type.toLowerCase().includes(query)
+      );
+      renderFullTable(filtered);
     }
 
     async function handleSend(e) {
       e.preventDefault();
       const to = document.getElementById("sendTo").value;
       const amt = parseFloat(document.getElementById("sendAmt").value);
+      const ref = document.getElementById("sendRef").value;
       const msg = document.getElementById("sendMsg");
       
       if (amt > currentBalance) {
@@ -253,31 +363,39 @@
       }
 
       const { data: { session } } = await sb.auth.getSession();
-      
       const newBal = currentBalance - amt;
+      const txRef = "TXN-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+
       const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", session.user.id);
-      
       if (err1) {
         msg.className = "msg error";
-        msg.textContent = "Error: " + err1.message;
+        msg.textContent = err1.message;
         return false;
       }
 
       await sb.from("transactions").insert({
         user_id: session.user.id,
+        reference: txRef,
+        description: `Transfer to ${to}`,
+        amount: -amt, // Negative for outgoing
+        currency: userCurrency,
         type: 'transfer',
-        amount: amt,
-        description: `Sent to ${to}`
+        status: 'completed',
+        account_name: 'Everyday Account',
+        account_number: '•••• 4021',
+        balance_after: newBal
       });
 
       currentBalance = newBal;
       document.getElementById("mainBalance").textContent = formatMoney(newBal);
       document.getElementById("sendAmt").value = "";
+      document.getElementById("sendTo").value = "";
+      document.getElementById("sendRef").value = "";
       
       msg.className = "msg success";
-      msg.textContent = `Successfully sent ${formatMoney(amt)} to ${to}`;
+      msg.textContent = `Successfully sent ${formatMoney(amt)}. Ref: ${txRef}`;
       
-      loadRecentTransactions(session.user.id);
+      await loadTransactions(session.user.id);
       return false;
     }
 
