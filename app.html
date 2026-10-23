@@ -155,7 +155,7 @@
               <input type="text" id="sendTo" placeholder="e.g. Maya Chen" required>
             </div>
             <div class="form-group">
-              <label>IBAN / Account Number</label>
+              <label>Recipient IBAN / Account Number</label>
               <input type="text" id="sendIban" placeholder="DE89 3704..." required>
             </div>
             <div class="form-group">
@@ -163,8 +163,8 @@
               <input type="number" id="sendAmt" min="0.01" step="0.01" placeholder="0.00" required>
             </div>
             <div class="form-group">
-              <label>Reference</label>
-              <input type="text" id="sendRef" placeholder="e.g. Dinner split" required>
+              <label>Purpose of Payment</label>
+              <input type="text" id="sendRef" placeholder="e.g. Dinner split / Invoice #402" required>
             </div>
             <button type="submit" class="btn-primary">Confirm Transfer</button>
             <div id="sendMsg" class="msg"></div>
@@ -190,7 +190,7 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>Date & Time</th><th>Details</th><th>Sender</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Status</th><th>Receipt</th></tr>
+              <tr><th>Date & Time</th><th>Details</th><th>Counterparty</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Status</th><th>Receipt</th></tr>
             </thead>
             <tbody id="fullTxList"><tr><td colspan="8">Loading...</td></tr></tbody>
           </table>
@@ -251,6 +251,7 @@
     
     let currentBalance = 0;
     let userCurrency = 'EUR';
+    let currentUserName = '';
     let allTransactions = [];
 
     const formatMoney = n => new Intl.NumberFormat('en-IE', { style: 'currency', currency: userCurrency }).format(n);
@@ -275,6 +276,7 @@
 
       const { data: profile } = await sb.from("profiles").select("*").eq("id", session.user.id).single();
       if (profile) {
+        currentUserName = profile.name;
         const firstName = profile.name.split(" ")[0];
         document.getElementById("userName").textContent = firstName;
         document.getElementById("userInitial").textContent = firstName[0].toUpperCase();
@@ -353,18 +355,22 @@
         const isPos = t.amount > 0;
         
         let detailHtml = `<div class="tx-desc">${t.description}</div><div class="tx-ref">${t.reference}</div>`;
-        let senderHtml = "-";
+        let counterpartyHtml = "-";
         
         if (t.type === 'deposit' && t.sender_name) {
-          senderHtml = `<strong>${t.sender_name}</strong><br><small style="color:var(--mut)">${t.sender_account}</small>`;
+          counterpartyHtml = `<strong>${t.sender_name}</strong><br><small style="color:var(--mut)">${t.sender_account}</small>`;
           detailHtml = `<div class="tx-desc">${t.purpose || 'Incoming Transfer'}</div><div class="tx-ref">${t.reference}</div>`;
+        } else if (t.type === 'transfer') {
+          // Extract receiver from description (e.g. "Transfer to Maya Chen")
+          counterpartyHtml = `<strong>${t.description.replace('Transfer to ', '')}</strong><br><small style="color:var(--mut)">Outgoing SEPA</small>`;
+          detailHtml = `<div class="tx-desc">${t.purpose || 'Transfer'}</div><div class="tx-ref">${t.reference}</div>`;
         }
 
         return `
           <tr>
             <td>${new Date(t.created_at).toLocaleString()}</td>
             <td>${detailHtml}</td>
-            <td>${senderHtml}</td>
+            <td>${counterpartyHtml}</td>
             <td style="text-transform:capitalize">${t.type}</td>
             <td class="tx-amt ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}${formatMoney(t.amount)}</td>
             <td>${formatMoney(t.balance_after)}</td>
@@ -388,46 +394,54 @@
 
     function downloadReceipt(index) {
       const t = allTransactions[index];
-      const date = new Date(t.created_at).toLocaleString();
+      const dateObj = new Date(t.created_at);
+      const dateStr = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
       
-      let receiptContent = `
-========================================
-           FLUXXBANK RECEIPT
-========================================
-Date: ${date}
+      let isOutgoing = t.amount < 0;
+      let senderName = isOutgoing ? currentUserName : (t.sender_name || 'FluxxBank Customer');
+      let senderAcc = isOutgoing ? 'DE89 3704 0044 0532 0130 00' : (t.sender_account || 'N/A');
+      let receiverName = isOutgoing ? t.description.replace('Transfer to ', '') : currentUserName;
+      let receiverAcc = isOutgoing ? 'Provided by customer' : 'DE89 3704 0044 0532 0130 00';
+      
+      const receiptContent = `
+======================================================
+                      FLUXXBANK
+               Official Transaction Receipt
+======================================================
+Date: ${dateStr}          Time: ${timeStr}
 Reference: ${t.reference}
 Status: ${t.status.toUpperCase()}
 
---- TRANSACTION DETAILS ---
-Type: ${t.type.toUpperCase()}
-Description: ${t.description}
-Account: ${t.account_name} (${t.account_number})
-`;
+------------------- TRANSACTION -------------------
+Type:        ${t.type.toUpperCase()}
+Amount:      ${formatMoney(t.amount)}
+Currency:    ${t.currency}
+Purpose:     ${t.purpose || t.description}
 
-      if (t.type === 'deposit' && t.sender_name) {
-        receiptContent += `
---- SENDER DETAILS ---
-Sender Name: ${t.sender_name}
-Sender Account: ${t.sender_account}
-Purpose: ${t.purpose}
-`;
-      }
+------------------- SENDER DETAILS ----------------
+Name:        ${senderName}
+Account:     ${senderAcc}
 
-      receiptContent += `
---- FINANCIALS ---
-Amount: ${formatMoney(t.amount)}
-Currency: ${t.currency}
+------------------- RECEIVER DETAILS --------------
+Name:        ${receiverName}
+Account:     ${receiverAcc}
+
+------------------- ACCOUNTING --------------------
 Balance After: ${formatMoney(t.balance_after)}
-========================================
+
+======================================================
 Thank you for banking with Fluxxbank.
-This is an official computer-generated receipt.
+This is a computer-generated receipt and requires no signature.
+For support, visit fluxxbank.org.uk
+======================================================
       `;
 
       const blob = new Blob([receiptContent], { type: 'text/plain' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Fluxxbank_Receipt_${t.reference}.txt`;
+      a.download = `FluxxBank_Receipt_${t.reference}.txt`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -437,8 +451,9 @@ This is an official computer-generated receipt.
     async function handleSend(e) {
       e.preventDefault();
       const to = document.getElementById("sendTo").value;
+      const iban = document.getElementById("sendIban").value;
       const amt = parseFloat(document.getElementById("sendAmt").value);
-      const ref = document.getElementById("sendRef").value;
+      const purpose = document.getElementById("sendRef").value;
       const msg = document.getElementById("sendMsg");
       
       if (amt > currentBalance) {
@@ -458,6 +473,7 @@ This is an official computer-generated receipt.
         return false;
       }
 
+      // Save transaction with Sender and Purpose details
       await sb.from("transactions").insert({
         user_id: session.user.id,
         reference: txRef,
@@ -469,17 +485,20 @@ This is an official computer-generated receipt.
         account_name: 'Everyday Account',
         account_number: '•••• 4021',
         balance_after: newBal,
-        purpose: ref
+        sender_name: currentUserName,
+        sender_account: iban, // Using the new input as the receiver's account in DB context
+        purpose: purpose
       });
 
       currentBalance = newBal;
       document.getElementById("mainBalance").textContent = formatMoney(newBal);
       document.getElementById("sendAmt").value = "";
       document.getElementById("sendTo").value = "";
+      document.getElementById("sendIban").value = "";
       document.getElementById("sendRef").value = "";
       
       msg.className = "msg success";
-      msg.textContent = `Successfully sent ${formatMoney(amt)}. Ref: ${txRef}`;
+      msg.textContent = `Successfully sent ${formatMoney(amt)} to ${to}. Ref: ${txRef}`;
       
       await loadTransactions(session.user.id);
       return false;
