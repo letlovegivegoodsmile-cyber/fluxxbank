@@ -71,11 +71,13 @@
   .msg{padding:12px;border-radius:8px;font-size:0.9rem;margin-top:12px;display:none;}
   .msg.success{background:rgba(16,185,129,0.1);color:var(--ok);border:1px solid var(--ok);display:block;}
   .msg.error{background:rgba(239,68,68,0.1);color:var(--bad);border:1px solid var(--bad);display:block;}
+  
+  .btn-receipt{background:rgba(59,130,246,0.1);color:var(--accent);border:1px solid rgba(59,130,246,0.3);padding:6px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;font-weight:600;transition:0.2s;}
+  .btn-receipt:hover{background:var(--accent);color:white;}
 </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="logo">⚡ Fluxxbank</div>
     <div class="nav-item active" onclick="switchView('overview', this)">🏠 Overview</div>
@@ -86,7 +88,6 @@
     <button class="logout-btn" onclick="doLogout()">Sign out securely</button>
   </aside>
 
-  <!-- Main App Area -->
   <main class="main">
     <div class="header">
       <h1>Welcome back, <span id="userName">Loading...</span></h1>
@@ -184,9 +185,9 @@
         <div class="table-wrap">
           <table>
             <thead>
-              <tr><th>Date & Time</th><th>Description / Ref</th><th>Type</th><th>Account</th><th>Amount</th><th>Balance After</th><th>Status</th></tr>
+              <tr><th>Date & Time</th><th>Description / Ref</th><th>Type</th><th>Account</th><th>Amount</th><th>Balance After</th><th>Status</th><th>Receipt</th></tr>
             </thead>
-            <tbody id="fullTxList"><tr><td colspan="7">Loading...</td></tr></tbody>
+            <tbody id="fullTxList"><tr><td colspan="8">Loading...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -234,7 +235,6 @@
         </div>
       </div>
     </div>
-
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -249,7 +249,6 @@
 
     const formatMoney = n => new Intl.NumberFormat('en-IE', { style: 'currency', currency: userCurrency }).format(n);
 
-    // Switch Views
     function switchView(viewName, btn) {
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       if (btn) btn.classList.add('active');
@@ -261,7 +260,6 @@
       const { data: { session } } = await sb.auth.getSession();
       if (!session) { window.location.href = "index.html"; return; }
 
-      // Fetch Profile
       const { data: profile } = await sb.from("profiles").select("*").eq("id", session.user.id).single();
       if (profile) {
         const firstName = profile.name.split(" ")[0];
@@ -270,7 +268,6 @@
         document.getElementById("userNameCard").textContent = profile.name.toUpperCase();
         document.getElementById("accName").textContent = profile.name;
         
-        // Security View
         document.getElementById("profName").value = profile.name;
         document.getElementById("profEmail").value = profile.email;
         document.getElementById("profPhone").value = profile.phone || 'Not provided';
@@ -289,7 +286,6 @@
       const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false });
       allTransactions = txs || [];
 
-      // Calculate Received / Spent
       let received = 0, spent = 0;
       allTransactions.forEach(t => {
         if (t.amount > 0) received += t.amount;
@@ -321,9 +317,9 @@
 
     function renderFullTable(data) {
       const list = document.getElementById("fullTxList");
-      if (data.length === 0) return list.innerHTML = '<tr><td colspan="7">No transactions found.</td></tr>';
+      if (data.length === 0) return list.innerHTML = '<tr><td colspan="8">No transactions found.</td></tr>';
       
-      list.innerHTML = data.map(t => {
+      list.innerHTML = data.map((t, index) => {
         const isPos = t.amount > 0;
         return `
           <tr>
@@ -334,6 +330,7 @@
             <td class="tx-amt ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}${formatMoney(t.amount)}</td>
             <td>${formatMoney(t.balance_after)}</td>
             <td><span class="status-badge status-${t.status}">${t.status}</span></td>
+            <td><button class="btn-receipt" onclick="downloadReceipt(${index})">⬇ PDF</button></td>
           </tr>
         `;
       }).join("");
@@ -347,6 +344,43 @@
         t.type.toLowerCase().includes(query)
       );
       renderFullTable(filtered);
+    }
+
+    function downloadReceipt(index) {
+      const t = allTransactions[index];
+      const date = new Date(t.created_at).toLocaleString();
+      
+      const receiptContent = `
+========================================
+           FLUXXBANK RECEIPT
+========================================
+Date: ${date}
+Reference: ${t.reference}
+Status: ${t.status.toUpperCase()}
+
+--- TRANSACTION DETAILS ---
+Type: ${t.type.toUpperCase()}
+Description: ${t.description}
+Account: ${t.account_name} (${t.account_number})
+
+--- FINANCIALS ---
+Amount: ${formatMoney(t.amount)}
+Currency: ${t.currency}
+Balance After: ${formatMoney(t.balance_after)}
+========================================
+Thank you for banking with Fluxxbank.
+This is an official computer-generated receipt.
+      `;
+
+      const blob = new Blob([receiptContent], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Fluxxbank_Receipt_${t.reference}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     }
 
     async function handleSend(e) {
@@ -377,7 +411,7 @@
         user_id: session.user.id,
         reference: txRef,
         description: `Transfer to ${to}`,
-        amount: -amt, // Negative for outgoing
+        amount: -amt,
         currency: userCurrency,
         type: 'transfer',
         status: 'completed',
