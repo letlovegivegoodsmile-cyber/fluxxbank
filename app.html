@@ -74,6 +74,8 @@
   
   .btn-receipt{background:rgba(59,130,246,0.1);color:var(--accent);border:1px solid rgba(59,130,246,0.3);padding:6px 10px;border-radius:6px;font-size:0.75rem;cursor:pointer;font-weight:600;transition:0.2s;}
   .btn-receipt:hover{background:var(--accent);color:white;}
+  
+  #liveToast{position:fixed;top:20px;right:20px;background:var(--ok);color:white;padding:12px 20px;border-radius:8px;font-weight:bold;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:opacity 0.3s;opacity:0;}
 </style>
 </head>
 <body>
@@ -180,7 +182,10 @@
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <div class="card-title" style="margin:0;">Full Ledger</div>
-          <input type="text" id="searchTx" placeholder="Search transactions..." onkeyup="filterHistory()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:white;width:250px;">
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="searchTx" placeholder="Search..." onkeyup="filterHistory()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:white;width:200px;">
+            <button class="btn-primary" style="width:auto; padding:8px 16px;" onclick="window.print()">🖨️ Statement</button>
+          </div>
         </div>
         <div class="table-wrap">
           <table>
@@ -203,7 +208,6 @@
           <div class="acc-detail"><span>Currency</span><span id="accCurrency">EUR</span></div>
           <div class="acc-detail"><span>IBAN</span><span>DE89 3704 0044 0532 0130 00</span></div>
           <div class="acc-detail"><span>BIC / SWIFT</span><span>FLUXXDEFFXXX</span></div>
-          <button class="btn-primary" style="margin-top:20px;background:transparent;border:1px solid var(--accent);color:var(--accent);">Download PDF Statement</button>
         </div>
         <div class="card" style="background:linear-gradient(135deg,#1e293b,#0f172a);">
           <div class="card-title">Virtual Debit Card</div>
@@ -237,6 +241,8 @@
     </div>
   </main>
 
+  <div id="liveToast"></div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
@@ -254,6 +260,13 @@
       if (btn) btn.classList.add('active');
       document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
       document.getElementById('view-' + viewName).classList.add('active');
+    }
+
+    function showLiveToast(msg) {
+      const toast = document.getElementById("liveToast");
+      toast.textContent = msg;
+      toast.style.opacity = "1";
+      setTimeout(() => { toast.style.opacity = "0"; }, 4000);
     }
 
     async function init() {
@@ -280,6 +293,23 @@
       }
 
       await loadTransactions(session.user.id);
+      listenForUpdates(session.user.id);
+    }
+
+    function listenForUpdates(userId) {
+      sb.channel('custom-all-channel')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${userId}` }, (payload) => {
+          if (payload.new && payload.new.balance !== undefined) {
+            currentBalance = payload.new.balance;
+            document.getElementById("mainBalance").textContent = formatMoney(currentBalance);
+            showLiveToast(`💰 Balance updated: ${formatMoney(currentBalance)}`);
+          }
+        })
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions', filter: `user_id=eq.${userId}` }, (payload) => {
+          loadTransactions(userId);
+          showLiveToast(`🔔 New Transaction: ${payload.new.description}`);
+        })
+        .subscribe();
     }
 
     async function loadTransactions(userId) {
