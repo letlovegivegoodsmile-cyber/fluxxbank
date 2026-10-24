@@ -1,353 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>FluxxBank Admin Console</title>
-  <style>
-    :root {
-      --bg: #080e1c; --panel: #101a2e; --panel2: #15223b; --border: #263653;
-      --text: #edf3ff; --muted: #98a8c2; --orange: #f58220; --green: #32c997; --red: #ff7070;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: Arial, Helvetica, sans-serif; }
-    button, input { font: inherit; }
-    button { cursor: pointer; }
-    .hidden { display: none !important; }
-    
-    /* Login Screen */
-    #loginScreen { min-height: 100vh; display: grid; place-items: center; padding: 20px; background: radial-gradient(ellipse at top, #192c4c 0%, var(--bg) 65%); }
-    .login-box { width: 100%; max-width: 410px; padding: 32px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 70px #0005; }
-    .brand { color: var(--orange); font-size: 25px; font-weight: 800; letter-spacing: .3px; }
-    .subtitle { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 9px 0 25px; }
-    label { display: block; margin: 16px 0 7px; font-size: 13px; color: #c8d5e9; }
-    input { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; outline: none; margin-bottom: 12px;}
-    input:focus { border-color: var(--orange); }
-    .btn { border: 0; border-radius: 8px; padding: 11px 15px; font-weight: 700; background: var(--orange); color: #111827; }
-    .btn:disabled { opacity: .6; cursor: wait; }
-    .full { width: 100%; margin-top: 10px; }
-    .secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
-    .small { padding: 6px 10px; font-size: 12px; }
-    .error { color: var(--red); font-size: 13px; line-height: 1.5; margin-top: 12px; overflow-wrap: anywhere; }
-    .success { color: var(--green); }
-    
-    /* App Layout */
-    #app { min-height: 100vh; }
-    .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
-    .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
-    .sidebar .brand { padding: 0 10px 27px; font-size: 22px; }
-    .side-label { padding: 12px 10px; color: var(--muted); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
-    .side-btn { display: block; width: 100%; margin: 5px 0; padding: 12px; text-align: left; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #b9c7dd; }
-    .side-btn:hover, .side-btn.on { background: #172742; border-color: #293d5e; color: white; }
-    .side-btn.on { box-shadow: inset 3px 0 var(--orange); }
-    main { min-width: 0; }
-    .topbar { min-height: 82px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border-bottom: 1px solid var(--border); background: #0c1526; }
-    .topbar h1 { margin: 0; font-size: 21px; }
-    .topbar small { display: block; margin-top: 6px; color: var(--muted); }
-    .content { padding: 28px; }
-    .view { display: none; }
-    .view.on { display: block; }
-    .section-title { margin: 0 0 8px; font-size: 20px; }
-    .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 25px; }
-    .stat, .panel { min-width: 0; padding: 21px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
-    .stat-label { color: var(--muted); font-size: 13px; }
-    .stat-value { margin-top: 12px; font-size: 30px; font-weight: 800; }
-    .panel h2 { margin: 0 0 17px; font-size: 16px; }
-    .table-wrap { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    th { color: var(--muted); font-weight: 600; white-space: nowrap; }
-    td small { display: block; marginbrand-top: 5px; color:"> var(--muted); }
-    .status { displayFl: inline-block; padding: ux5px 8px; border-radiusx: 6px; background: #26344c; color: #dce7f8; font-size: 11px; text-transform: capitalize; }
-    .status.active { background: #103a32; color: #72e4bb; }
-    .status.pending { background: #49341b; color: #ffd18c; }
-    .empty { padding: 25px 10px; color: var(--muted); text-align: center; font-size: 13px; }
-    
-    /* Toast Notification */
-    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; transition: opacity 0.3s; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxxbank | Secure App</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+  :root{
+    --bg:#070b14; --panel:#0f172a; --border:#1e293b;
+    --txt:#f8fafc; --mut:#94a3b8; --accent:#3b82f6;
+    --ok:#10b981; --bad:#ef4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;}
+  body{background:var(--bg);color:var(--txt);min-height:100vh;display:flex;}
+  
+  /* Sidebar */
+  .sidebar{width:260px;background:var(--panel);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;}
+  .logo{font-size:1.5rem;font-weight:800;color:var(--accent);margin-bottom:40px;display:flex;align-items:center;gap:10px;}
+  .nav-item{padding:12px 16px;border-radius:8px;color:var(--mut);cursor:pointer;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+  .nav-item:hover, .nav-item.active{background:rgba(59,130,246,0.1);color:var(--accent);}
+  .logout-btn{margin-top:auto;background:transparent;border:1px solid var(--border);color:var(--txt);padding:10px;border-radius:8px;cursor:pointer;transition:0.2s;}
+  .logout-btn:hover{background:var(--border);}
+
+  /* Main Content */
+  .main{flex:1;padding:40px;overflow-y:auto;}
+  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;}
+  .header h1{font-size:1.5rem;font-weight:600;}
+  .user-profile{display:flex;align-items:center;gap:12px;}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:bold;color:white;}
+
+  /* Cards */
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;}
+  .card-title{color:var(--mut);font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+  
+  /* Balance */
+  .balance-amount{font-size:3rem;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;color:transparent;}
+  .account-num{color:var(--mut);font-family:monospace;font-size:0.9rem;}
+
+  /* Send Money Form */
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-size:0.85rem;color:var(--mut);margin-bottom:6px;}
+  .form-group input, .form-group select{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:1rem;outline:none;}
+  .form-group input:focus, .form-group select:focus{border-color:var(--accent);}
+  .btn-send{width:100%;padding:14px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:1rem;cursor:pointer;transition:background 0.2s;}
+  .btn-send:hover{background:#2563eb;}
+
+  /* Transaction List */
+  .tx-list{display:flex;flex-direction:column;gap:16px;}
+  .tx-item{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border);}
+  .tx-item:last-child{border-bottom:none;padding-bottom:0;}
+  .tx-info h4{font-size:0.95rem;font-weight:500;margin-bottom:4px;}
+  .tx-info p{font-size:0.8rem;color:var(--mut);}
+  .tx-amount{font-weight:700;font-size:1rem;}
+  .tx-in{color:var(--ok);}
+  .tx-out{color:var(--txt);}
+
+  .msg{padding:12px;border-radius:8px;font-size:0.9rem;margin-top:12px;display:none;}
+  .msg.success{background:rgba(16,185,129,0.1);color:var(--ok);border:1px solid var(--ok);display:block;}
+  .msg.error{background:rgba(239,68,68,0.1);color:var(--bad);border:1px solid var(--bad);display:block;}
+
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+    .grid { grid-template-columns: 1fr; }
+    .main { padding: 20px; }
+  }
+</style>
 </head>
 <body>
-  <!-- LOGIN SCREEN -->
-  <section id="loginScreen">
-    <div class="login-box">
-      <div class="Bank</div>
-      <p class="subtitle">Administrator access. Sign in using your authorized Supabase account.</p>
-      <form id="loginForm">
-        <label for="aEmail">Administrator email</label>
-        <input type="email" id="aEmail" placeholder="Enter your email" required>
-        <label for="aPass">Password</label>
-        <input type="password" id="aPass" placeholder="Enter your password" required>
-        <div id="loginErr" class="error" role="alert"></div>
-        <button class="btn full" id="loginBtn" type="submit">Sign in</button>
-      </form>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">⚡ Fluxxbank</div>
+    <div class="nav-item active">🏠 Dashboard</div>
+    <div class="nav-item">💳 Cards</div>
+    <div class="nav-item">📊 Analytics</div>
+    <div class="nav-item">⚙️ Settings</div>
+    <button class="logout-btn" onclick="doLogout()">Sign out securely</button>
+  </aside>
+
+  <!-- Main App Area -->
+  <main class="main">
+    <div class="header">
+      <h1>Welcome back, <span id="userName">Loading...</span></h1>
+      <div class="user-profile">
+        <div class="avatar" id="userInitial">U</div>
+      </div>
     </div>
-  </section>
 
-  <!-- MAIN ADMIN APP -->
-  <div id="app" class="hidden">
-    <div class="layout">
-      <aside class="sidebar">
-        <div class="brand">FluxxBank</div>
-        <div class="side-label">Administration</div>
-        <nav class="side-nav">
-          <button class="side-btn on" data-view="dash" type="button">Overview</button>
-          <button class="side-btn" data-view="cust" type="button">Customers</button>
-          <button class="side-btn" data-view="appr" type="button">Approvals</button>
-        </nav>
-      </aside>
-
-      <main>
-        <header class="topbar">
-          <div><h1 id="pageTitle">Overview</h1><small id="adminIdentity">Administrator</small></div>
-          <button class="btn secondary" id="logoutBtn" type="button">Sign out</button>
-        </header>
-
-        <div class="content">
-          <!-- OVERVIEW TAB -->
-          <section id="view-dash" class="view on">
-            <h2 class="section-title">Overview</h2>
-            <div class="stats">
-              <div class="stat"><div class="stat-label">Customer profiles</div><div class="stat-value" id="kCustomers">—</div></div>
-              <div class="stat"><div class="stat-label">Pending applications</div><div class="stat-value" id="kAppr">—</div></div>
-            </div>
-            <div class="panel">
-              <h2>Recent customer profiles</h2>
-              <div class="table-wrap"><table>
-                <thead><tr><th>Customer</th><th>Status</th><th>Role</th></tr></thead>
-                <tbody id="recentBody"><tr><td colspan="3">Loading...</td></tr></tbody>
-              </table></div>
-            </div>
-          </section>
-
-          <!-- CUSTOMERS TAB -->
-          <section id="view-cust" class="view">
-            <h2 class="section-title">Customers</h2>
-            <p class="subtitle">View customer profiles, balances, and manage their accounts.</p>
-            <div class="panel"><div class="table-wrap"><table>
-              <thead><tr><th>Customer</th><th>Status</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead>
-              <tbody id="custBody"><tr><td colspan="5">Loading...</td></tr></tbody>
-            </table></div></div>
-          </section>
-
-          <!-- APPROVALS TAB -->
-          <section id="view-appr" class="view">
-            <h2 class="section-title">Approvals</h2>
-            <p class="subtitle">Review pending customer profiles. Approval changes the status and sends a welcome email.</p>
-            <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading...</div></div></div>
-          </section>
+    <div class="grid">
+      <!-- Left Column -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Balance Card -->
+        <div class="card">
+          <div class="card-title">Total Available Balance</div>
+          <div class="balance-amount" id="mainBalance">€0.00</div>
+          <div class="account-num">IBAN: DE89 3704 0044 0532 0130 00</div>
         </div>
-      </main>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-title">Recent Activity</div>
+          <div class="tx-list" id="txList">
+            <div style="color:var(--mut);font-size:0.9rem;">Loading transactions...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <!-- Send Money Card -->
+        <div class="card">
+          <div class="card-title">Send Money</div>
+          <form onsubmit="return handleSend(event)">
+            <div class="form-group">
+              <label>Recipient</label>
+              <select id="sendTo" required>
+                <option value="" disabled selected>Select recipient</option>
+                <option value="Maya Chen">Maya Chen</option>
+                <option value="Jonas Weber">Jonas Weber</option>
+                <option value="Luna Ortiz">Luna Ortiz</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Amount (€)</label>
+              <input type="number" id="sendAmt" min="0.01" step="0.01" placeholder="0.00" required>
+            </div>
+            <button type="submit" class="btn-send">Send Instantly</button>
+            <div id="sendMsg" class="msg"></div>
+          </form>
+        </div>
+
+        <!-- Virtual Card -->
+        <div class="card" style="background:linear-gradient(135deg,#1e293b,#0f172a);">
+          <div class="card-title">Virtual Debit Card</div>
+          <div style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;margin:20px 0;">•••• •••• •••• 4021</div>
+          <div style="display:flex;justify-content:space-between;color:var(--mut);font-size:0.8rem;">
+            <span id="userNameCard">USER NAME</span>
+            <span>12/28</span>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div id="toast" class="hidden"></div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // Initialize Supabase
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     
-    let customers = [];
-    const $ = id => document.getElementById(id);
-    let toastTimer = null;
+    // Currency Formatter
+    const eur = n => "€" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+    let currentBalance = 0;
 
-    // Toast Notification Helper
-    function toast(msg) {
-      const el = $("toast"); 
-      el.textContent = msg; 
-      el.classList.remove("hidden");
-      el.style.opacity = "1";
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        el.style.opacity = "0";
-        setTimeout(() => el.classList.add("hidden"), 300);
-      }, 3500);
-    }
-
-    function escapeHtml(v) { 
-      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]); 
-    }
-    
-    function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
-    
-    function statusBadge(status) {
-      const v = String(status ?? "Unknown"); const l = v.toLowerCase();
-      const css = l === "active" ? "active" : l.includes("pending") ? "pending" : "";
-      return `<span class="status ${css}">${escapeHtml(v)}</span>`;
-    }
-
-    // --- INITIALIZATION ---
-    document.addEventListener("DOMContentLoaded", async () => {
-      if (!window.supabase) return alert("Supabase failed to load.");
+    // Load data on page start
+    async function init() {
+      const { data: { session } } = await sb.auth.getSession();
       
-      const { data } = await sb.auth.getSession();
-      if (data.session) { 
-        boot(data.session.user); 
-      } else { 
-        $("loginScreen").classList.remove("hidden"); 
+      // If not logged in, kick them back to the homepage
+      if (!session) { 
+        window.location.href = "index.html"; 
+        return; 
       }
 
-      // Login Form
-      $("loginForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
-        $("loginErr").textContent = "";
-        try {
-          const { data, error } = await sb.auth.signInWithPassword({ 
-            email: $("aEmail").value.trim(), 
-            password: $("aPass").value 
-          });
-          if (error) throw error;
-          await boot(data.user);
-        } catch (err) { 
-          $("loginErr").textContent = err.message; 
-        } finally { 
-          btn.disabled = false; btn.textContent = "Sign in"; 
-        }
-      });
-
-      // Logout
-      $("logoutBtn").addEventListener("click", async () => { 
-        await sb.auth.signOut(); 
-        location.reload(); 
-      });
-
-      // Sidebar Navigation
-      document.querySelectorAll(".side-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
-          btn.classList.add("on");
-          document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
-          $("view-" + btn.dataset.view).classList.add("on");
-          $("pageTitle").textContent = btn.textContent;
-        });
-      });
-
-      // Handle Approvals (Event Delegation)
-      document.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("approve-btn")) {
-          const index = e.target.getAttribute("data-index");
-          const customer = customers[index];
-          e.target.disabled = true; 
-          e.target.textContent = "Approving...";
-          
-          // 1. Update status in database
-          const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
-          if (error) {
-            toast("Error: " + error.message);
-            e.target.disabled = false; 
-            e.target.textContent = "Approve";
-          } else {
-            // 2. Trigger Email Function
-            await sb.functions.invoke('send-approval-email', {
-              body: { email: customer.email, name: customer.name }
-            });
-            toast("Approved & email sent! 🚀");
-            await loadAll();
-          }
-        }
-      });
-    });
-
-    // --- BOOT & DATA FETCHING ---
-    async function boot(user) {
-      try {
-        const { data: profile } = await sb.from("profiles").select("role, status, name").eq("id", user.id).single();
+      // Fetch customer profile
+      const { data: profile } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
+      if (profile) {
+        const firstName = profile.name ? profile.name.split(" ")[0] : "Customer";
+        document.getElementById("userName").textContent = firstName;
+        document.getElementById("userInitial").textContent = firstName[0].toUpperCase();
+        document.getElementById("userNameCard").textContent = profile.name ? profile.name.toUpperCase() : "USER";
         
-        // Security check: Must be an active admin
-        if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
-          await sb.auth.signOut(); 
-          throw new Error("This account is not an active administrator.");
-        }
-        
-        $("adminIdentity").textContent = profile.name || "Administrator";
-        await loadAll();
-        
-        $("loginScreen").classList.add("hidden"); 
-        $("app").classList.remove("hidden");
-      } catch (error) { 
-        $("loginErr").textContent = error.message; 
+        // Update UI with real balance
+        document.getElementById("mainBalance").textContent = eur(profile.balance);
+        currentBalance = profile.balance;
       }
+
+      // Load real transactions
+      loadTransactions(session.user.id);
     }
 
-    async function loadAll() {
-      const { data } = await sb.from("profiles").select("id, name, email, status, role, balance, created_at").order("created_at", { ascending: false });
-      customers = data || [];
-      renderOverview(); 
-      renderCustomers(); 
-      renderApprovals();
-    }
+    // Fetch real transactions from database
+    async function loadTransactions(userId) {
+      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(5);
+      const list = document.getElementById("txList");
+      
+      if (!txs || txs.length === 0) {
+        list.innerHTML = '<div style="color:var(--mut);font-size:0.9rem;">No recent activity.</div>';
+        return;
+      }
 
-    // --- RENDER FUNCTIONS ---
-    function renderOverview() {
-      $("kCustomers").textContent = customers.length;
-      $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
-      $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
-        <tr>
-          <td>${escapeHtml(c.name || "Unnamed")}<small>${escapeHtml(c.email || "")}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role || "customer")}</td>
-        </tr>
-      `).join("") || '<tr><td colspan="3">No profiles found.</td></tr>';
-    }
-
-    function renderCustomers() {
-      $("custBody").innerHTML = customers.map((c, i) => `
-        <tr>
-          <td>${escapeHtml(c.name || "Unnamed")}<small>${escapeHtml(c.email || "")}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role || "customer")}</td>
-          <td style="font-weight:bold; color:var(--green);">$${Number(c.balance || 0).toFixed(2)}</td>
-          <td>
-            ${isPending(c.status) ? `<button class="btn small approve-btn" type="button" data-index="${i}">Approve</button>` : ""}
-            <button class="btn small" style="background:var(--orange); color:#000; margin-left:5px;" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button>
-          </td>
-        </tr>
-      `).join("") || '<tr><td colspan="5">No profiles found.</td></tr>';
-    }
-
-    function renderApprovals() {
-      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
-      $("apprList").innerHTML = pending.map(({ customer, index }) => `
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid var(--border)">
-          <div>
-            <strong>${escapeHtml(customer.name || "Unnamed")}</strong>
-            <div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email || "")}</div>
+      list.innerHTML = txs.map(t => {
+        const isIncoming = t.type === 'deposit';
+        return `
+          <div class="tx-item">
+            <div class="tx-info">
+              <h4>${t.description}</h4>
+              <p>${new Date(t.created_at).toLocaleDateString()}</p>
+            </div>
+            <div class="tx-amount ${isIncoming ? 'tx-in' : 'tx-out'}">
+              ${isIncoming ? '+' : '−'}${eur(t.amount)}
+            </div>
           </div>
-          <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
-        </div>
-      `).join("") || '<div class="empty">No pending applications.</div>';
+        `;
+      }).join("");
     }
 
-    // --- ADMIN ACTIONS ---
-    async function depositMoney(userId, userName) {
-      const amountStr = prompt(`How much to deposit for ${userName}? (e.g. 500)`);
-      if (!amountStr) return;
-      const amount = parseFloat(amountStr);
-      if (isNaN(amount) || amount <= 0) return alert("Invalid amount");
-
-      // Get current balance
-      const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
-      const newBalance = Number(profile.balance || 0) + amount;
-
-      // Update balance
-      const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
-      if (err1) return toast("Error: " + err1.message);
-
-      // Log transaction
-      await sb.from("transactions").insert({ 
-        user_id: userId, 
-        type: 'deposit', 
-        amount: amount, 
-        description: 'Admin manual deposit' 
-      });
+    // Handle sending money
+    async function handleSend(e) {
+      e.preventDefault();
+      const to = document.getElementById("sendTo").value;
+      const amt = parseFloat(document.getElementById("sendAmt").value);
+      const msg = document.getElementById("sendMsg");
       
-      toast(`✅ Deposited $${amount} to ${userName}`);
-      await loadAll(); 
+      // Check if they have enough money
+      if (amt > currentBalance) {
+        msg.className = "msg error";
+        msg.textContent = "Insufficient funds.";
+        return false;
+      }
+
+      const { data: { session } } = await sb.auth.getSession();
+      
+      // 1. Deduct balance from database
+      const newBal = currentBalance - amt;
+      const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", session.user.id);
+      
+      if (err1) {
+        msg.className = "msg error";
+        msg.textContent = "Error: " + err1.message;
+        return false;
+      }
+
+      // 2. Add transaction record to database
+      await sb.from("transactions").insert({
+        user_id: session.user.id,
+        type: 'transfer',
+        amount: amt,
+        description: `Sent to ${to}`
+      });
+
+      // 3. Update UI without reloading page
+      currentBalance = newBal;
+      document.getElementById("mainBalance").textContent = eur(newBal);
+      document.getElementById("sendAmt").value = "";
+      
+      msg.className = "msg success";
+      msg.textContent = `Successfully sent ${eur(amt)} to ${to}`;
+      
+      // Refresh the transaction list
+      loadTransactions(session.user.id); 
+      return false;
     }
+
+    // Logout function
+    async function doLogout() {
+      await sb.auth.signOut();
+      window.location.href = "index.html";
+    }
+
+    // Run init on load
+    init();
   </script>
 </body>
 </html>
