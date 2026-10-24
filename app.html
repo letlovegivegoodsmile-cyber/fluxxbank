@@ -1,3 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxxbank | Secure App</title>
+<style>
+  :root{
+    --bg:#070b14; --panel:#0f172a; --border:#1e293b;
+    --txt:#f8fafc; --mut:#94a3b8; --accent:#3b82f6;
+    --ok:#10b981; --bad:#ef4444;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;}
+  body{background:var(--bg);color:var(--txt);min-height:100vh;display:flex;}
+  
+  .sidebar{width:260px;background:var(--panel);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;}
+  .logo{font-size:1.5rem;font-weight:800;color:var(--accent);margin-bottom:40px;display:flex;align-items:center;gap:10px;}
+  .nav-item{padding:12px 16px;border-radius:8px;color:var(--mut);cursor:pointer;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+  .nav-item:hover, .nav-item.active{background:rgba(59,130,246,0.1);color:var(--accent);}
+  .logout-btn{margin-top:auto;background:transparent;border:1px solid var(--border);color:var(--txt);padding:10px;border-radius:8px;cursor:pointer;transition:0.2s;}
+  .logout-btn:hover{background:var(--border);}
+
+  .main{flex:1;padding:40px;overflow-y:auto;}
+  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;}
+  .header h1{font-size:1.5rem;font-weight:600;}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:bold;color:white;}
+
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;}
+  .card-title{color:var(--mut);font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+  
+  .balance-amount{font-size:3rem;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;color:transparent;}
+  .account-num{color:var(--mut);font-family:monospace;font-size:0.9rem;}
+
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-size:0.85rem;color:var(--mut);margin-bottom:6px;}
+  .form-group input, .form-group select{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:1rem;outline:none;}
+  .form-group input:focus, .form-group select:focus{border-color:var(--accent);}
+  .btn-send{width:100%;padding:14px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:1rem;cursor:pointer;transition:background 0.2s;}
+  .btn-send:hover{background:#2563eb;}
+
+  .tx-list{display:flex;flex-direction:column;gap:16px;}
+  .tx-item{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border);}
+  .tx-item:last-child{border-bottom:none;padding-bottom:0;}
+  .tx-info h4{font-size:0.95rem;font-weight:500;margin-bottom:4px;}
+  .tx-info p{font-size:0.8rem;color:var(--mut);}
+  .tx-amount{font-weight:700;font-size:1rem;}
+  .tx-in{color:var(--ok);}
+  .tx-out{color:var(--txt);}
+
+  .msg{padding:12px;border-radius:8px;font-size:0.9rem;margin-top:12px;display:none;}
+  .msg.success{background:rgba(16,185,129,0.1);color:var(--ok);border:1px solid var(--ok);display:block;}
+  .msg.error{background:rgba(239,68,68,0.1);color:var(--bad);border:1px solid var(--bad);display:block;}
+</style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">⚡ Fluxxbank</div>
+    <div class="nav-item active">🏠 Dashboard</div>
+    <div class="nav-item">💳 Cards</div>
+    <div class="nav-item">📊 Analytics</div>
+    <div class="nav-item">⚙️ Settings</div>
+    <button class="logout-btn" onclick="doLogout()">Sign out securely</button>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+      <h1>Welcome back, <span id="userName">Loading...</span></h1>
+      <div class="user-profile">
+        <div class="avatar" id="userInitial">U</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <div class="card">
+          <div class="card-title">Total Available Balance</div>
+          <div class="balance-amount" id="mainBalance">€0.00</div>
+          <div class="account-num">IBAN: DE89 3704 0044 0532 0130 00</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Recent Activity</div>
+          <div class="tx-list" id="txList">
+            <div style="color:var(--mut);font-size:0.9rem;">Loading transactions...</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:24px;">
+        <div class="card">
+          <div class="card-title">Send Money</div>
+          <form onsubmit="return handleSend(event)">
+            <div class="form-group">
+              <label>Recipient</label>
+              <select id="sendTo" required>
+                <option value="" disabled selected>Select recipient</option>
+                <option value="Maya Chen">Maya Chen</option>
+                <option value="Jonas Weber">Jonas Weber</option>
+                <option value="Luna Ortiz">Luna Ortiz</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Amount (€)</label>
+              <input type="number" id="sendAmt" min="0.01" step="0.01" placeholder="0.00" required>
+            </div>
+            <button type="submit" class="btn-send">Send Instantly</button>
+            <div id="sendMsg" class="msg"></div>
+          </form>
+        </div>
+
+        <div class="card" style="background:linear-gradient(135deg,#1e293b,#0f172a);">
+          <div class="card-title">Virtual Debit Card</div>
+          <div style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;margin:20px 0;">•••• •••• •••• 4021</div>
+          <div style="display:flex;justify-content:space-between;color:var(--mut);font-size:0.8rem;">
+            <span id="userNameCard">USER NAME</span>
+            <span>12/28</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
@@ -5,11 +130,10 @@
     const eur = n => "€" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
     let currentBalance = 0;
 
-    // --- CHECK IF USER IS HERE TO RESET PASSWORD ---
-    async function checkPasswordReset() {
+    async function init() {
+      // 1. Check if user is here to reset password
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('reset') === 'true') {
-        // Show a prompt to update password
         const newPassword = prompt("Please enter your new password (min 6 characters):");
         if (newPassword && newPassword.length >= 6) {
           const { error } = await sb.auth.updateUser({ password: newPassword });
@@ -17,27 +141,21 @@
             alert("Error updating password: " + error.message);
           } else {
             alert("✅ Password updated successfully! You can now use the app.");
-            // Remove the '?reset=true' from the URL
             window.history.replaceState({}, document.title, window.location.pathname);
           }
         } else if (newPassword !== null) {
           alert("Password must be at least 6 characters.");
         }
       }
-    }
 
-    // Load data on page start
-    async function init() {
-      // Run the reset check first
-      await checkPasswordReset();
-
+      // 2. Check login session
       const { data: { session } } = await sb.auth.getSession();
-      
       if (!session) { 
         window.location.href = "index.html"; 
         return; 
       }
 
+      // 3. Load user data
       const { data: profile } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
       if (profile) {
         const firstName = profile.name ? profile.name.split(" ")[0] : "Customer";
@@ -51,7 +169,6 @@
       loadTransactions(session.user.id);
     }
 
-    // ... KEEP the rest of your functions exactly the same ...
     async function loadTransactions(userId) {
       const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(5);
       const list = document.getElementById("txList");
@@ -90,10 +207,9 @@
       }
 
       const { data: { session } } = await sb.auth.getSession();
-      
       const newBal = currentBalance - amt;
-      const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", session.user.id);
       
+      const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", session.user.id);
       if (err1) {
         msg.className = "msg error";
         msg.textContent = "Error: " + err1.message;
@@ -125,3 +241,5 @@
 
     init();
   </script>
+</body>
+</html>
