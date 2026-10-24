@@ -2,15 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Flux Bank — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --navy: #0B1221; --navy-light: #151E32; --accent: #3B82F6; --bg: #F4F6FA; --text: #0F172A; --text-muted: #64748B; --border: #E2E8F0; --green: #10B981; --red: #EF4444; --radius: 16px; --shadow: 0 4px 24px rgba(15, 23, 42, 0.06); }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
-  .app { display: flex; height: 100vh; }
+  :root { 
+    --navy: #0B1221; --navy-light: #151E32; --accent: #3B82F6; 
+    --bg: #F4F6FA; --text: #0F172A; --text-muted: #64748B; 
+    --border: #E2E8F0; --green: #10B981; --red: #EF4444; 
+    --radius: 16px; --shadow: 0 4px 24px rgba(15, 23, 42, 0.06); 
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); height: 100dvh; overflow: hidden; }
+  
+  .app { display: flex; height: 100dvh; }
   
   /* WELCOME SCREEN */
   .welcome-screen { position: fixed; inset: 0; background: var(--navy); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: opacity 0.8s ease, visibility 0.8s ease; }
@@ -23,7 +29,7 @@
   .progress-bar { height: 100%; width: 0%; background: var(--accent); border-radius: 4px; animation: loadProgress 6s ease-in-out forwards; }
   @keyframes loadProgress { 0% { width: 0%; } 30% { width: 40%; } 80% { width: 90%; } 100% { width: 100%; } }
 
-  /* SIDEBAR */
+  /* DESKTOP SIDEBAR */
   .sidebar { width: 260px; background: var(--navy); color: white; padding: 24px 16px; display: flex; flex-direction: column; flex-shrink: 0; }
   .logo { display: flex; align-items: center; gap: 12px; padding: 0 12px 32px; font-weight: 700; font-size: 22px; letter-spacing: -0.5px; }
   .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), #60A5FA); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
@@ -33,15 +39,12 @@
   .nav-item.active { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
   .nav-icon { width: 20px; text-align: center; }
   
-  /* TOPBAR */
+  /* MAIN AREA */
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  .topbar { height: 72px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; }
+  .topbar { height: 72px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; flex-shrink: 0; }
   .search { background: var(--bg); border: none; padding: 10px 16px 10px 40px; border-radius: 12px; width: 320px; font-size: 14px; outline: none; }
-  .search-wrap { position: relative; }
-  .search-wrap::before { content: "⌕"; position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
   .top-right { display: flex; align-items: center; gap: 20px; }
   .notif { width: 40px; height: 40px; border-radius: 12px; background: var(--bg); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; font-size: 16px; }
-  .notif::after { content: ""; position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid white; }
   
   /* PROFILE DROPDOWN */
   .profile-wrap { position: relative; }
@@ -59,8 +62,7 @@
   .drop-item { padding: 10px 12px; font-size: 14px; font-weight: 500; color: var(--text); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
   .drop-item:hover { background: var(--bg); color: var(--accent); }
   .drop-item.danger { color: var(--red); }
-  .drop-item.danger:hover { background: #FEF2F2; }
-
+  
   /* CONTENT */
   .content { flex: 1; overflow-y: auto; padding: 32px; }
   .greeting { margin-bottom: 28px; }
@@ -83,10 +85,10 @@
   .transaction { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
   .transaction:last-child { border-bottom: none; }
   .tx-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: var(--bg); flex-shrink: 0; }
-  .tx-details { flex: 1; }
-  .tx-name { font-weight: 600; font-size: 14.5px; }
+  .tx-details { flex: 1; min-width: 0; } /* Prevents text overflow */
+  .tx-name { font-weight: 600; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tx-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
-  .tx-amount { font-weight: 600; font-size: 15px; }
+  .tx-amount { font-weight: 600; font-size: 15px; flex-shrink: 0; }
   .tx-amount.credit { color: var(--green); }
   
   .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -100,17 +102,78 @@
   .account-type { font-size: 12px; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 20px; }
   
   .page { display: none; }
-  .page.active { display: block; }
-  
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; padding: 14px 18px; border-radius: 12px; font-size: 14px; opacity: 0; transform: translateY(8px); transition: all 0.2s; pointer-events: none; z-index: 1000; }
-  .toast.show { opacity: 1; transform: translateY(0); }
+  .page.active { display: block; animation: fadeIn 0.3s; }
 
-  @media (max-width: 1100px) {
-    .stats, .grid-2 { grid-template-columns: 1fr; }
-    .sidebar { width: 80px; padding: 24px 8px; }
-    .logo span, .nav-item span, .profile-info { display: none; }
-    .logo { justify-content: center; padding-bottom: 24px; }
-    .search { width: 180px; }
+  /* MODALS */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(11, 18, 33, 0.7); backdrop-filter: blur(4px); display: none; place-items: center; z-index: 1000; padding: 20px; }
+  .modal-overlay.active { display: grid; }
+  .modal { background: white; border-radius: 16px; padding: 32px; width: 100%; max-width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); max-height: 90dvh; overflow-y: auto; }
+  .modal h2 { font-size: 1.5rem; margin-bottom: 10px; }
+  .modal p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
+  
+  /* RECEIPT STYLES */
+  .receipt-box { background: white; border-radius: 16px; padding: 30px; width: 100%; max-width: 400px; font-family: 'Courier New', Courier, monospace; position: relative; max-height: 90dvh; overflow-y: auto; }
+  .receipt-logo { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--navy); margin-bottom: 20px; }
+  .receipt-logo svg { width: 24px; height: 24px; fill: var(--accent); }
+  .receipt-divider { border-top: 2px dashed var(--border); margin: 20px 0; }
+  .receipt-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem; gap: 10px;}
+  .receipt-row span:first-child { color: var(--text-muted); flex-shrink: 0; }
+  .receipt-row span:last-child { font-weight: 700; color: var(--text); text-align: right; word-break: break-all; }
+  .barcode { width: 100%; height: 40px; background: repeating-linear-gradient(90deg, #111827 0, #111827 2px, transparent 2px, transparent 4px, #111827 4px, #111827 6px, transparent 6px, transparent 10px); margin-top: 20px; opacity: 0.7; }
+  
+  /* FORM INPUTS */
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
+  .form-control { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; background: var(--bg); transition: border 0.2s; }
+  .form-control:focus { border-color: var(--accent); background: white; }
+
+  /* --- MOBILE RESPONSIVENESS (The Magic) --- */
+  .mobile-nav { display: none; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: none !important; } /* Hide desktop sidebar */
+    
+    /* Setup Bottom Navigation */
+    .mobile-nav { 
+      display: flex; position: fixed; bottom: 0; left: 0; right: 0; 
+      background: white; border-top: 1px solid var(--border); 
+      z-index: 500; padding-bottom: env(safe-area-inset-bottom); /* iOS safe area */
+      height: 65px;
+    }
+    .mobile-nav-item {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--text-muted); text-decoration: none; font-size: 11px; font-weight: 500; gap: 4px;
+    }
+    .mobile-nav-item.active { color: var(--accent); }
+    .mobile-nav-item .nav-icon { font-size: 20px; }
+
+    /* Adjust Layout for Mobile */
+    .main { height: calc(100dvh - 65px); padding-bottom: 10px; }
+    .topbar { padding: 0 16px; height: 64px; }
+    .search-wrap { display: none; } /* Hide search bar on mobile */
+    .profile-info { display: none; } /* Hide name, keep avatar */
+    .content { padding: 20px 16px; }
+    
+    /* Stack cards vertically */
+    .stats { grid-template-columns: 1fr; gap: 12px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    
+    /* Typography adjustments */
+    .greeting h1 { font-size: 24px; }
+    .stat-value { font-size: 24px; }
+    .card { padding: 20px; }
+    
+    /* Make 2FA code input bigger for touch */
+    #twoFactorCode { font-size: 24px; letter-spacing: 4px; text-align: center; }
+  }
+
+  /* PRINT STYLES */
+  @media print {
+    body * { visibility: hidden; }
+    #receiptModal, #receiptModal * { visibility: visible; }
+    #receiptModal { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: white; display: block; padding: 0; }
+    .modal { box-shadow: none; max-width: 100%; padding: 0; }
+    .no-print { display: none !important; }
   }
 </style>
 </head>
@@ -121,24 +184,22 @@
     <div class="spinner"></div>
     <h1 id="welcomeName">Welcome</h1>
     <p>Securely loading your dashboard...</p>
-    <div class="progress-bar-container">
-      <div class="progress-bar"></div>
-    </div>
+    <div class="progress-bar-container"><div class="progress-bar"></div></div>
   </div>
 </div>
 
 <div class="app">
+  <!-- DESKTOP SIDEBAR -->
   <aside class="sidebar">
     <div class="logo"><div class="logo-icon">F</div><span>Flux Bank</span></div>
     <nav class="nav">
-      <a class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span> <span>Dashboard</span></a>
-      <a class="nav-item" data-page="accounts"><span class="nav-icon">▣</span> <span>Accounts</span></a>
-      <a class="nav-item" data-page="transfer"><span class="nav-icon">↗</span> <span>Transfer</span></a>
-      <a class="nav-item" data-page="payments"><span class="nav-icon">≡</span> <span>Payments</span></a>
-      <a class="nav-item" data-page="cards"><span class="nav-icon">◆</span> <span>Cards</span></a>
-      <a class="nav-item" data-page="analytics"><span class="nav-icon">▦</span> <span>Analytics</span></a>
-      <a class="nav-item" data-page="profile"><span class="nav-icon">○</span> <span>Profile</span></a>
-      <a class="nav-item" data-page="settings"><span class="nav-icon">⚙</span> <span>Settings</span></a>
+      <a class="nav-item" data-page="dashboard" href="#dashboard"><span class="nav-icon">⌂</span> <span>Dashboard</span></a>
+      <a class="nav-item" data-page="accounts" href="#accounts"><span class="nav-icon">▣</span> <span>Accounts</span></a>
+      <a class="nav-item" data-page="transfer" href="#transfer"><span class="nav-icon">↗</span> <span>Transfer</span></a>
+      <a class="nav-item" data-page="payments" href="#payments"><span class="nav-icon">≡</span> <span>Payments</span></a>
+      <a class="nav-item" data-page="cards" href="#cards"><span class="nav-icon">◆</span> <span>Cards</span></a>
+      <a class="nav-item" data-page="profile" href="#profile"><span class="nav-icon">○</span> <span>Profile</span></a>
+      <a class="nav-item" data-page="settings" href="#settings"><span class="nav-icon">⚙</span> <span>Settings</span></a>
     </nav>
   </aside>
 
@@ -159,7 +220,7 @@
           </div>
           <div class="dropdown" id="profileDropdown">
             <div class="drop-item" onclick="document.getElementById('avatarUpload').click()">📷 Upload Photo</div>
-            <div class="drop-item" data-page="profile" onclick="toggleDropdown()">👤 View Profile</div>
+            <div class="drop-item" data-page="profile">👤 View Profile</div>
             <div class="drop-item danger" onclick="doLogout()">⏻ Sign Out</div>
           </div>
           <input type="file" id="avatarUpload" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
@@ -168,6 +229,7 @@
     </header>
 
     <div class="content">
+      <!-- DASHBOARD -->
       <section class="page active" id="dashboard">
         <div class="greeting">
           <h1 id="greetingText">Good evening</h1>
@@ -180,17 +242,17 @@
         </div>
         <div class="grid-2">
           <div class="card">
-            <div class="card-header"><h3>Recent Transactions</h3><a href="#" data-page="accounts">View all →</a></div>
+            <div class="card-header"><h3>Recent Transactions</h3><a href="#accounts">View all →</a></div>
             <div id="recentTransactionsList"><div class="transaction"><div class="tx-details">Loading...</div></div></div>
           </div>
           <div>
             <div class="card" style="margin-bottom:20px;">
               <div class="card-header"><h3>Quick Actions</h3></div>
               <div class="quick-actions">
-                <button class="action-btn" data-page="transfer"><span>↗</span> Send Money</button>
-                <button class="action-btn" data-toast="Request link copied"><span>↙</span> Request</button>
-                <button class="action-btn" data-page="payments"><span>≡</span> Pay Bills</button>
-                <button class="action-btn" data-toast="Add money coming soon"><span>+</span> Add Money</button>
+                <button class="action-btn" onclick="window.location.hash='transfer'"><span>↗</span> Send Money</button>
+                <button class="action-btn" onclick="alert('Request link copied')"><span>↙</span> Request</button>
+                <button class="action-btn" onclick="window.location.hash='payments'"><span>≡</span> Pay Bills</button>
+                <button class="action-btn" onclick="alert('Coming soon')"><span>+</span> Add Money</button>
               </div>
             </div>
             <div class="card">
@@ -204,6 +266,7 @@
         </div>
       </section>
 
+      <!-- ACCOUNTS -->
       <section class="page" id="accounts">
         <div class="greeting"><h1>Accounts</h1><p>Both accounts, one view.</p></div>
         <div class="accounts">
@@ -211,23 +274,38 @@
         </div>
       </section>
 
+      <!-- TRANSFER -->
       <section class="page" id="transfer">
-        <div class="greeting"><h1>Send money</h1><p>Transfer funds instantly to other Fluxx members.</p></div>
-        <div class="card" style="max-width:480px;">
-          <form onsubmit="return handleTransfer(event)">
-            <label style="display:block;font-size:13px;color:#64748B;margin-bottom:6px;">Recipient</label>
-            <select id="transferRecipient" class="search" style="width:100%;margin-bottom:16px;padding-left:16px; appearance: auto;" required>
-              <option value="" disabled selected>Loading users...</option>
-            </select>
+        <div class="greeting"><h1>Send money</h1><p>Transfer funds securely to any bank.</p></div>
+        <div class="card" style="max-width:500px;">
+          <form onsubmit="return open2FA(event)">
+            <div class="form-group">
+              <label>Recipient Name</label>
+              <input type="text" id="transferName" class="form-control" placeholder="e.g. Maya Chen" required>
+            </div>
+            <div class="form-group">
+              <label>IBAN / Account Number</label>
+              <input type="text" id="transferIban" class="form-control" placeholder="DE89 3704 0044 0532 0130 00" required>
+            </div>
+            <div class="form-group">
+              <label>BIC / SWIFT Code</label>
+              <input type="text" id="transferBic" class="form-control" placeholder="FLUXXDEFFXXX" required>
+            </div>
+            <div class="form-group">
+              <label>Amount (€)</label>
+              <input type="number" id="transferAmount" class="form-control" placeholder="0.00" min="0.01" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label>Purpose of Transfer</label>
+              <input type="text" id="transferPurpose" class="form-control" placeholder="e.g. Family support, Rent" required>
+            </div>
             
-            <label style="display:block;font-size:13px;color:#64748B;margin-bottom:6px;">Amount (€)</label>
-            <input type="number" id="transferAmount" class="search" style="width:100%;margin-bottom:16px;padding-left:16px;" placeholder="0.00" min="0.01" step="0.01" required>
-            
-            <button type="submit" class="action-btn" style="width:100%; background: var(--accent); color: white;">Send Instantly</button>
+            <button type="submit" class="action-btn" style="width:100%; background: var(--accent); color: white; padding:16px; font-size:16px;">Send Securely</button>
           </form>
         </div>
       </section>
 
+      <!-- OTHER PAGES -->
       <section class="page" id="payments">
         <div class="greeting"><h1>Payments</h1><p>Upcoming bills.</p></div>
         <div class="card"><div class="transaction"><div class="tx-icon">⚡</div><div class="tx-details"><div class="tx-name">Electricity</div><div class="tx-meta">Due Oct 28</div></div><div class="tx-amount">€112.40</div></div></div>
@@ -240,11 +318,6 @@
           <div style="font-size:20px;letter-spacing:3px;">•••• •••• •••• 4820</div>
           <div style="display:flex;justify-content:space-between;width:100%;"><span id="cardHolderName">MARCEL JANKO</span><span>12/28</span></div>
         </div>
-      </section>
-
-      <section class="page" id="analytics">
-        <div class="greeting"><h1>Analytics</h1><p>This month.</p></div>
-        <div class="stats"><div class="stat-card"><div class="stat-label">Food</div><div class="stat-value">€186</div></div></div>
       </section>
 
       <section class="page" id="profile">
@@ -268,44 +341,100 @@
     </div>
   </main>
 </div>
-<div class="toast" id="toast"></div>
+
+<!-- MOBILE BOTTOM NAVIGATION -->
+<div class="mobile-nav">
+  <a class="mobile-nav-item active" data-page="dashboard" href="#dashboard">
+    <span class="nav-icon">⌂</span> Home
+  </a>
+  <a class="mobile-nav-item" data-page="accounts" href="#accounts">
+    <span class="nav-icon">▣</span> Accounts
+  </a>
+  <a class="mobile-nav-item" data-page="transfer" href="#transfer">
+    <span class="nav-icon" style="color:var(--accent); background:rgba(59,130,246,0.1); padding:4px 12px; border-radius:20px;">↗</span> Send
+  </a>
+  <a class="mobile-nav-item" data-page="cards" href="#cards">
+    <span class="nav-icon">◆</span> Cards
+  </a>
+  <a class="mobile-nav-item" data-page="profile" href="#profile">
+    <span class="nav-icon">○</span> Profile
+  </a>
+</div>
+
+<!-- 2FA MODAL -->
+<div class="modal-overlay" id="twoFactorModal">
+  <div class="modal">
+    <h2>Security Check 🛡️</h2>
+    <p>We've sent a 6-digit verification code to your email address.</p>
+    <div class="form-group">
+      <label>Enter 2FA Code</label>
+      <input type="text" id="twoFactorCode" class="form-control" placeholder="e.g. 123456" maxlength="6" style="text-align:center; font-size:24px; letter-spacing:5px; font-weight:bold;">
+    </div>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button class="action-btn" style="flex:1; padding:14px;" onclick="close2FA()">Cancel</button>
+      <button class="action-btn" style="flex:1; background:var(--accent); color:white; padding:14px;" onclick="processTransfer()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div class="modal-overlay" id="receiptModal">
+  <div class="receipt-box">
+    <div class="receipt-logo">
+      <svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg> Fluxxbank
+    </div>
+    <div style="text-align:center; font-size:12px; color:var(--text-muted); margin-bottom:20px;">OFFICIAL TRANSFER RECEIPT</div>
+    
+    <div class="receipt-divider"></div>
+    
+    <div class="receipt-row"><span>Date:</span><span id="rcDate">-</span></div>
+    <div class="receipt-row"><span>Reference:</span><span id="rcRef">-</span></div>
+    <div class="receipt-row"><span>Status:</span><span style="color:var(--green);">✔ Successful</span></div>
+    
+    <div class="receipt-divider"></div>
+    
+    <div class="receipt-row"><span>Sender:</span><span id="rcSender">-</span></div>
+    <div class="receipt-row"><span>Recipient:</span><span id="rcRecipient">-</span></div>
+    <div class="receipt-row"><span>IBAN:</span><span id="rcIban">-</span></div>
+    <div class="receipt-row"><span>BIC:</span><span id="rcBic">-</span></div>
+    <div class="receipt-row"><span>Purpose:</span><span id="rcPurpose">-</span></div>
+    
+    <div class="receipt-divider"></div>
+    
+    <div class="receipt-row" style="font-size:1.2rem; margin-top:20px;">
+      <span>Total Sent:</span><span id="rcAmount" style="color:var(--accent);">€0.00</span>
+    </div>
+    
+    <div class="barcode"></div>
+    <div style="text-align:center; font-size:10px; color:var(--text-muted); margin-top:10px;">Thank you for banking in motion.</div>
+    
+    <div class="no-print" style="display:flex; gap:10px; margin-top:20px;">
+      <button class="action-btn" style="flex:1; padding:14px;" onclick="closeReceipt()">Close</button>
+      <button class="action-btn" style="flex:1; background:var(--navy); color:white; padding:14px;" onclick="window.print()">🖨️ Print</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // UI LOGIC
+  // --- HASH ROUTING ---
   function show(page) {
     document.querySelectorAll(".page").forEach(function (p) { p.classList.remove("active"); });
-    document.querySelectorAll(".nav-item").forEach(function (n) { n.classList.toggle("active", n.dataset.page === page); });
+    document.querySelectorAll(".nav-item, .mobile-nav-item").forEach(function (n) { n.classList.toggle("active", n.dataset.page === page); });
     var el = document.getElementById(page);
     if (el) el.classList.add("active");
     toggleDropdown();
   }
-  
-  document.querySelectorAll("[data-page]").forEach(function (el) {
-    el.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (el.dataset.page) show(el.dataset.page);
-    });
-  });
-  
-  document.querySelectorAll("[data-toast]").forEach(function (el) {
-    el.addEventListener("click", function () {
-      var t = document.getElementById("toast");
-      t.textContent = el.dataset.toast;
-      t.classList.add("show");
-      setTimeout(function () { t.classList.remove("show"); }, 1800);
-    });
-  });
-  
+
+  function handleRouting() {
+    const hash = window.location.hash.replace('#', '') || 'dashboard';
+    show(hash);
+  }
+  window.addEventListener('hashchange', handleRouting);
+
+  // --- UI LOGIC ---
   document.getElementById("balance").addEventListener("click", function () {
     this.textContent = this.textContent.indexOf("€") === 0 ? "••••••" : this.dataset.real;
-  });
-  
-  document.getElementById("bell").addEventListener("click", function () {
-    var t = document.getElementById("toast");
-    t.textContent = "No new notifications";
-    t.classList.add("show");
-    setTimeout(function () { t.classList.remove("show"); }, 1800);
   });
 
   const dropdown = document.getElementById("profileDropdown");
@@ -318,7 +447,7 @@
     if (!dropdown.contains(e.target)) dropdown.classList.remove("show");
   });
 
-  // SUPABASE LOGIC
+  // --- SUPABASE LOGIC ---
   const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
   const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -327,6 +456,7 @@
   let currentBalance = 0;
   let currentUser = null;
   let userInitials = "U";
+  let pendingTransfer = null;
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
@@ -359,23 +489,7 @@
     }
 
     loadTransactions(session.user.id);
-    loadTransferRecipients(session.user.id); // Populate the transfer dropdown
-  }
-
-  // Fetch other users dynamically for the transfer list
-  async function loadTransferRecipients(currentId) {
-    const { data: users } = await sb.from("profiles")
-      .select("id, name")
-      .neq("id", currentId)
-      .eq("status", "active");
-      
-    const select = document.getElementById("transferRecipient");
-    if(users && users.length > 0) {
-      select.innerHTML = '<option value="" disabled selected>Select recipient</option>' + 
-        users.map(u => `<option value="${u.id}" data-name="${u.name}">${u.name}</option>`).join("");
-    } else {
-      select.innerHTML = '<option value="" disabled selected>No other users found</option>';
-    }
+    handleRouting();
   }
 
   function updateAvatarUI(url) {
@@ -399,10 +513,7 @@
     try {
       const file = event.target.files[0];
       if (!file) return;
-      var t = document.getElementById("toast");
-      t.textContent = "Uploading photo...";
-      t.classList.add("show");
-
+      
       const fileExt = file.name.split('.').pop();
       const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
       
@@ -416,8 +527,6 @@
       if (dbError) throw dbError;
 
       updateAvatarUI(publicUrl);
-      t.textContent = "✅ Profile photo updated!";
-      setTimeout(() => t.classList.remove("show"), 3000);
     } catch (error) {
       alert("Error uploading image: " + error.message);
     }
@@ -446,7 +555,6 @@
     list.innerHTML = txs.map(t => {
       const isIncoming = t.type === 'deposit';
       const dateObj = new Date(t.created_at);
-      // Formatting date & time specifically for the backdated transactions
       const dStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
       const tStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
       
@@ -455,7 +563,7 @@
           <div class="tx-icon">${isIncoming ? '↓' : '↑'}</div>
           <div class="tx-details">
             <div class="tx-name">${t.description}</div>
-            <div class="tx-meta">${dStr} at ${tStr} · ${t.type}</div>
+            <div class="tx-meta">${dStr} at ${tStr}</div>
           </div>
           <div class="tx-amount ${isIncoming ? 'credit' : ''}">
             ${isIncoming ? '+' : '-'}${eur(t.amount)}
@@ -465,11 +573,9 @@
     }).join("");
   }
 
-  async function handleTransfer(e) {
+  // --- 2FA & TRANSFER LOGIC ---
+  function open2FA(e) {
     e.preventDefault();
-    const selectEl = document.getElementById("transferRecipient");
-    const recipientId = selectEl.value;
-    const recipientName = selectEl.options[selectEl.selectedIndex].getAttribute("data-name");
     const amount = parseFloat(document.getElementById("transferAmount").value);
     
     if (amount > currentBalance) {
@@ -477,31 +583,48 @@
       return false;
     }
 
+    pendingTransfer = {
+      name: document.getElementById("transferName").value,
+      iban: document.getElementById("transferIban").value,
+      bic: document.getElementById("transferBic").value,
+      amount: amount,
+      purpose: document.getElementById("transferPurpose").value
+    };
+
+    document.getElementById("twoFactorModal").classList.add("active");
+    document.getElementById("twoFactorCode").value = "";
+    document.getElementById("twoFactorCode").focus();
+  }
+
+  function close2FA() {
+    document.getElementById("twoFactorModal").classList.remove("active");
+    pendingTransfer = null;
+  }
+
+  async function processTransfer() {
+    const code = document.getElementById("twoFactorCode").value;
+    
+    if (code.length !== 6) {
+      alert("Please enter a valid 6-digit code.");
+      return;
+    }
+
+    document.getElementById("twoFactorModal").classList.remove("active");
+    
+    const amount = pendingTransfer.amount;
     const newBal = currentBalance - amount;
+    
     const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", currentUser.id);
     if (err1) return alert("Error: " + err1.message);
 
-    // Log transfer for sender
+    const reference = "FLX-" + Date.now().toString(36).toUpperCase();
     await sb.from("transactions").insert({
       user_id: currentUser.id,
       type: 'transfer',
       amount: amount,
-      description: `Sent to ${recipientName}`
+      description: `${pendingTransfer.purpose} - ${pendingTransfer.name}`,
+      reference: reference
     });
-
-    // Add balance to recipient
-    const { data: recipientProfile } = await sb.from("profiles").select("balance").eq("id", recipientId).single();
-    if (recipientProfile) {
-        await sb.from("profiles").update({ balance: Number(recipientProfile.balance) + amount }).eq("id", recipientId);
-        
-        // Log deposit for recipient
-        await sb.from("transactions").insert({
-          user_id: recipientId,
-          type: 'deposit',
-          amount: amount,
-          description: `Received from ${document.getElementById("headerName").textContent}`
-        });
-    }
 
     currentBalance = newBal;
     const formatted = eur(newBal);
@@ -509,17 +632,37 @@
     document.getElementById("balance").dataset.real = formatted;
     document.getElementById("currentAccBal").textContent = formatted;
     document.getElementById("accPageBal").textContent = formatted;
-
-    document.getElementById("transferAmount").value = "";
     
-    var t = document.getElementById("toast");
-    t.textContent = `Successfully sent ${eur(amount)} to ${recipientName}`;
-    t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 3000);
+    document.getElementById("transferName").value = "";
+    document.getElementById("transferIban").value = "";
+    document.getElementById("transferBic").value = "";
+    document.getElementById("transferAmount").value = "";
+    document.getElementById("transferPurpose").value = "";
 
+    showReceipt(pendingTransfer, reference);
+    
     loadTransactions(currentUser.id);
-    show("dashboard");
-    return false;
+    
+    pendingTransfer = null;
+  }
+
+  function showReceipt(data, ref) {
+    const now = new Date();
+    document.getElementById("rcDate").textContent = now.toLocaleDateString() + " " + now.toLocaleTimeString();
+    document.getElementById("rcRef").textContent = ref;
+    document.getElementById("rcSender").textContent = document.getElementById("headerName").textContent;
+    document.getElementById("rcRecipient").textContent = data.name;
+    document.getElementById("rcIban").textContent = data.iban;
+    document.getElementById("rcBic").textContent = data.bic;
+    document.getElementById("rcPurpose").textContent = data.purpose;
+    document.getElementById("rcAmount").textContent = eur(data.amount);
+    
+    document.getElementById("receiptModal").classList.add("active");
+  }
+
+  function closeReceipt() {
+    document.getElementById("receiptModal").classList.remove("active");
+    window.location.hash = "dashboard";
   }
 
   async function doLogout() {
