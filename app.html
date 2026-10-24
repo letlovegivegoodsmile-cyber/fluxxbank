@@ -3,163 +3,412 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fluxxbank | Premium Banking</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Fluxxbank | Customer Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #05070f; --panel: rgba(15, 23, 42, 0.6); --border: rgba(255, 255, 255, 0.08);
-    --text: #f8fafc; --muted: #94a3b8; --accent: #4f7cff; --accent2: #22d3ee;
-    --gradient: linear-gradient(135deg, #4f7cff 0%, #22d3ee 100%);
-    --success: #10b981; --danger: #ef4444;
+    --sidebar-bg: #111827; 
+    --sidebar-text: #9CA3AF;
+    --sidebar-active: #FFFFFF;
+    --bg: #F3F4F6; 
+    --card-bg: #FFFFFF;
+    --text-main: #111827;
+    --text-muted: #6B7280;
+    --border: #E5E7EB;
+    --accent: #2563EB;
+    --success: #10B981;
+    --danger: #EF4444;
   }
+  
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-  body {
-    background-color: var(--bg); background-image: radial-gradient(circle at 0% 0%, rgba(79, 124, 255, 0.15) 0%, transparent 40%), radial-gradient(circle at 100% 100%, rgba(34, 211, 238, 0.1) 0%, transparent 40%);
-    color: var(--text); min-height: 100vh; display: flex; overflow: hidden;
+  body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; overflow: hidden; }
+
+  /* --- SIDEBAR --- */
+  .sidebar {
+    width: 260px; background: var(--sidebar-bg); color: var(--sidebar-text);
+    display: flex; flex-direction: column; padding: 24px;
+    border-right: 1px solid rgba(255,255,255,0.05);
   }
-  .sidebar { width: 280px; background: rgba(8, 12, 24, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border); padding: 32px 24px; display: flex; flex-direction: column; z-index: 10; }
-  .logo { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 12px; margin-bottom: 48px; letter-spacing: -0.5px; }
-  .logo span { background: var(--gradient); -webkit-background-clip: text; color: transparent; }
-  .nav-item { padding: 14px 18px; border-radius: 12px; color: var(--muted); font-weight: 500; margin-bottom: 8px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 14px; }
-  .nav-item:hover, .nav-item.active { background: rgba(79, 124, 255, 0.1); color: var(--accent); transform: translateX(4px); }
-  .nav-item.active { border-left: 3px solid var(--accent); }
-  .user-pill { margin-top: auto; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 16px; border-radius: 16px; display: flex; align-items: center; gap: 12px; }
-  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--gradient); display: grid; place-items: center; font-weight: 700; color: white; }
-  .user-info h4 { font-size: 0.9rem; font-weight: 600; }
-  .user-info p { font-size: 0.75rem; color: var(--muted); }
-  .logout-btn { margin-left: auto; background: transparent; border: none; color: var(--muted); cursor: pointer; transition: color 0.2s; }
-  .logout-btn:hover { color: var(--danger); }
-  .main { flex: 1; padding: 48px; overflow-y: auto; }
-  .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
-  .header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
-  .header h1 span { color: var(--muted); font-weight: 400; }
-  .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
-  .glass-panel { background: var(--panel); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 24px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); }
-  .balance-label { color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; font-weight: 600; }
-  .balance-amount { font-size: 4rem; font-weight: 800; letter-spacing: -2px; background: var(--gradient); -webkit-background-clip: text; color: transparent; line-height: 1; margin-bottom: 12px; }
-  .account-details { color: var(--muted); font-family: monospace; font-size: 0.95rem; display: flex; gap: 20px; }
+  .logo { font-size: 1.4rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+  .logo svg { fill: white; width: 24px; height: 24px; }
   
-  .card-visual { width: 100%; height: 220px; border-radius: 20px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(255, 255, 255, 0.1); position: relative; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 24px 50px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05); overflow: hidden; }
-  .card-visual::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(79,124,255,0.15) 0%, transparent 60%); pointer-events: none; }
-  .card-top { display: flex; justify-content: space-between; align-items: center; }
-  .card-chip { width: 45px; height: 32px; background: linear-gradient(135deg, #e2e8f0, #94a3b8); border-radius: 6px; position: relative; }
-  .card-chip::after { content: ''; position: absolute; inset: 4px; border: 1px solid rgba(0,0,0,0.1); border-radius: 3px; }
-  .card-logo { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; }
-  .card-number { font-family: monospace; font-size: 1.4rem; letter-spacing: 3px; color: rgba(255,255,255,0.9); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-  .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
-  .card-holder, .card-expiry { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-  .card-holder div, .card-expiry div { color: white; font-size: 0.9rem; font-weight: 600; margin-top: 4px; }
+  .nav-section { font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; color: #4B5563; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px;
+    border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 0.95rem;
+    transition: all 0.2s; margin-bottom: 4px;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+  .nav-item.active { background: var(--accent); color: white; }
+  .nav-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .user-profile { margin-top: auto; display: flex; align-items: center; gap: 12px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: #374151; display: grid; place-items: center; color: white; font-weight: 600; }
+  .user-info h4 { color: white; font-size: 0.9rem; margin-bottom: 2px; }
+  .user-info p { font-size: 0.75rem; }
+  .logout-btn { margin-left: auto; background: transparent; border: none; color: var(--sidebar-text); cursor: pointer; }
+  .logout-btn:hover { color: white; }
+
+  /* --- MAIN AREA --- */
+  .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+  .top-header { 
+    height: 80px; display: flex; align-items: center; justify-content: space-between; 
+    padding: 0 40px; background: var(--card-bg); border-bottom: 1px solid var(--border);
+  }
+  .top-header h1 { font-size: 1.25rem; font-weight: 600; }
+  .header-actions { display: flex; align-items: center; gap: 20px; }
+  .btn-primary { 
+    background: var(--accent); color: white; border: none; padding: 10px 20px; 
+    border-radius: 8px; font-weight: 500; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-primary:hover { background: #1D4ED8; }
+
+  .content { padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* --- DASHBOARD GRID --- */
+  .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  .card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
   
-  .form-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 24px; }
-  .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
-  .form-control { width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: white; font-size: 1rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-  .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.2); }
-  .btn-send { width: 100%; padding: 16px; border-radius: 12px; border: none; background: var(--gradient); color: white; font-weight: 700; font-size: 1rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 8px 20px rgba(79, 124, 255, 0.3); }
-  .btn-send:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(79, 124, 255, 0.4); }
-  
-  /* Transaction List Styling */
-  .activity-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
-  .tx-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
-  .tx-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .tx-info { display: flex; align-items: center; gap: 16px; }
-  .tx-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.05); display: grid; place-items: center; font-size: 1.2rem; }
-  .tx-details h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
-  .tx-details p { font-size: 0.8rem; color: var(--muted); }
-  .tx-amount { font-weight: 700; font-size: 1rem; }
-  .tx-in { color: var(--success); }
-  .tx-out { color: var(--text); }
-  
-  .msg { padding: 16px; border-radius: 12px; font-size: 0.9rem; font-weight: 500; margin-top: 20px; display: none; }
-  .msg.success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); display: block; }
-  .msg.error { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); display: block; }
+  /* Balance Card */
+  .balance-card { background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: white; position: relative; overflow: hidden; }
+  .balance-card::after { content: ''; position: absolute; top: -50%; right: -20%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(37,99,235,0.3) 0%, transparent 70%); border-radius: 50%; }
+  .balance-label { color: #94A3B8; font-size: 0.9rem; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .balance-amount { font-size: 3rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 24px; }
+  .account-info { color: #94A3B8; font-size: 0.85rem; font-family: monospace; }
+
+  /* Quick Actions */
+  .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; }
+  .action-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
+  .action-btn:hover { background: white; border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .action-btn svg { width: 24px; height: 24px; stroke: var(--accent); fill: none; stroke-width: 2; }
+  .action-btn span { font-size: 0.8rem; font-weight: 500; color: var(--text-main); }
+
+  /* Transactions Table */
+  .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .table-header h2 { font-size: 1.1rem; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 12px 16px; color: var(--text-muted); font-size: 0.8rem; font-weight: 500; border-bottom: 1px solid var(--border); }
+  td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  tr:last-child td { border-bottom: none; }
+  .tx-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #F3F4F6; color: #4B5563; margin-right: 12px; }
+  .tx-details { display: flex; align-items: center; }
+  .tx-name { font-weight: 500; }
+  .tx-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+  .status-pill { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; }
+  .status-completed { background: #ECFDF5; color: var(--success); }
+  .status-pending { background: #FFFBEB; color: #D97706; }
+  .amount-in { color: var(--success); font-weight: 600; }
+  .amount-out { color: var(--text-main); font-weight: 600; }
+
+  /* --- CARDS VIEW (Screenshot 2 style) --- */
+  .cards-grid { display: flex; flex-wrap: wrap; gap: 40px; margin-top: 20px; }
+  .virtual-card { 
+    width: 400px; height: 250px; border-radius: 20px; 
+    background: #111827; color: white; padding: 30px; position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2); overflow: hidden;
+  }
+  /* Gold concentric lines effect */
+  .virtual-card::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    border-radius: 50%; border: 1px solid rgba(245, 196, 81, 0.2);
+    box-shadow: 0 0 0 10px rgba(245, 196, 81, 0.05), 0 0 0 20px rgba(245, 196, 81, 0.05), 0 0 0 30px rgba(245, 196, 81, 0.05), 0 0 0 40px rgba(245, 196, 81, 0.05), 0 0 0 50px rgba(245, 196, 81, 0.05);
+  }
+  .card-brand { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; position: relative; z-index: 2; }
+  .card-brand span { font-size: 1.2rem; font-weight: 600; }
+  .card-number { font-family: monospace; font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 20px; position: relative; z-index: 2; }
+  .card-details { display: flex; justify-content: space-between; font-size: 0.8rem; color: #9CA3AF; position: relative; z-index: 2; }
+  .card-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px; width: 400px; }
+  .card-action-btn { background: #ECFCCB; border: none; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font-weight: 500; font-size: 0.75rem; color: #3F6212; transition: 0.2s; }
+  .card-action-btn:hover { background: #D9F99D; }
+
+  /* --- SUPPORT VIEW (Screenshot 1 style) --- */
+  .support-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
+  .support-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 30px; display: flex; justify-content: space-between; align-items: center; }
+  .support-card-content h3 { margin-bottom: 8px; font-size: 1.1rem; }
+  .support-card-content p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; max-width: 300px; }
+  .btn-secondary { background: white; border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-weight: 500; cursor: pointer; }
+  .btn-secondary:hover { background: var(--bg); }
+
+  /* Modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); display: none; place-items: center; z-index: 100; }
+  .modal-overlay.active { display: grid; }
+  .modal { background: white; border-radius: 16px; width: 100%; max-width: 400px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+  .modal h2 { font-size: 1.25rem; margin-bottom: 20px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 8px; }
+  .form-control { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; outline: none; }
+  .form-control:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+  .modal-actions button { flex: 1; }
+
+  @media(max-width: 900px) {
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .sidebar { width: 80px; padding: 20px 10px; }
+    .logo span, .nav-item span, .user-info { display: none; }
+    .nav-item { justify-content: center; }
+    .virtual-card, .card-actions { width: 100%; }
+  }
 </style>
 </head>
 <body>
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="logo">⚡ Fluxx<span>bank</span></div>
-    <div class="nav-item active">🏠 Overview</div>
-    <div class="nav-item">💳 My Cards</div>
-    <div class="nav-item">📈 Analytics</div>
-    <div class="nav-item">⚙️ Settings</div>
-    <div class="user-pill">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+      <span>Fluxxbank</span>
+    </div>
+
+    <div class="nav-section">Wallet</div>
+    <div class="nav-item active" onclick="switchTab('dashboard', this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('transactions', this)">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span>Transactions</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('cards', this)">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <span>My Cards</span>
+    </div>
+
+    <div class="nav-section" style="margin-top:24px">Support</div>
+    <div class="nav-item" onclick="switchTab('support', this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>Help Center</span>
+    </div>
+
+    <div class="user-profile">
       <div class="avatar" id="userInitial">U</div>
       <div class="user-info">
         <h4 id="userName">Loading...</h4>
         <p>Premium Member</p>
       </div>
-      <button class="logout-btn" onclick="doLogout()" title="Sign Out">⏻</button>
+      <button class="logout-btn" onclick="doLogout()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
     </div>
   </aside>
 
+  <!-- MAIN CONTENT -->
   <main class="main">
-    <div class="header">
-      <h1>Good to see you, <span id="headerName">...</span></h1>
-    </div>
+    <header class="top-header">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="header-actions">
+        <button class="btn-primary" onclick="openTransferModal()">Move Money</button>
+      </div>
+    </header>
 
-    <div class="dashboard-grid">
-      <div style="display:flex; flex-direction:column; gap:32px;">
-        <div class="glass-panel">
-          <div class="balance-label">Total Available Balance</div>
-          <div class="balance-amount" id="mainBalance">€0.00</div>
-          <div class="account-details">
-            <span>IBAN: DE89 3704 0044 0532 0130 00</span>
-            <span>BIC: FLUXXDEFFXXX</span>
+    <div class="content">
+      
+      <!-- DASHBOARD VIEW -->
+      <div id="view-dashboard" class="view active">
+        <div class="dashboard-grid">
+          
+          <!-- Left Column -->
+          <div style="display:flex; flex-direction:column; gap:24px;">
+            
+            <!-- Balance Card -->
+            <div class="card balance-card">
+              <div class="balance-label">
+                <span>Total Available Balance</span>
+                <span id="ibanDisplay">IBAN: DE89 **** 0130 00</span>
+              </div>
+              <div class="balance-amount" id="mainBalance">€0.00</div>
+              <div style="display:flex; gap:40px; font-size:0.9rem; position:relative; z-index:2;">
+                <div><span style="color:#94A3B8">Money In:</span> <br><span id="moneyIn" style="font-weight:600; color:#10B981;">€0.00</span></div>
+                <div><span style="color:#94A3B8">Money Out:</span> <br><span id="moneyOut" style="font-weight:600; color:#F87171;">€0.00</span></div>
+              </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="card">
+              <div class="table-header">
+                <h2>Recent Transactions</h2>
+                <button class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;" onclick="switchTab('transactions', document.querySelectorAll('.nav-item')[1])">View All</button>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>To/From</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th style="text-align:right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTxList">
+                  <tr><td colspan="4" style="text-align:center; padding:20px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
 
-        <!-- FULL TRANSACTION HISTORY -->
-        <div class="glass-panel">
-          <div class="form-title">Transaction History</div>
-          <div class="activity-list" id="txList">
-            <div style="color:var(--muted); font-size:0.9rem;">Loading transactions...</div>
+          <!-- Right Column -->
+          <div style="display:flex; flex-direction:column; gap:24px;">
+            <div class="card">
+              <h2 style="font-size:1.1rem; margin-bottom:16px;">Quick Actions</h2>
+              <div class="quick-actions" style="grid-template-columns: 1fr 1fr;">
+                <div class="action-btn" onclick="openTransferModal()">
+                  <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                  <span>Send</span>
+                </div>
+                <div class="action-btn">
+                  <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                  <span>Request</span>
+                </div>
+                <div class="action-btn">
+                  <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                  <span>Statements</span>
+                </div>
+                <div class="action-btn" onclick="switchTab('support', document.querySelectorAll('.nav-item')[3])">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  <span>Support</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="card" style="background: var(--accent); color: white;">
+              <h3 style="margin-bottom:8px;">Need a physical card?</h3>
+              <p style="font-size:0.85rem; opacity:0.9; margin-bottom:16px;">Order our 18g metal card directly to your door.</p>
+              <button class="btn-secondary" style="background:white; border:none; color:var(--accent); font-weight:600;">Upgrade Plan</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style="display:flex; flex-direction:column; gap:32px;">
-        <div class="card-visual">
-          <div class="card-top">
-            <div class="card-chip"></div>
-            <div class="card-logo">Fluxx</div>
+      <!-- TRANSACTIONS VIEW -->
+      <div id="view-transactions" class="view">
+        <div class="card">
+          <div class="table-header">
+            <h2>All Transactions</h2>
+            <input type="text" placeholder="Search..." class="form-control" style="width:250px;">
           </div>
-          <div class="card-number">•••• •••• •••• 4021</div>
-          <div class="card-bottom">
-            <div class="card-holder">
-              Card Holder
-              <div id="cardName">USER NAME</div>
-            </div>
-            <div class="card-expiry">
-              Expires
-              <div>12/28</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="glass-panel">
-          <div class="form-title">Send Money</div>
-          <form onsubmit="return handleSend(event)">
-            <div class="form-group">
-              <label>Recipient</label>
-              <select id="sendTo" class="form-control" required>
-                <option value="" disabled selected>Choose a contact</option>
-                <option value="Maya Chen">Maya Chen</option>
-                <option value="Jonas Weber">Jonas Weber</option>
-                <option value="Luna Ortiz">Luna Ortiz</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Amount (€)</label>
-              <input type="number" id="sendAmt" class="form-control" min="0.01" step="0.01" placeholder="0.00" required>
-            </div>
-            <button type="submit" class="btn-send">Send Instantly ⚡</button>
-            <div id="sendMsg" class="msg"></div>
-          </form>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>To/From</th>
+                <th>Status</th>
+                <th>Method</th>
+                <th style="text-align:right">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="allTxList">
+              <tr><td colspan="5" style="text-align:center; padding:20px;">Loading...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
+
+      <!-- CARDS VIEW (Screenshot 2 Style) -->
+      <div id="view-cards" class="view">
+        <h2 style="font-size:1.5rem; margin-bottom:24px;">My Cards</h2>
+        <div class="cards-grid">
+          <div>
+            <!-- The Card Design -->
+            <div class="virtual-card">
+              <div class="card-brand">
+                <span>VISA</span>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#F5C451" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              </div>
+              <div class="card-number">•••• •••• •••• 1301</div>
+              <div class="card-details">
+                <div>
+                  <div style="font-size:0.65rem; margin-bottom:4px;">CARDHOLDER</div>
+                  <div id="cardName" style="color:white; font-weight:600;">USER NAME</div>
+                </div>
+                <div>
+                  <div style="font-size:0.65rem; margin-bottom:4px;">EXPIRES</div>
+                  <div style="color:white; font-weight:600;">12/28</div>
+                </div>
+              </div>
+            </div>
+            <!-- Card Actions -->
+            <div class="card-actions">
+              <button class="card-action-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                Show details
+              </button>
+              <button class="card-action-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                See PIN
+              </button>
+              <button class="card-action-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+                Freeze
+              </button>
+              <button class="card-action-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+                More
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUPPORT VIEW (Screenshot 1 Style) -->
+      <div id="view-support" class="view">
+        <h2 style="font-size:1.5rem; margin-bottom:24px;">Starlight Support</h2>
+        
+        <div class="support-grid">
+          <!-- Card 1 -->
+          <div class="support-card">
+            <div class="support-card-content">
+              <h3>Physical Card Related Issues</h3>
+              <p>For all issues related to your physical (plastic or metal) debit card, please contact Visa support at:</p>
+              <div style="display:flex; align-items:center; gap:10px; font-weight:600; font-size:1.1rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                +1-833-233-0417
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="support-card" style="background:#FAFAFA;">
+            <div class="support-card-content">
+              <h3>Self-Service Help Center</h3>
+              <p>Get answers to our most common questions and issues in our searchable Help Center.</p>
+              <button class="btn-primary">Go to Help Center</button>
+            </div>
+            <div style="width:100px; height:100px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
+
+  <!-- SEND MONEY MODAL -->
+  <div class="modal-overlay" id="transferModal">
+    <div class="modal">
+      <h2>Move Money</h2>
+      <form onsubmit="return handleSend(event)">
+        <div class="form-group">
+          <label>Recipient</label>
+          <select id="sendTo" class="form-control" required>
+            <option value="" disabled selected>Choose a contact</option>
+            <option value="Maya Chen">Maya Chen</option>
+            <option value="Jonas Weber">Jonas Weber</option>
+            <option value="Luna Ortiz">Luna Ortiz</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Amount (€)</label>
+          <input type="number" id="sendAmt" class="form-control" min="0.01" step="0.01" placeholder="0.00" required>
+        </div>
+        <div id="sendMsg" style="font-size:0.85rem; color:var(--danger); min-height:18px; margin-bottom:10px;"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeTransferModal()">Cancel</button>
+          <button type="submit" class="btn-primary">Send Money</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -169,6 +418,26 @@
     
     const eur = n => "€" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
     let currentBalance = 0;
+
+    // Navigation Logic
+    function switchTab(tabId, element) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      document.getElementById('view-' + tabId).classList.add('active');
+      if (element) element.classList.add('active');
+
+      const titles = { dashboard: 'Dashboard', transactions: 'Transactions', cards: 'My Cards', support: 'Help Center' };
+      document.getElementById('pageTitle').textContent = titles[tabId];
+    }
+
+    // Modal Logic
+    function openTransferModal() { document.getElementById('transferModal').classList.add('active'); }
+    function closeTransferModal() { 
+      document.getElementById('transferModal').classList.remove('active'); 
+      document.getElementById('sendMsg').textContent = "";
+      document.getElementById('sendAmt').value = "";
+    }
 
     async function init() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -193,7 +462,6 @@
         const fullName = profile.name ? profile.name.toUpperCase() : "USER";
         
         document.getElementById("userName").textContent = firstName;
-        document.getElementById("headerName").textContent = firstName;
         document.getElementById("userInitial").textContent = firstName[0].toUpperCase();
         document.getElementById("cardName").textContent = fullName;
         
@@ -204,37 +472,71 @@
       loadTransactions(session.user.id);
     }
 
-    // --- DISPLAYS FULL HISTORY WITH DATE & TIME ---
     async function loadTransactions(userId) {
-      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(10);
-      const list = document.getElementById("txList");
+      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false });
+      
+      const recentList = document.getElementById("recentTxList");
+      const allList = document.getElementById("allTxList");
       
       if (!txs || txs.length === 0) {
-        list.innerHTML = '<div style="color:var(--muted);font-size:0.9rem;">No recent activity.</div>';
+        recentList.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-muted);">No recent activity.</td></tr>';
+        allList.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">No transactions found.</td></tr>';
         return;
       }
 
-      list.innerHTML = txs.map(t => {
+      // Calculate Money In / Out
+      let inTotal = 0, outTotal = 0;
+      txs.forEach(t => {
+        if (t.type === 'deposit') inTotal += t.amount;
+        else outTotal += t.amount;
+      });
+      document.getElementById("moneyIn").textContent = eur(inTotal);
+      document.getElementById("moneyOut").textContent = eur(outTotal);
+
+      // Render Recent (Top 4)
+      recentList.innerHTML = txs.slice(0, 4).map(t => {
         const isIncoming = t.type === 'deposit';
-        
-        // Format the date and time beautifully
         const dateObj = new Date(t.created_at);
-        const formattedDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-        const formattedTime = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        const dStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
         
         return `
-          <div class="tx-item">
-            <div class="tx-info">
-              <div class="tx-icon">${isIncoming ? '📥' : '📤'}</div>
+          <tr>
+            <td>
               <div class="tx-details">
-                <h4>${t.description}</h4>
-                <p>${formattedDate} at ${formattedTime}</p> <!-- Shows backdated time! -->
+                <div class="tx-icon">${isIncoming ? '↓' : '↑'}</div>
+                <div>
+                  <div class="tx-name">${t.description}</div>
+                </div>
               </div>
-            </div>
-            <div class="tx-amount ${isIncoming ? 'tx-in' : 'tx-out'}">
-              ${isIncoming ? '+' : '−'}${eur(t.amount)}
-            </div>
-          </div>
+            </td>
+            <td><div class="tx-date">${dStr}</div></td>
+            <td><span class="status-pill ${isIncoming ? 'status-completed' : 'status-completed'}" style="${!isIncoming ? 'background:#F3F4F6; color:#4B5563;' : ''}">Completed</span></td>
+            <td style="text-align:right" class="${isIncoming ? 'amount-in' : 'amount-out'}">${isIncoming ? '+' : '−'}${eur(t.amount)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      // Render All
+      allList.innerHTML = txs.map(t => {
+        const isIncoming = t.type === 'deposit';
+        const dateObj = new Date(t.created_at);
+        const dStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        
+        return `
+          <tr>
+            <td><div class="tx-date">${dStr}</div></td>
+            <td>
+              <div class="tx-details">
+                <div class="tx-icon">${isIncoming ? '↓' : '↑'}</div>
+                <div>
+                  <div class="tx-name">${t.description}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-pill status-completed">Completed</span></td>
+            <td>${isIncoming ? 'Bank Transfer' : 'FluxxPay'}</td>
+            <td style="text-align:right" class="${isIncoming ? 'amount-in' : 'amount-out'}">${isIncoming ? '+' : '−'}${eur(t.amount)}</td>
+          </tr>
         `;
       }).join("");
     }
@@ -246,19 +548,17 @@
       const msg = document.getElementById("sendMsg");
       
       if (amt > currentBalance) {
-        msg.className = "msg error";
         msg.textContent = "Insufficient funds to complete this transfer.";
         return false;
       }
 
-      msg.className = "msg"; 
+      msg.textContent = "Processing...";
       
       const { data: { session } } = await sb.auth.getSession();
       const newBal = currentBalance - amt;
       
       const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", session.user.id);
       if (err1) {
-        msg.className = "msg error";
         msg.textContent = "Error: " + err1.message;
         return false;
       }
@@ -272,11 +572,8 @@
 
       currentBalance = newBal;
       document.getElementById("mainBalance").textContent = eur(newBal);
-      document.getElementById("sendAmt").value = "";
       
-      msg.className = "msg success";
-      msg.textContent = `Successfully sent ${eur(amt)} to ${to}.`;
-      
+      closeTransferModal();
       loadTransactions(session.user.id); 
       return false;
     }
