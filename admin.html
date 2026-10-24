@@ -3,35 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FluxxBank Admin</title>
+  <title>FluxxBank Admin Console</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #0F172A; 
-      --panel: #1E293B; 
-      --border: #334155;
-      --text: #F8FAFC; 
-      --muted: #94A3B8; 
-      --success: #10B981; 
-      --danger: #EF4444;
-    }
+    :root { --bg: #080e1c; --panel: #101a2e; --border: #263653; --text: #edf3ff; --muted: #98a8c2; --accent: #3B82F6; --success: #10B981; --danger: #EF4444; }
     * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
     body { margin: 0; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
     
-    /* Sidebar / Nav */
-    .sidebar { width: 250px; background: #0B1120; border-right: 1px solid var(--border); padding: 20px; }
-    .brand { font-size: 1.5rem; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+    .sidebar { width: 250px; background: #0B1120; border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; }
+    .brand { font-size: 1.5rem; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; color: white; }
     .brand svg { fill: white; width: 24px; height: 24px; }
     .nav-item { padding: 12px; border-radius: 8px; color: var(--muted); cursor: pointer; margin-bottom: 8px; font-weight: 500; }
     .nav-item.active { background: var(--panel); color: white; border: 1px solid var(--border); }
-
-    /* Main Content */
+    
     .main { flex: 1; padding: 30px; }
     .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
     .top-header h1 { font-size: 1.5rem; margin: 0; }
-    .search-bar { background: var(--panel); border: 1px solid var(--border); padding: 10px 16px; border-radius: 20px; color: white; outline: none; width: 300px; }
     
-    /* Table Container */
     .table-container { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
     .table-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .table-header h2 { margin: 0; font-size: 1.1rem; font-weight: 600; }
@@ -42,17 +30,29 @@
     tr:hover { background: rgba(255,255,255,0.02); }
     
     .status { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: #334155; color: white; }
+    .status.active { background: rgba(16, 185, 129, 0.2); color: #34D399; }
+    .status.pending { background: rgba(245, 158, 11, 0.2); color: #FBBF24; }
     
-    /* Buttons */
     .btn { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition: 0.2s; }
-    .btn-green { background: var(--success); color: #064E3B; }
+    .btn-green { background: var(--success); color: white; }
     .btn-green:hover { background: #059669; }
-    .btn-red { background: var(--danger); color: white; }
-    .btn-red:hover { background: #DC2626; }
-    .btn-gray { background: #475569; color: white; cursor: not-allowed; }
+    .btn-blue { background: var(--accent); color: white; }
+    
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; place-items: center; z-index: 100; }
+    .modal-overlay.active { display: grid; }
+    .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 500px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+    .modal h2 { margin-top: 0; margin-bottom: 20px; color: white; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+    .form-control { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: #0F172A; color: white; outline: none; }
+    .form-control:focus { border-color: var(--accent); }
+    .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+    .modal-actions button { flex: 1; padding: 12px; font-size: 1rem; }
+    .btn-gray { background: #334155; color: white; }
     
     /* Login Screen */
-    #loginScreen { position: fixed; inset: 0; background: var(--bg); display: grid; place-items: center; z-index: 100; }
+    #loginScreen { position: fixed; inset: 0; background: var(--bg); display: grid; place-items: center; z-index: 200; }
     .login-box { background: var(--panel); padding: 40px; border-radius: 16px; border: 1px solid var(--border); width: 100%; max-width: 400px; }
     .login-box input { width: 100%; padding: 14px; margin-bottom: 16px; border-radius: 8px; border: 1px solid var(--border); background: #0F172A; color: white; outline: none; }
   </style>
@@ -74,28 +74,27 @@
   <!-- MAIN APP -->
   <div class="sidebar" id="appSidebar" style="display:none;">
     <div class="brand"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg> Fluxx Admin</div>
-    <div class="nav-item active">Admin Controls</div>
+    <div class="nav-item active">User Management</div>
     <div class="nav-item" style="margin-top:auto; color:var(--danger);" onclick="doLogout()">Sign Out</div>
   </div>
 
   <div class="main" id="appMain" style="display:none;">
     <div class="top-header">
-      <h1>Admin Controls</h1>
-      <input type="text" class="search-bar" placeholder="Search by name or email...">
+      <h1>User Management</h1>
+      <span style="color:var(--muted); font-size:0.9rem;">Manage user accounts and deposits</span>
     </div>
 
     <div class="table-container">
       <div class="table-header">
-        <h2>User Management</h2>
-        <span style="color:var(--muted); font-size:0.85rem;">Manage user approvals</span>
+        <h2>All Customers</h2>
       </div>
       <table>
         <thead>
           <tr>
-            <th>User ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Status</th>
+            <th>Balance</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -103,6 +102,46 @@
           <tr><td colspan="5" style="text-align:center;">Loading users...</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- DEPOSIT MODAL -->
+  <div class="modal-overlay" id="depositModal">
+    <div class="modal">
+      <h2>Deposit Funds</h2>
+      <form onsubmit="return submitDeposit(event)">
+        <input type="hidden" id="depositUserId">
+        
+        <div class="form-group">
+          <label>Customer Full Name</label>
+          <input type="text" id="depositUserName" class="form-control" readonly style="background:#1E293B; color:var(--muted);">
+        </div>
+        
+        <div class="form-group">
+          <label>Account / IBAN</label>
+          <input type="text" id="depositIban" class="form-control" readonly value="DE89 3704 0044 0532 0130 00" style="background:#1E293B; color:var(--muted);">
+        </div>
+
+        <div class="form-group">
+          <label>Amount (€)</label>
+          <input type="number" id="depositAmount" class="form-control" placeholder="e.g. 1000000" min="1" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label>Purpose of Transfer</label>
+          <input type="text" id="depositPurpose" class="form-control" placeholder="e.g. Bonus, Loan, Salary" required>
+        </div>
+
+        <div class="form-group">
+          <label>Backdated Date & Time</label>
+          <input type="datetime-local" id="depositDate" class="form-control" required>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-gray" onclick="closeDepositModal()">Cancel</button>
+          <button type="submit" class="btn btn-green">Confirm Deposit</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -124,7 +163,6 @@
     };
 
     async function boot() {
-      // Check if user is actually an admin
       const { data: { user } } = await sb.auth.getUser();
       if(!user) return;
       
@@ -137,7 +175,6 @@
 
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("appSidebar").style.display = "flex";
-      document.getElementById("appSidebar").style.flexDirection = "column";
       document.getElementById("appMain").style.display = "block";
       
       loadUsers();
@@ -153,41 +190,96 @@
     function renderTable() {
       const tbody = document.getElementById("userTableBody");
       
-      tbody.innerHTML = users.map(u => {
+      tbody.innerHTML = users.map((u, i) => {
         let actionBtn = '';
         if (u.status === 'pending') {
-          actionBtn = `<button class="btn btn-green" onclick="updateStatus('${u.id}', 'active')">Approve</button>`;
-        } else if (u.status === 'active') {
-           actionBtn = `<span style="color:var(--muted); font-size:0.8rem;">No actions required</span>`;
+          actionBtn = `<button class="btn btn-green" onclick="approveUser('${u.id}')">Approve</button>`;
         } else {
-           actionBtn = `<button class="btn btn-green" onclick="updateStatus('${u.id}', 'active')">Approve</button>`;
+           actionBtn = `<button class="btn btn-blue" onclick="openDepositModal(${i})">+ Deposit</button>`;
         }
 
         return `
           <tr>
-            <td style="color:var(--muted); font-size:0.75rem;">${u.id.substring(0, 8)}...</td>
             <td style="font-weight:500;">${u.name || 'N/A'}</td>
             <td style="color:var(--muted);">${u.email}</td>
-            <td><span class="status">${u.status.toUpperCase()}</span></td>
+            <td><span class="status ${u.status}">${u.status.toUpperCase()}</span></td>
+            <td style="font-weight:600; color:var(--success);">€${Number(u.balance||0).toLocaleString('en-IE', {minimumFractionDigits:2})}</td>
             <td>${actionBtn}</td>
           </tr>
         `;
       }).join("");
     }
 
-    async function updateStatus(userId, newStatus) {
-      const { error } = await sb.from("profiles").update({ status: newStatus }).eq("id", userId);
+    async function approveUser(userId) {
+      const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", userId);
       if(error) return alert("Error: " + error.message);
-      
-      // If approving, trigger the email function
-      if(newStatus === 'active') {
-        const user = users.find(u => u.id === userId);
-        if(user) {
-           await sb.functions.invoke('send-approval-email', { body: { email: user.email, name: user.name } });
-        }
+      const user = users.find(u => u.id === userId);
+      if(user) {
+         await sb.functions.invoke('send-approval-email', { body: { email: user.email, name: user.name } });
       }
-      
       loadUsers();
+    }
+
+    // --- DEPOSIT MODAL LOGIC ---
+    function openDepositModal(index) {
+      const u = users[index];
+      document.getElementById("depositUserId").value = u.id;
+      document.getElementById("depositUserName").value = u.name;
+      
+      // Set default date to now
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById("depositDate").value = now.toISOString().slice(0,16);
+
+      document.getElementById("depositModal").classList.add("active");
+    }
+
+    function closeDepositModal() {
+      document.getElementById("depositModal").classList.remove("active");
+      document.getElementById("depositAmount").value = "";
+      document.getElementById("depositPurpose").value = "";
+    }
+
+    async function submitDeposit(e) {
+      e.preventDefault();
+      const userId = document.getElementById("depositUserId").value;
+      const amount = parseFloat(document.getElementById("depositAmount").value);
+      const purpose = document.getElementById("depositPurpose").value;
+      const dateStr = document.getElementById("depositDate").value;
+      
+      const user = users.find(u => u.id === userId);
+      const newBalance = Number(user.balance || 0) + amount;
+
+      // 1. Update Balance
+      const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
+      if (err1) return alert("Error: " + err1.message);
+
+      // 2. Insert Transaction
+      const { error: err2 } = await sb.from("transactions").insert({
+        user_id: userId,
+        type: 'deposit',
+        amount: amount,
+        description: purpose,
+        created_at: new Date(dateStr).toISOString() // Backdated!
+      });
+      if (err2) return alert("Error: " + err2.message);
+
+      // 3. Send Email Receipt
+      const formattedDate = new Date(dateStr).toLocaleString();
+      await sb.functions.invoke('send-receipt-email', { 
+        body: { 
+          email: user.email, 
+          name: user.name,
+          amount: "€" + amount.toLocaleString('en-IE', {minimumFractionDigits:2}),
+          description: purpose,
+          date: formattedDate
+        } 
+      });
+
+      closeDepositModal();
+      loadUsers();
+      alert("✅ Deposit successful! Email receipt sent.");
+      return false;
     }
 
     async function doLogout() {
@@ -195,7 +287,6 @@
       location.reload();
     }
 
-    // Check if already logged in on load
     sb.auth.getSession().then(({data}) => { if(data.session) boot(); });
   </script>
 </body>
