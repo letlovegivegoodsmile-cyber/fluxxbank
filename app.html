@@ -3,309 +3,659 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fluxxbank | Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Flux Bank — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F3F4F6; 
-    --sidebar-bg: #FFFFFF;
-    --card-bg: #FFFFFF;
-    --text-main: #111827;
-    --text-muted: #6B7280;
-    --border: #E5E7EB;
-    --accent: #4F46E5; /* Indigo blue from image */
-    --success-bg: #D1FAE5; --success-text: #065F46;
-    --warning-bg: #FEF3C7; --warning-text: #92400E;
-    --purple-bg: #F3E8FF; --purple-text: #6B21A8;
+    --navy: #0B1221;
+    --navy-light: #151E32;
+    --accent: #3B82F6;
+    --bg: #F4F6FA;
+    --text: #0F172A;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --green: #10B981;
+    --red: #EF4444;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
   }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+  }
+  .app { display: flex; height: 100vh; }
   
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-  body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; display: flex; }
-
-  /* --- SIDEBAR --- */
+  /* SIDEBAR */
   .sidebar {
-    width: 80px; background: var(--sidebar-bg); border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; align-items: center; padding: 24px 0; gap: 30px;
+    width: 260px;
+    background: var(--navy);
+    color: white;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
   }
-  .logo-icon { width: 40px; height: 40px; background: var(--accent); border-radius: 12px; display: grid; place-items: center; color: white; margin-bottom: 20px; }
-  .nav-icon { width: 24px; height: 24px; stroke: var(--text-muted); fill: none; stroke-width: 2; cursor: pointer; transition: stroke 0.2s; }
-  .nav-icon:hover, .nav-icon.active { stroke: var(--accent); }
-  .avatar { width: 36px; height: 36px; border-radius: 50%; background: #E5E7EB; display: grid; place-items: center; font-weight: 600; font-size: 0.8rem; color: var(--text-main); margin-top: auto; }
-
-  /* --- MAIN AREA --- */
-  .main { flex: 1; padding: 30px 40px; max-width: 1200px; margin: 0 auto; }
-  .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-  .brand { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  .brand svg { width: 24px; height: 24px; fill: var(--accent); }
-  .header-actions { display: flex; align-items: center; gap: 16px; }
-  .header-actions .avatar { margin-top: 0; background: #D1D5DB; }
-
-  /* --- GRID LAYOUT --- */
-  .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
-
-  /* --- BLUE BALANCE CARD --- */
-  .balance-card {
-    background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%);
-    border-radius: 20px; padding: 24px; color: white; position: relative; overflow: hidden;
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px 32px;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.5px;
   }
-  .balance-card h3 { font-size: 0.9rem; opacity: 0.9; margin-bottom: 8px; font-weight: 500; }
-  .balance-amount { font-size: 2.5rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-  /* SVG Sparkline */
-  .chart-svg { position: absolute; bottom: 20px; right: 20px; width: 120px; height: 60px; opacity: 0.8; }
-
-  /* --- STAT CARDS --- */
-  .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-  .stat-card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border); }
-  .stat-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
-  .stat-value { font-size: 1.5rem; font-weight: 700; }
-
-  /* --- TRANSACTIONS TABLE --- */
-  .section-header { display: flex; justify-content: space-between; align-items: center; margin: 30px 0 16px; }
-  .section-header h2 { font-size: 1.1rem; font-weight: 600; }
-  .card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 20px; }
-  table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 10px 0; color: var(--text-muted); font-size: 0.8rem; font-weight: 500; border-bottom: 1px solid var(--border); }
-  td { padding: 16px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; font-weight: 500; }
-  tr:last-child td { border-bottom: none; }
-  
-  /* Status Pills */
-  .pill { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
-  .pill.success { background: var(--success-bg); color: var(--success-text); }
-  .pill.warning { background: var(--warning-bg); color: var(--warning-text); }
-  .pill.purple { background: var(--purple-bg); color: var(--purple-text); }
-
-  .btn-receipt { 
-    background: var(--accent); color: white; border: none; padding: 12px 20px; 
-    border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 20px;
-    transition: background 0.2s;
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), #60A5FA);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
   }
-  .btn-receipt:hover { background: #4338CA; }
+  .nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    color: #94A3B8;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14.5px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .nav-item:hover, .nav-item.active { background: var(--navy-light); color: white; }
+  .nav-item.active { background: rgba(59, 130, 246, 0.15); color: #60A5FA; }
+  .nav-icon { width: 20px; text-align: center; }
+  
+  /* TOPBAR */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar {
+    height: 72px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+  }
+  .search {
+    background: var(--bg);
+    border: none;
+    padding: 10px 16px 10px 40px;
+    border-radius: 12px;
+    width: 320px;
+    font-size: 14px;
+    outline: none;
+  }
+  .search-wrap { position: relative; }
+  .search-wrap::before {
+    content: "⌕";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+  .top-right { display: flex; align-items: center; gap: 20px; }
+  .notif {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    font-size: 16px;
+  }
+  .notif::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+  .profile { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, #1E3A8A, #60A5FA);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 0 0 2px var(--accent);
+    flex-shrink: 0;
+  }
+  .profile-info { line-height: 1.3; }
+  .profile-name { font-weight: 600; font-size: 14px; }
+  .profile-role { font-size: 12px; color: var(--text-muted); }
+  
+  /* CONTENT AREA */
+  .content { flex: 1; overflow-y: auto; padding: 32px; }
+  .greeting { margin-bottom: 28px; }
+  .greeting h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .greeting p { color: var(--text-muted); margin-top: 4px; }
+  
+  /* STATS */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; cursor: pointer; }
+  .stat-change { font-size: 13px; margin-top: 6px; }
+  .positive { color: var(--green); }
+  .negative { color: var(--red); }
+  
+  /* GRID LAYOUT */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 20px;
+  }
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .card-header h3 { font-size: 16px; font-weight: 600; }
+  .card-header a { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 500; }
+  
+  /* TRANSACTIONS */
+  .transaction {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .transaction:last-child { border-bottom: none; }
+  .tx-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+  .tx-details { flex: 1; }
+  .tx-name { font-weight: 600; font-size: 14.5px; }
+  .tx-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+  .tx-amount { font-weight: 600; font-size: 15px; }
+  .tx-amount.credit { color: var(--green); }
+  
+  /* QUICK ACTIONS & ACCOUNTS */
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .action-btn {
+    background: var(--bg);
+    border: none;
+    padding: 16px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13.5px;
+    transition: all 0.2s;
+  }
+  .action-btn:hover { background: #E8EDF5; transform: translateY(-1px); }
+  .accounts { display: flex; flex-direction: column; gap: 12px; }
+  .account-item {
+    background: linear-gradient(135deg, #0B1221, #1E293B);
+    color: white;
+    padding: 18px 20px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .account-item.savings { background: linear-gradient(135deg, #1E3A8A, #3B82F6); }
+  .account-name { font-size: 13px; opacity: 0.8; }
+  .account-balance { font-size: 20px; font-weight: 700; margin-top: 4px; }
+  .account-type {
+    font-size: 12px;
+    background: rgba(255,255,255,0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+  
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--navy);
+    color: white;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.2s;
+    pointer-events: none;
+    z-index: 1000;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
 
-  /* --- RECEIPT DISPLAY (Right side of image) --- */
-  .receipt-panel { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); padding: 30px; position: relative; }
-  .receipt-dots { display: flex; gap: 6px; justify-content: center; margin-bottom: 20px; }
-  .receipt-dots div { width: 8px; height: 8px; border-radius: 50%; background: #E5E7EB; }
-  
-  .receipt-content { text-align: center; font-family: monospace; }
-  .receipt-logo { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 24px; }
-  .receipt-logo svg { width: 24px; height: 24px; fill: var(--accent); }
-  .receipt-divider { border-top: 1px dashed var(--border); margin: 20px 0; }
-  .receipt-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted); }
-  .receipt-row span:last-child { color: var(--text-main); font-weight: 600; }
-  .barcode { width: 100%; height: 50px; background: repeating-linear-gradient(90deg, #111827 0, #111827 2px, transparent 2px, transparent 4px, #111827 4px, #111827 6px, transparent 6px, transparent 10px); margin-top: 30px; opacity: 0.8; }
-  
-  @media(max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 1100px) {
+    .stats, .grid-2 { grid-template-columns: 1fr; }
+    .sidebar { width: 80px; padding: 24px 8px; }
+    .logo span, .nav-item span, .profile-info { display: none; }
+    .logo { justify-content: center; padding-bottom: 24px; }
+    .search { width: 180px; }
+  }
 </style>
 </head>
 <body>
-
-  <!-- SIDEBAR -->
+<div class="app">
   <aside class="sidebar">
-    <div class="logo-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+    <div class="logo">
+      <div class="logo-icon">F</div>
+      <span>Flux Bank</span>
     </div>
-    <svg class="nav-icon active" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    <svg class="nav-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-    <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    <div class="avatar" id="userInitial" onclick="doLogout()">U</div>
+    <nav class="nav">
+      <a class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span> <span>Dashboard</span></a>
+      <a class="nav-item" data-page="accounts"><span class="nav-icon">▣</span> <span>Accounts</span></a>
+      <a class="nav-item" data-page="transfer"><span class="nav-icon">↗</span> <span>Transfer</span></a>
+      <a class="nav-item" data-page="payments"><span class="nav-icon">≡</span> <span>Payments</span></a>
+      <a class="nav-item" data-page="cards"><span class="nav-icon">◆</span> <span>Cards</span></a>
+      <a class="nav-item" data-page="analytics"><span class="nav-icon">▦</span> <span>Analytics</span></a>
+      <a class="nav-item" data-page="profile"><span class="nav-icon">○</span> <span>Profile</span></a>
+      <a class="nav-item" data-page="settings"><span class="nav-icon">⚙</span> <span>Settings</span></a>
+    </nav>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <main class="main">
-    <div class="top-header">
-      <div class="brand">
-        <svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
-        Fluxxbank
+    <header class="topbar">
+      <div class="search-wrap">
+        <input type="text" class="search" placeholder="Search transactions, recipients...">
       </div>
-      <div class="header-actions">
-        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <div class="avatar" id="headerAvatar">U</div>
+      <div class="top-right">
+        <div class="notif" id="bell">●</div>
+        <div class="profile" data-page="profile">
+          <div class="avatar" id="headerAvatar">U</div>
+          <div class="profile-info">
+            <div class="profile-name" id="headerName">Loading...</div>
+            <div class="profile-role">Premium Member</div>
+          </div>
+        </div>
       </div>
-    </div>
+    </header>
 
-    <div class="dashboard-grid">
+    <div class="content">
       
-      <!-- LEFT COLUMN -->
-      <div>
-        <!-- Blue Balance Card -->
-        <div class="balance-card">
-          <h3>Total Balance</h3>
-          <div class="balance-amount" id="mainBalance">$0.00</div>
-          <!-- SVG Chart Line -->
-          <svg class="chart-svg" viewBox="0 0 100 40" preserveAspectRatio="none">
-            <path d="M0 30 Q 10 20, 20 25 T 40 10 T 60 20 T 80 5 T 100 15" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2" />
-          </svg>
-        </div>
-
-        <!-- Stat Row -->
-        <div class="stat-row">
-          <div class="stat-card">
-            <div class="stat-title">Available Balance</div>
-            <div class="stat-value" id="availBalance">$0.00</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-title">Pending Deposits</div>
-            <div class="stat-value" id="pendingDeposits">$0.00</div>
-          </div>
-        </div>
-
-        <!-- Recent Transactions -->
-        <div class="section-header">
-          <h2>Recent Transactions</h2>
-          <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      <!-- DASHBOARD PAGE -->
+      <section class="page active" id="dashboard">
+        <div class="greeting">
+          <h1 id="greetingText">Good evening</h1>
+          <p>Here's what's happening with your money today.</p>
         </div>
         
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-label">Total Balance</div>
+            <div class="stat-value" id="balance" data-real="€0.00">€0.00</div>
+            <div class="stat-change positive">↑ 12.4% vs last month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Monthly Income</div>
+            <div class="stat-value" id="monthlyIncome">€0.00</div>
+            <div class="stat-change positive">↑ 8.1% vs last month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Monthly Expenses</div>
+            <div class="stat-value" id="monthlyExpenses">€0.00</div>
+            <div class="stat-change negative">↓ 3.2% vs last month</div>
+          </div>
+        </div>
+        
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Transactions</h3>
+              <a href="#" data-page="accounts">View all →</a>
+            </div>
+            <div id="recentTransactionsList">
+              <div class="transaction"><div class="tx-details">Loading transactions...</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:20px;">
+              <div class="card-header"><h3>Quick Actions</h3></div>
+              <div class="quick-actions">
+                <button class="action-btn" data-page="transfer"><span>↗</span> Send Money</button>
+                <button class="action-btn" data-toast="Request link copied"><span>↙</span> Request</button>
+                <button class="action-btn" data-page="payments"><span>≡</span> Pay Bills</button>
+                <button class="action-btn" data-toast="Add money coming soon"><span>+</span> Add Money</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3>Your Accounts</h3></div>
+              <div class="accounts">
+                <div class="account-item"><div><div class="account-name">Current Account</div><div class="account-balance" id="currentAccBal">€0.00</div></div><div class="account-type">EUR</div></div>
+                <div class="account-item savings"><div><div class="account-name">Savings Account</div><div class="account-balance">€0.00</div></div><div class="account-type">EUR</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACCOUNTS PAGE -->
+      <section class="page" id="accounts">
+        <div class="greeting"><h1>Accounts</h1><p>Both accounts, one view.</p></div>
+        <div class="accounts">
+          <div class="account-item"><div><div class="account-name">Current · DE89 3704 0044 0532 0130 00</div><div class="account-balance" id="accPageBal">€0.00</div></div><div class="account-type">EUR</div></div>
+          <div class="account-item savings"><div><div class="account-name">Savings · DE12 5001 0517 5407 3249 31</div><div class="account-balance">€0.00</div></div><div class="account-type">EUR</div></div>
+        </div>
+      </section>
+
+      <!-- TRANSFER PAGE (Now Functional) -->
+      <section class="page" id="transfer">
+        <div class="greeting"><h1>Send money</h1><p>Transfer funds instantly.</p></div>
+        <div class="card" style="max-width:480px;">
+          <form onsubmit="return handleTransfer(event)">
+            <label style="display:block;font-size:13px;color:#64748B;margin-bottom:6px;">Recipient</label>
+            <select id="transferRecipient" class="search" style="width:100%;margin-bottom:16px;padding-left:16px; appearance: auto;" required>
+              <option value="" disabled selected>Select recipient</option>
+              <option value="Maya Chen">Maya Chen</option>
+              <option value="Jonas Weber">Jonas Weber</option>
+              <option value="Luna Ortiz">Luna Ortiz</option>
+            </select>
+            
+            <label style="display:block;font-size:13px;color:#64748B;margin-bottom:6px;">Amount (€)</label>
+            <input type="number" id="transferAmount" class="search" style="width:100%;margin-bottom:16px;padding-left:16px;" placeholder="0.00" min="0.01" step="0.01" required>
+            
+            <button type="submit" class="action-btn" style="width:100%; background: var(--accent); color: white;">Send Instantly</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- OTHER PAGES (Static) -->
+      <section class="page" id="payments">
+        <div class="greeting"><h1>Payments</h1><p>Upcoming bills.</p></div>
         <div class="card">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="txBody">
-              <!-- Transactions injected here -->
-            </tbody>
-          </table>
-          <button class="btn-receipt" onclick="showReceipt()">Generate Receipt</button>
+          <div class="transaction"><div class="tx-icon">⚡</div><div class="tx-details"><div class="tx-name">Electricity</div><div class="tx-meta">Due Oct 28</div></div><div class="tx-amount">€112.40</div></div>
+          <div class="transaction"><div class="tx-icon">☎</div><div class="tx-details"><div class="tx-name">Mobile</div><div class="tx-meta">Due Nov 2</div></div><div class="tx-amount">€29.99</div></div>
         </div>
-      </div>
+      </section>
 
-      <!-- RIGHT COLUMN (Receipt View) -->
-      <div class="receipt-panel" id="receiptPanel">
-        <div class="receipt-dots">
-          <div></div><div></div><div></div><div></div><div></div>
+      <section class="page" id="cards">
+        <div class="greeting"><h1>Cards</h1><p>Your Flux Visa.</p></div>
+        <div class="account-item" style="max-width:420px;min-height:180px;flex-direction:column;align-items:flex-start;justify-content:space-between;">
+          <div style="font-weight:700;">Flux Bank · Visa</div>
+          <div style="font-size:20px;letter-spacing:3px;">•••• •••• •••• 4820</div>
+          <div style="display:flex;justify-content:space-between;width:100%;"><span id="cardHolderName">MARCEL JANKO</span><span>12/28</span></div>
         </div>
-        
-        <div class="receipt-content">
-          <h2 class="receipt-logo">
-            <svg viewBox="0 0 24 24"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
-            Fluxxbank
-          </h2>
-          <h3 style="font-size: 1.2rem; font-family: 'Inter', sans-serif; margin-bottom: 30px;">OFFICIAL RECEIPT</h3>
-          
-          <div class="receipt-divider"></div>
-          
-          <div class="receipt-row">
-            <span>Date:</span>
-            <span id="rcDate">[DATE]</span>
-          </div>
-          <div class="receipt-row">
-            <span>Description:</span>
-            <span id="rcDesc">[DESCRIPTION]</span>
-          </div>
-          <div class="receipt-row">
-            <span>Amount:</span>
-            <span id="rcAmt">[AMOUNT]</span>
-          </div>
-          
-          <div class="receipt-divider"></div>
-          
-          <div class="receipt-row" style="text-align: left;">
-            <span>Transaction ID:</span>
-            <span id="rcId" style="font-size: 0.8rem;">FLX-000000</span>
-          </div>
-          
-          <div class="barcode"></div>
-        </div>
-      </div>
+      </section>
 
+      <section class="page" id="analytics">
+        <div class="greeting"><h1>Analytics</h1><p>This month.</p></div>
+        <div class="stats">
+          <div class="stat-card"><div class="stat-label">Food</div><div class="stat-value">€186</div></div>
+          <div class="stat-card"><div class="stat-label">Transport</div><div class="stat-value">€94</div></div>
+          <div class="stat-card"><div class="stat-label">Bills</div><div class="stat-value">€412</div></div>
+        </div>
+      </section>
+
+      <section class="page" id="profile">
+        <div class="greeting"><h1>Profile</h1><p>Your customer view.</p></div>
+        <div class="card" style="max-width:480px;display:flex;gap:16px;align-items:center;">
+          <div class="avatar" id="profileAvatar" style="width:72px;height:72px;font-size:24px;">U</div>
+          <div>
+            <div class="profile-name" id="profileName" style="font-size:18px;">Loading...</div>
+            <div class="profile-role">Premium Member · Flux Bank</div>
+            <div class="profile-role">Customer since 2024</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="settings">
+        <div class="greeting"><h1>Settings</h1><p>Preview only.</p></div>
+        <div class="card" style="max-width:480px;">
+          <div class="transaction" style="cursor:pointer;" onclick="doLogout()"><div class="tx-details"><div class="tx-name" style="color:var(--red)">Sign Out</div><div class="tx-meta">Securely end your session</div></div></div>
+        </div>
+      </section>
     </div>
   </main>
+</div>
+<div class="toast" id="toast"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    const usd = n => "$" + Number(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
-    let currentBalance = 0;
-    let latestTx = null;
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // --- UI LOGIC ---
+  function show(page) {
+    document.querySelectorAll(".page").forEach(function (p) { p.classList.remove("active"); });
+    document.querySelectorAll(".nav-item").forEach(function (n) { n.classList.toggle("active", n.dataset.page === page); });
+    var el = document.getElementById(page);
+    if (el) el.classList.add("active");
+  }
+  
+  document.querySelectorAll("[data-page]").forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (el.dataset.page) show(el.dataset.page);
+    });
+  });
+  
+  document.querySelectorAll("[data-toast]").forEach(function (el) {
+    el.addEventListener("click", function () {
+      var t = document.getElementById("toast");
+      t.textContent = el.dataset.toast;
+      t.classList.add("show");
+      setTimeout(function () { t.classList.remove("show"); }, 1800);
+    });
+  });
+  
+  document.getElementById("balance").addEventListener("click", function () {
+    this.textContent = this.textContent.indexOf("€") === 0 ? "••••••" : this.dataset.real;
+  });
+  
+  document.getElementById("bell").addEventListener("click", function () {
+    var t = document.getElementById("toast");
+    t.textContent = "No new notifications";
+    t.classList.add("show");
+    setTimeout(function () { t.classList.remove("show"); }, 1800);
+  });
 
-    async function init() {
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) { window.location.href = "index.html"; return; }
+  // --- SUPABASE LOGIC ---
+  const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  
+  const eur = n => "€" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+  let currentBalance = 0;
+  let currentUser = null;
 
-      const { data: profile } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
-      if (profile) {
-        const firstName = profile.name ? profile.name.split(" ")[0] : "Customer";
-        document.getElementById("userInitial").textContent = firstName[0].toUpperCase();
-        document.getElementById("headerAvatar").textContent = firstName[0].toUpperCase();
-        
-        document.getElementById("mainBalance").textContent = usd(profile.balance);
-        document.getElementById("availBalance").textContent = usd(profile.balance);
-        currentBalance = profile.balance;
+  async function init() {
+    // 1. Check if user is here to reset password
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('reset') === 'true') {
+      const newPassword = prompt("Please enter your new password (min 6 characters):");
+      if (newPassword && newPassword.length >= 6) {
+        const { error } = await sb.auth.updateUser({ password: newPassword });
+        if (error) alert("Error updating password: " + error.message);
+        else {
+          alert("✅ Password updated successfully!");
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
       }
-
-      loadTransactions(session.user.id);
     }
 
-    async function loadTransactions(userId) {
-      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false });
-      const tbody = document.getElementById("txBody");
+    // 2. Auth Check
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = "index.html"; return; }
+    currentUser = session.user;
+
+    // 3. Load Profile
+    const { data: profile } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
+    if (profile) {
+      const fullName = profile.name || "Customer";
+      const firstName = fullName.split(" ")[0];
+      const initials = fullName.split(" ").map(n => n[0]).join("").toUpperCase();
       
-      if (!txs || txs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-muted);">No transactions found.</td></tr>';
-        return;
-      }
+      // Update UI text
+      document.getElementById("greetingText").textContent = `Good evening, ${firstName}`;
+      document.getElementById("headerName").textContent = fullName;
+      document.getElementById("profileName").textContent = fullName;
+      document.getElementById("cardHolderName").textContent = fullName.toUpperCase();
+      
+      // Update avatars
+      document.getElementById("headerAvatar").textContent = initials;
+      document.getElementById("profileAvatar").textContent = initials;
 
-      // Set the latest transaction for the receipt
-      latestTx = txs[0];
-
-      tbody.innerHTML = txs.slice(0, 5).map((t, index) => {
-        // Randomly assign status pills to match your image
-        const pills = ['success', 'warning', 'purple'];
-        const pillClass = pills[index % 3];
-        const statusText = pillClass === 'success' ? 'Completed' : pillClass === 'warning' ? 'Pending' : 'Cleared';
-        
-        const dateObj = new Date(t.created_at);
-        const dStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-        
-        return `
-          <tr>
-            <td style="color:var(--text-muted)">${dStr}</td>
-            <td>${t.description}</td>
-            <td style="font-weight:600;">${usd(t.amount)}</td>
-            <td><span class="pill ${pillClass}">${statusText}</span></td>
-          </tr>
-        `;
-      }).join("");
-
-      updateReceipt(latestTx);
+      // Update Balances
+      currentBalance = Number(profile.balance);
+      const formatted = eur(currentBalance);
+      
+      document.getElementById("balance").textContent = formatted;
+      document.getElementById("balance").dataset.real = formatted;
+      document.getElementById("currentAccBal").textContent = formatted;
+      document.getElementById("accPageBal").textContent = formatted;
     }
 
-    function updateReceipt(tx) {
-      if(!tx) return;
-      const dateObj = new Date(tx.created_at);
+    // 4. Load Transactions
+    loadTransactions(session.user.id);
+  }
+
+  async function loadTransactions(userId) {
+    const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(5);
+    
+    const list = document.getElementById("recentTransactionsList");
+    
+    if (!txs || txs.length === 0) {
+      list.innerHTML = '<div class="transaction"><div class="tx-details"><div class="tx-name">No recent activity</div></div></div>';
+      return;
+    }
+
+    let inTotal = 0, outTotal = 0;
+
+    // Get all transactions for monthly totals (simplified for this view)
+    const { data: allTxs } = await sb.from("transactions").select("*").eq("user_id", userId);
+    if (allTxs) {
+       allTxs.forEach(t => {
+           if(t.type === 'deposit') inTotal += t.amount;
+           else outTotal += t.amount;
+       });
+       document.getElementById("monthlyIncome").textContent = eur(inTotal);
+       document.getElementById("monthlyExpenses").textContent = eur(outTotal);
+    }
+
+    list.innerHTML = txs.map(t => {
+      const isIncoming = t.type === 'deposit';
+      const dateObj = new Date(t.created_at);
       const dStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
       
-      document.getElementById("rcDate").textContent = dStr;
-      document.getElementById("rcDesc").textContent = tx.description;
-      document.getElementById("rcAmt").textContent = usd(tx.amount);
-      document.getElementById("rcId").textContent = tx.id.substring(0, 8).toUpperCase();
+      return `
+        <div class="transaction">
+          <div class="tx-icon">${isIncoming ? '↓' : '↑'}</div>
+          <div class="tx-details">
+            <div class="tx-name">${t.description}</div>
+            <div class="tx-meta">${dStr} · ${t.type}</div>
+          </div>
+          <div class="tx-amount ${isIncoming ? 'credit' : ''}">
+            ${isIncoming ? '+' : '-'}${eur(t.amount)}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  async function handleTransfer(e) {
+    e.preventDefault();
+    const recipient = document.getElementById("transferRecipient").value;
+    const amount = parseFloat(document.getElementById("transferAmount").value);
+    
+    if (amount > currentBalance) {
+      alert("Insufficient funds! Your balance is " + eur(currentBalance));
+      return false;
     }
 
-    function showReceipt() {
-      if(!latestTx) return alert("No transactions to generate a receipt for.");
-      // Flash effect to draw attention to receipt panel
-      const panel = document.getElementById("receiptPanel");
-      panel.style.boxShadow = "0 0 20px rgba(79, 70, 229, 0.4)";
-      setTimeout(() => { panel.style.boxShadow = "none"; }, 1000);
-    }
+    const newBal = currentBalance - amount;
+    
+    // Update balance in DB
+    const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", currentUser.id);
+    if (err1) return alert("Error: " + err1.message);
 
-    async function doLogout() {
-      if(confirm("Do you want to log out?")) {
-        await sb.auth.signOut();
-        window.location.href = "index.html";
-      }
-    }
+    // Log transaction in DB
+    await sb.from("transactions").insert({
+      user_id: currentUser.id,
+      type: 'transfer',
+      amount: amount,
+      description: `Sent to ${recipient}`
+    });
 
-    init();
-  </script>
+    // Update UI
+    currentBalance = newBal;
+    const formatted = eur(newBal);
+    document.getElementById("balance").textContent = formatted;
+    document.getElementById("balance").dataset.real = formatted;
+    document.getElementById("currentAccBal").textContent = formatted;
+    document.getElementById("accPageBal").textContent = formatted;
+
+    document.getElementById("transferAmount").value = "";
+    
+    var t = document.getElementById("toast");
+    t.textContent = `Successfully sent ${eur(amount)} to ${recipient}`;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
+
+    // Refresh transactions and go back to dashboard
+    loadTransactions(currentUser.id);
+    show("dashboard");
+    return false;
+  }
+
+  async function doLogout() {
+    await sb.auth.signOut();
+    window.location.href = "index.html";
+  }
+
+  init();
+</script>
 </body>
 </html>
