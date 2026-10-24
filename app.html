@@ -30,6 +30,76 @@
   }
   .app { display: flex; height: 100vh; }
   
+  /* --- WELCOME SCREEN OVERLAY --- */
+  .welcome-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--navy);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  .welcome-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .welcome-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 24px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .welcome-screen h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #60A5FA, #3B82F6);
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .welcome-screen p {
+    color: #94A3B8;
+    font-size: 1rem;
+    margin-bottom: 40px;
+  }
+  .progress-bar-container {
+    width: 240px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 4px;
+    animation: loadProgress 6s ease-in-out forwards;
+  }
+  @keyframes loadProgress {
+    0% { width: 0%; }
+    30% { width: 40%; }
+    80% { width: 90%; }
+    100% { width: 100%; }
+  }
+
   /* SIDEBAR */
   .sidebar {
     width: 260px;
@@ -292,6 +362,19 @@
 </style>
 </head>
 <body>
+
+<!-- WELCOME SCREEN OVERLAY -->
+<div class="welcome-screen" id="welcomeScreen">
+  <div class="welcome-content">
+    <div class="spinner"></div>
+    <h1 id="welcomeName">Welcome</h1>
+    <p>Securely loading your dashboard...</p>
+    <div class="progress-bar-container">
+      <div class="progress-bar"></div>
+    </div>
+  </div>
+</div>
+
 <div class="app">
   <aside class="sidebar">
     <div class="logo">
@@ -394,7 +477,7 @@
         </div>
       </section>
 
-      <!-- TRANSFER PAGE (Now Functional) -->
+      <!-- TRANSFER PAGE -->
       <section class="page" id="transfer">
         <div class="greeting"><h1>Send money</h1><p>Transfer funds instantly.</p></div>
         <div class="card" style="max-width:480px;">
@@ -415,7 +498,7 @@
         </div>
       </section>
 
-      <!-- OTHER PAGES (Static) -->
+      <!-- OTHER PAGES -->
       <section class="page" id="payments">
         <div class="greeting"><h1>Payments</h1><p>Upcoming bills.</p></div>
         <div class="card">
@@ -512,7 +595,7 @@
   let currentUser = null;
 
   async function init() {
-    // 1. Check if user is here to reset password
+    // 1. Password Reset Logic
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('reset') === 'true') {
       const newPassword = prompt("Please enter your new password (min 6 characters):");
@@ -538,6 +621,14 @@
       const firstName = fullName.split(" ")[0];
       const initials = fullName.split(" ").map(n => n[0]).join("").toUpperCase();
       
+      // ** TRIGGER PERSONALIZED WELCOME SCREEN **
+      document.getElementById("welcomeName").textContent = `Welcome, ${firstName}`;
+      
+      // Wait 6 seconds, then hide the welcome screen
+      setTimeout(() => {
+        document.getElementById("welcomeScreen").classList.add("hidden");
+      }, 6000);
+
       // Update UI text
       document.getElementById("greetingText").textContent = `Good evening, ${firstName}`;
       document.getElementById("headerName").textContent = fullName;
@@ -574,7 +665,6 @@
 
     let inTotal = 0, outTotal = 0;
 
-    // Get all transactions for monthly totals (simplified for this view)
     const { data: allTxs } = await sb.from("transactions").select("*").eq("user_id", userId);
     if (allTxs) {
        allTxs.forEach(t => {
@@ -617,11 +707,9 @@
 
     const newBal = currentBalance - amount;
     
-    // Update balance in DB
     const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", currentUser.id);
     if (err1) return alert("Error: " + err1.message);
 
-    // Log transaction in DB
     await sb.from("transactions").insert({
       user_id: currentUser.id,
       type: 'transfer',
@@ -629,7 +717,6 @@
       description: `Sent to ${recipient}`
     });
 
-    // Update UI
     currentBalance = newBal;
     const formatted = eur(newBal);
     document.getElementById("balance").textContent = formatted;
@@ -644,7 +731,6 @@
     t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 3000);
 
-    // Refresh transactions and go back to dashboard
     loadTransactions(currentUser.id);
     show("dashboard");
     return false;
