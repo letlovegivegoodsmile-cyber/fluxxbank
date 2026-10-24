@@ -7,45 +7,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --navy: #0B1221;
-    --navy-light: #151E32;
-    --accent: #3B82F6;
-    --bg: #F4F6FA;
-    --text: #0F172A;
-    --text-muted: #64748B;
-    --border: #E2E8F0;
-    --green: #10B981;
-    --red: #EF4444;
-    --radius: 16px;
-    --shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
-  }
+  :root { --navy: #0B1221; --navy-light: #151E32; --accent: #3B82F6; --bg: #F4F6FA; --text: #0F172A; --text-muted: #64748B; --border: #E2E8F0; --green: #10B981; --red: #EF4444; --radius: 16px; --shadow: 0 4px 24px rgba(15, 23, 42, 0.06); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    height: 100vh;
-    overflow: hidden;
-  }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
   .app { display: flex; height: 100vh; }
   
-  /* --- WELCOME SCREEN --- */
-  .welcome-screen {
-    position: fixed; inset: 0; background: var(--navy); z-index: 9999;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    color: white; transition: opacity 0.8s ease, visibility 0.8s ease;
-  }
+  /* WELCOME SCREEN */
+  .welcome-screen { position: fixed; inset: 0; background: var(--navy); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: opacity 0.8s ease, visibility 0.8s ease; }
   .welcome-screen.hidden { opacity: 0; visibility: hidden; }
-  .spinner {
-    width: 60px; height: 60px; border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px;
-  }
+  .spinner { width: 60px; height: 60px; border: 4px solid rgba(255, 255, 255, 0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .welcome-screen h1 {
-    font-size: 2.5rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 8px;
-    background: linear-gradient(135deg, #60A5FA, #3B82F6); -webkit-background-clip: text; color: transparent;
-  }
+  .welcome-screen h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; background: linear-gradient(135deg, #60A5FA, #3B82F6); -webkit-background-clip: text; color: transparent; }
   .welcome-screen p { color: #94A3B8; font-size: 1rem; margin-bottom: 40px; }
   .progress-bar-container { width: 240px; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; }
   .progress-bar { height: 100%; width: 0%; background: var(--accent); border-radius: 4px; animation: loadProgress 6s ease-in-out forwards; }
@@ -71,34 +43,17 @@
   .notif { width: 40px; height: 40px; border-radius: 12px; background: var(--bg); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; font-size: 16px; }
   .notif::after { content: ""; position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid white; }
   
-  /* PROFILE & DROPDOWN */
+  /* PROFILE DROPDOWN */
   .profile-wrap { position: relative; }
   .profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 8px; border-radius: 12px; transition: background 0.2s; }
   .profile:hover { background: var(--bg); }
-  
-  /* THE BOLD AVATAR */
-  .avatar {
-    width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(160deg, #1E3A8A, #60A5FA);
-    color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;
-    flex-shrink: 0; transition: all 0.3s ease; overflow: hidden;
-  }
-  /* When a photo is uploaded, add a bold glowing ring */
-  .avatar.has-photo {
-    box-shadow: 0 0 0 3px white, 0 0 0 6px var(--accent);
-    border: none;
-  }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(160deg, #1E3A8A, #60A5FA); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; transition: all 0.3s ease; overflow: hidden; }
+  .avatar.has-photo { box-shadow: 0 0 0 3px white, 0 0 0 6px var(--accent); }
   .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  
   .profile-info { line-height: 1.3; }
   .profile-name { font-weight: 600; font-size: 14px; }
   .profile-role { font-size: 12px; color: var(--text-muted); }
-  
-  /* Dropdown Menu */
-  .dropdown {
-    position: absolute; top: 55px; right: 0; background: white; border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border);
-    width: 200px; padding: 8px; display: none; z-index: 100;
-  }
+  .dropdown { position: absolute; top: 55px; right: 0; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border); width: 200px; padding: 8px; display: none; z-index: 100; }
   .dropdown.show { display: block; animation: fadeIn 0.2s; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
   .drop-item { padding: 10px 12px; font-size: 14px; font-weight: 500; color: var(--text); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
@@ -123,6 +78,8 @@
   .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .card-header h3 { font-size: 16px; font-weight: 600; }
   .card-header a { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 500; }
+  
+  /* TRANSACTIONS */
   .transaction { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
   .transaction:last-child { border-bottom: none; }
   .tx-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: var(--bg); flex-shrink: 0; }
@@ -131,6 +88,7 @@
   .tx-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
   .tx-amount { font-weight: 600; font-size: 15px; }
   .tx-amount.credit { color: var(--green); }
+  
   .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .action-btn { background: var(--bg); border: none; padding: 16px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; font-size: 13.5px; transition: all 0.2s; }
   .action-btn:hover { background: #E8EDF5; transform: translateY(-1px); }
@@ -140,8 +98,10 @@
   .account-name { font-size: 13px; opacity: 0.8; }
   .account-balance { font-size: 20px; font-weight: 700; margin-top: 4px; }
   .account-type { font-size: 12px; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 20px; }
+  
   .page { display: none; }
   .page.active { display: block; }
+  
   .toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; padding: 14px 18px; border-radius: 12px; font-size: 14px; opacity: 0; transform: translateY(8px); transition: all 0.2s; pointer-events: none; z-index: 1000; }
   .toast.show { opacity: 1; transform: translateY(0); }
 
@@ -156,9 +116,8 @@
 </head>
 <body>
 
-<!-- WELCOME SCREEN OVERLAY -->
 <div class="welcome-screen" id="welcomeScreen">
-  <div class="welcome-content" style="text-align:center; display:flex; flex-direction:column; align-items:center;">
+  <div style="text-align:center; display:flex; flex-direction:column; align-items:center;">
     <div class="spinner"></div>
     <h1 id="welcomeName">Welcome</h1>
     <p>Securely loading your dashboard...</p>
@@ -170,10 +129,7 @@
 
 <div class="app">
   <aside class="sidebar">
-    <div class="logo">
-      <div class="logo-icon">F</div>
-      <span>Flux Bank</span>
-    </div>
+    <div class="logo"><div class="logo-icon">F</div><span>Flux Bank</span></div>
     <nav class="nav">
       <a class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span> <span>Dashboard</span></a>
       <a class="nav-item" data-page="accounts"><span class="nav-icon">▣</span> <span>Accounts</span></a>
@@ -193,8 +149,6 @@
       </div>
       <div class="top-right">
         <div class="notif" id="bell">●</div>
-        
-        <!-- PROFILE DROPDOWN AREA -->
         <div class="profile-wrap">
           <div class="profile" id="profileMenuBtn">
             <div class="avatar" id="headerAvatar">U</div>
@@ -203,62 +157,31 @@
               <div class="profile-role">Premium Member</div>
             </div>
           </div>
-          
-          <!-- Hidden Dropdown Menu -->
           <div class="dropdown" id="profileDropdown">
-            <div class="drop-item" onclick="document.getElementById('avatarUpload').click()">
-              📷 Upload Photo
-            </div>
-            <div class="drop-item" data-page="profile" onclick="toggleDropdown()">
-              👤 View Profile
-            </div>
-            <div class="drop-item danger" onclick="doLogout()">
-              ⏻ Sign Out
-            </div>
+            <div class="drop-item" onclick="document.getElementById('avatarUpload').click()">📷 Upload Photo</div>
+            <div class="drop-item" data-page="profile" onclick="toggleDropdown()">👤 View Profile</div>
+            <div class="drop-item danger" onclick="doLogout()">⏻ Sign Out</div>
           </div>
-          <!-- Hidden File Input -->
           <input type="file" id="avatarUpload" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
         </div>
-        
       </div>
     </header>
 
     <div class="content">
-      
-      <!-- DASHBOARD PAGE -->
       <section class="page active" id="dashboard">
         <div class="greeting">
           <h1 id="greetingText">Good evening</h1>
           <p>Here's what's happening with your money today.</p>
         </div>
-        
         <div class="stats">
-          <div class="stat-card">
-            <div class="stat-label">Total Balance</div>
-            <div class="stat-value" id="balance" data-real="€0.00">€0.00</div>
-            <div class="stat-change positive">↑ 12.4% vs last month</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Monthly Income</div>
-            <div class="stat-value" id="monthlyIncome">€0.00</div>
-            <div class="stat-change positive">↑ 8.1% vs last month</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Monthly Expenses</div>
-            <div class="stat-value" id="monthlyExpenses">€0.00</div>
-            <div class="stat-change negative">↓ 3.2% vs last month</div>
-          </div>
+          <div class="stat-card"><div class="stat-label">Total Balance</div><div class="stat-value" id="balance" data-real="€0.00">€0.00</div><div class="stat-change positive">↑ 12.4% vs last month</div></div>
+          <div class="stat-card"><div class="stat-label">Monthly Income</div><div class="stat-value" id="monthlyIncome">€0.00</div><div class="stat-change positive">↑ 8.1% vs last month</div></div>
+          <div class="stat-card"><div class="stat-label">Monthly Expenses</div><div class="stat-value" id="monthlyExpenses">€0.00</div><div class="stat-change negative">↓ 3.2% vs last month</div></div>
         </div>
-        
         <div class="grid-2">
           <div class="card">
-            <div class="card-header">
-              <h3>Recent Transactions</h3>
-              <a href="#" data-page="accounts">View all →</a>
-            </div>
-            <div id="recentTransactionsList">
-              <div class="transaction"><div class="tx-details">Loading transactions...</div></div>
-            </div>
+            <div class="card-header"><h3>Recent Transactions</h3><a href="#" data-page="accounts">View all →</a></div>
+            <div id="recentTransactionsList"><div class="transaction"><div class="tx-details">Loading...</div></div></div>
           </div>
           <div>
             <div class="card" style="margin-bottom:20px;">
@@ -281,26 +204,20 @@
         </div>
       </section>
 
-      <!-- ACCOUNTS PAGE -->
       <section class="page" id="accounts">
         <div class="greeting"><h1>Accounts</h1><p>Both accounts, one view.</p></div>
         <div class="accounts">
           <div class="account-item"><div><div class="account-name">Current · DE89 3704 0044 0532 0130 00</div><div class="account-balance" id="accPageBal">€0.00</div></div><div class="account-type">EUR</div></div>
-          <div class="account-item savings"><div><div class="account-name">Savings · DE12 5001 0517 5407 3249 31</div><div class="account-balance">€0.00</div></div><div class="account-type">EUR</div></div>
         </div>
       </section>
 
-      <!-- TRANSFER PAGE -->
       <section class="page" id="transfer">
-        <div class="greeting"><h1>Send money</h1><p>Transfer funds instantly.</p></div>
+        <div class="greeting"><h1>Send money</h1><p>Transfer funds instantly to other Fluxx members.</p></div>
         <div class="card" style="max-width:480px;">
           <form onsubmit="return handleTransfer(event)">
             <label style="display:block;font-size:13px;color:#64748B;margin-bottom:6px;">Recipient</label>
             <select id="transferRecipient" class="search" style="width:100%;margin-bottom:16px;padding-left:16px; appearance: auto;" required>
-              <option value="" disabled selected>Select recipient</option>
-              <option value="Maya Chen">Maya Chen</option>
-              <option value="Jonas Weber">Jonas Weber</option>
-              <option value="Luna Ortiz">Luna Ortiz</option>
+              <option value="" disabled selected>Loading users...</option>
             </select>
             
             <label style="display:block;font-size:13px;color:#64748B;margin-bottom:6px;">Amount (€)</label>
@@ -311,13 +228,9 @@
         </div>
       </section>
 
-      <!-- OTHER PAGES -->
       <section class="page" id="payments">
         <div class="greeting"><h1>Payments</h1><p>Upcoming bills.</p></div>
-        <div class="card">
-          <div class="transaction"><div class="tx-icon">⚡</div><div class="tx-details"><div class="tx-name">Electricity</div><div class="tx-meta">Due Oct 28</div></div><div class="tx-amount">€112.40</div></div>
-          <div class="transaction"><div class="tx-icon">☎</div><div class="tx-details"><div class="tx-name">Mobile</div><div class="tx-meta">Due Nov 2</div></div><div class="tx-amount">€29.99</div></div>
-        </div>
+        <div class="card"><div class="transaction"><div class="tx-icon">⚡</div><div class="tx-details"><div class="tx-name">Electricity</div><div class="tx-meta">Due Oct 28</div></div><div class="tx-amount">€112.40</div></div></div>
       </section>
 
       <section class="page" id="cards">
@@ -331,11 +244,7 @@
 
       <section class="page" id="analytics">
         <div class="greeting"><h1>Analytics</h1><p>This month.</p></div>
-        <div class="stats">
-          <div class="stat-card"><div class="stat-label">Food</div><div class="stat-value">€186</div></div>
-          <div class="stat-card"><div class="stat-label">Transport</div><div class="stat-value">€94</div></div>
-          <div class="stat-card"><div class="stat-label">Bills</div><div class="stat-value">€412</div></div>
-        </div>
+        <div class="stats"><div class="stat-card"><div class="stat-label">Food</div><div class="stat-value">€186</div></div></div>
       </section>
 
       <section class="page" id="profile">
@@ -345,7 +254,6 @@
           <div>
             <div class="profile-name" id="profileName" style="font-size:18px;">Loading...</div>
             <div class="profile-role">Premium Member · Flux Bank</div>
-            <div class="profile-role">Customer since 2024</div>
             <button class="action-btn" style="padding:8px 16px; margin-top:10px; font-size:12px; flex-direction:row;" onclick="document.getElementById('avatarUpload').click()">Upload New Photo</button>
           </div>
         </div>
@@ -364,13 +272,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // --- UI LOGIC ---
+  // UI LOGIC
   function show(page) {
     document.querySelectorAll(".page").forEach(function (p) { p.classList.remove("active"); });
     document.querySelectorAll(".nav-item").forEach(function (n) { n.classList.toggle("active", n.dataset.page === page); });
     var el = document.getElementById(page);
     if (el) el.classList.add("active");
-    toggleDropdown(); // Close dropdown on nav
+    toggleDropdown();
   }
   
   document.querySelectorAll("[data-page]").forEach(function (el) {
@@ -400,7 +308,6 @@
     setTimeout(function () { t.classList.remove("show"); }, 1800);
   });
 
-  // Dropdown logic
   const dropdown = document.getElementById("profileDropdown");
   document.getElementById("profileMenuBtn").addEventListener("click", (e) => {
     e.stopPropagation();
@@ -411,8 +318,7 @@
     if (!dropdown.contains(e.target)) dropdown.classList.remove("show");
   });
 
-
-  // --- SUPABASE LOGIC ---
+  // SUPABASE LOGIC
   const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
   const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -423,24 +329,10 @@
   let userInitials = "U";
 
   async function init() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('reset') === 'true') {
-      const newPassword = prompt("Please enter your new password (min 6 characters):");
-      if (newPassword && newPassword.length >= 6) {
-        const { error } = await sb.auth.updateUser({ password: newPassword });
-        if (error) alert("Error updating password: " + error.message);
-        else {
-          alert("✅ Password updated successfully!");
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }
-      }
-    }
-
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { window.location.href = "index.html"; return; }
     currentUser = session.user;
 
-    // Fetch profile including avatar_url
     const { data: profile } = await sb.from("profiles").select("name, balance, avatar_url").eq("id", session.user.id).single();
     
     if (profile) {
@@ -456,12 +348,10 @@
       document.getElementById("profileName").textContent = fullName;
       document.getElementById("cardHolderName").textContent = fullName.toUpperCase();
       
-      // Update Avatars (checking if there's a photo)
       updateAvatarUI(profile.avatar_url);
 
       currentBalance = Number(profile.balance);
       const formatted = eur(currentBalance);
-      
       document.getElementById("balance").textContent = formatted;
       document.getElementById("balance").dataset.real = formatted;
       document.getElementById("currentAccBal").textContent = formatted;
@@ -469,25 +359,37 @@
     }
 
     loadTransactions(session.user.id);
+    loadTransferRecipients(session.user.id); // Populate the transfer dropdown
   }
 
-  // --- AVATAR UPLOAD LOGIC ---
+  // Fetch other users dynamically for the transfer list
+  async function loadTransferRecipients(currentId) {
+    const { data: users } = await sb.from("profiles")
+      .select("id, name")
+      .neq("id", currentId)
+      .eq("status", "active");
+      
+    const select = document.getElementById("transferRecipient");
+    if(users && users.length > 0) {
+      select.innerHTML = '<option value="" disabled selected>Select recipient</option>' + 
+        users.map(u => `<option value="${u.id}" data-name="${u.name}">${u.name}</option>`).join("");
+    } else {
+      select.innerHTML = '<option value="" disabled selected>No other users found</option>';
+    }
+  }
+
   function updateAvatarUI(url) {
     const headerAv = document.getElementById("headerAvatar");
     const profileAv = document.getElementById("profileAvatar");
 
     if (url && url !== "null") {
-      // Photo exists
       headerAv.innerHTML = `<img src="${url}" alt="Avatar">`;
       headerAv.classList.add("has-photo");
-      
       profileAv.innerHTML = `<img src="${url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
       profileAv.classList.add("has-photo");
     } else {
-      // No photo, fallback to initials
       headerAv.innerHTML = userInitials;
       headerAv.classList.remove("has-photo");
-      
       profileAv.innerHTML = userInitials;
       profileAv.classList.remove("has-photo");
     }
@@ -497,39 +399,25 @@
     try {
       const file = event.target.files[0];
       if (!file) return;
-
-      // 1. Show loading toast
       var t = document.getElementById("toast");
       t.textContent = "Uploading photo...";
       t.classList.add("show");
 
-      // 2. Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${currentUser.id}-${Math.random()}.${fileExt}`;
       
-      const { error: uploadError } = await sb.storage
-        .from('avatars')
-        .upload(fileName, file, { upsert: true });
-
+      const { error: uploadError } = await sb.storage.from('avatars').upload(fileName, file, { upsert: true });
       if (uploadError) throw uploadError;
 
-      // 3. Get the public URL
       const { data } = sb.storage.from('avatars').getPublicUrl(fileName);
       const publicUrl = data.publicUrl;
 
-      // 4. Save URL to database
-      const { error: dbError } = await sb.from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', currentUser.id);
-
+      const { error: dbError } = await sb.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
       if (dbError) throw dbError;
 
-      // 5. Update the UI instantly
       updateAvatarUI(publicUrl);
-      
       t.textContent = "✅ Profile photo updated!";
       setTimeout(() => t.classList.remove("show"), 3000);
-
     } catch (error) {
       alert("Error uploading image: " + error.message);
     }
@@ -558,14 +446,16 @@
     list.innerHTML = txs.map(t => {
       const isIncoming = t.type === 'deposit';
       const dateObj = new Date(t.created_at);
+      // Formatting date & time specifically for the backdated transactions
       const dStr = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      const tStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
       
       return `
         <div class="transaction">
           <div class="tx-icon">${isIncoming ? '↓' : '↑'}</div>
           <div class="tx-details">
             <div class="tx-name">${t.description}</div>
-            <div class="tx-meta">${dStr} · ${t.type}</div>
+            <div class="tx-meta">${dStr} at ${tStr} · ${t.type}</div>
           </div>
           <div class="tx-amount ${isIncoming ? 'credit' : ''}">
             ${isIncoming ? '+' : '-'}${eur(t.amount)}
@@ -577,7 +467,9 @@
 
   async function handleTransfer(e) {
     e.preventDefault();
-    const recipient = document.getElementById("transferRecipient").value;
+    const selectEl = document.getElementById("transferRecipient");
+    const recipientId = selectEl.value;
+    const recipientName = selectEl.options[selectEl.selectedIndex].getAttribute("data-name");
     const amount = parseFloat(document.getElementById("transferAmount").value);
     
     if (amount > currentBalance) {
@@ -589,12 +481,27 @@
     const { error: err1 } = await sb.from("profiles").update({ balance: newBal }).eq("id", currentUser.id);
     if (err1) return alert("Error: " + err1.message);
 
+    // Log transfer for sender
     await sb.from("transactions").insert({
       user_id: currentUser.id,
       type: 'transfer',
       amount: amount,
-      description: `Sent to ${recipient}`
+      description: `Sent to ${recipientName}`
     });
+
+    // Add balance to recipient
+    const { data: recipientProfile } = await sb.from("profiles").select("balance").eq("id", recipientId).single();
+    if (recipientProfile) {
+        await sb.from("profiles").update({ balance: Number(recipientProfile.balance) + amount }).eq("id", recipientId);
+        
+        // Log deposit for recipient
+        await sb.from("transactions").insert({
+          user_id: recipientId,
+          type: 'deposit',
+          amount: amount,
+          description: `Received from ${document.getElementById("headerName").textContent}`
+        });
+    }
 
     currentBalance = newBal;
     const formatted = eur(newBal);
@@ -606,7 +513,7 @@
     document.getElementById("transferAmount").value = "";
     
     var t = document.getElementById("toast");
-    t.textContent = `Successfully sent ${eur(amount)} to ${recipient}`;
+    t.textContent = `Successfully sent ${eur(amount)} to ${recipientName}`;
     t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 3000);
 
