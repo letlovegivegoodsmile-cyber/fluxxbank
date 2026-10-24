@@ -3,99 +3,147 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fluxxbank | Secure App</title>
+<title>Fluxxbank | Premium Banking</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#070b14; --panel:#0f172a; --border:#1e293b;
-    --txt:#f8fafc; --mut:#94a3b8; --accent:#3b82f6;
-    --ok:#10b981; --bad:#ef4444;
+  :root {
+    --bg: #05070f; --panel: rgba(15, 23, 42, 0.6); --border: rgba(255, 255, 255, 0.08);
+    --text: #f8fafc; --muted: #94a3b8; --accent: #4f7cff; --accent2: #22d3ee;
+    --gradient: linear-gradient(135deg, #4f7cff 0%, #22d3ee 100%);
+    --success: #10b981; --danger: #ef4444;
   }
-  *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;}
-  body{background:var(--bg);color:var(--txt);min-height:100vh;display:flex;}
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+  body {
+    background-color: var(--bg); background-image: radial-gradient(circle at 0% 0%, rgba(79, 124, 255, 0.15) 0%, transparent 40%), radial-gradient(circle at 100% 100%, rgba(34, 211, 238, 0.1) 0%, transparent 40%);
+    color: var(--text); min-height: 100vh; display: flex; overflow: hidden;
+  }
+  .sidebar { width: 280px; background: rgba(8, 12, 24, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border); padding: 32px 24px; display: flex; flex-direction: column; z-index: 10; }
+  .logo { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 12px; margin-bottom: 48px; letter-spacing: -0.5px; }
+  .logo span { background: var(--gradient); -webkit-background-clip: text; color: transparent; }
+  .nav-item { padding: 14px 18px; border-radius: 12px; color: var(--muted); font-weight: 500; margin-bottom: 8px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 14px; }
+  .nav-item:hover, .nav-item.active { background: rgba(79, 124, 255, 0.1); color: var(--accent); transform: translateX(4px); }
+  .nav-item.active { border-left: 3px solid var(--accent); }
+  .user-pill { margin-top: auto; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 16px; border-radius: 16px; display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--gradient); display: grid; place-items: center; font-weight: 700; color: white; }
+  .user-info h4 { font-size: 0.9rem; font-weight: 600; }
+  .user-info p { font-size: 0.75rem; color: var(--muted); }
+  .logout-btn { margin-left: auto; background: transparent; border: none; color: var(--muted); cursor: pointer; transition: color 0.2s; }
+  .logout-btn:hover { color: var(--danger); }
+  .main { flex: 1; padding: 48px; overflow-y: auto; }
+  .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+  .header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -1px; }
+  .header h1 span { color: var(--muted); font-weight: 400; }
+  .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
+  .glass-panel { background: var(--panel); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 24px; padding: 32px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); }
+  .balance-label { color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; font-weight: 600; }
+  .balance-amount { font-size: 4rem; font-weight: 800; letter-spacing: -2px; background: var(--gradient); -webkit-background-clip: text; color: transparent; line-height: 1; margin-bottom: 12px; }
+  .account-details { color: var(--muted); font-family: monospace; font-size: 0.95rem; display: flex; gap: 20px; }
   
-  .sidebar{width:260px;background:var(--panel);border-right:1px solid var(--border);padding:24px;display:flex;flex-direction:column;}
-  .logo{font-size:1.5rem;font-weight:800;color:var(--accent);margin-bottom:40px;display:flex;align-items:center;gap:10px;}
-  .nav-item{padding:12px 16px;border-radius:8px;color:var(--mut);cursor:pointer;transition:all 0.2s;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
-  .nav-item:hover, .nav-item.active{background:rgba(59,130,246,0.1);color:var(--accent);}
-  .logout-btn{margin-top:auto;background:transparent;border:1px solid var(--border);color:var(--txt);padding:10px;border-radius:8px;cursor:pointer;transition:0.2s;}
-  .logout-btn:hover{background:var(--border);}
-
-  .main{flex:1;padding:40px;overflow-y:auto;}
-  .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px;}
-  .header h1{font-size:1.5rem;font-weight:600;}
-  .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:bold;color:white;}
-
-  .grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;}
-  .card-title{color:var(--mut);font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;}
+  .card-visual { width: 100%; height: 220px; border-radius: 20px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(255, 255, 255, 0.1); position: relative; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 24px 50px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05); overflow: hidden; }
+  .card-visual::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(79,124,255,0.15) 0%, transparent 60%); pointer-events: none; }
+  .card-top { display: flex; justify-content: space-between; align-items: center; }
+  .card-chip { width: 45px; height: 32px; background: linear-gradient(135deg, #e2e8f0, #94a3b8); border-radius: 6px; position: relative; }
+  .card-chip::after { content: ''; position: absolute; inset: 4px; border: 1px solid rgba(0,0,0,0.1); border-radius: 3px; }
+  .card-logo { font-weight: 800; font-size: 1.2rem; letter-spacing: 1px; }
+  .card-number { font-family: monospace; font-size: 1.4rem; letter-spacing: 3px; color: rgba(255,255,255,0.9); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+  .card-holder, .card-expiry { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .card-holder div, .card-expiry div { color: white; font-size: 0.9rem; font-weight: 600; margin-top: 4px; }
   
-  .balance-amount{font-size:3rem;font-weight:800;margin-bottom:8px;background:linear-gradient(90deg,#60a5fa,#a78bfa);-webkit-background-clip:text;color:transparent;}
-  .account-num{color:var(--mut);font-family:monospace;font-size:0.9rem;}
-
-  .form-group{margin-bottom:16px;}
-  .form-group label{display:block;font-size:0.85rem;color:var(--mut);margin-bottom:6px;}
-  .form-group input, .form-group select{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:1rem;outline:none;}
-  .form-group input:focus, .form-group select:focus{border-color:var(--accent);}
-  .btn-send{width:100%;padding:14px;background:var(--accent);color:white;border:none;border-radius:8px;font-weight:600;font-size:1rem;cursor:pointer;transition:background 0.2s;}
-  .btn-send:hover{background:#2563eb;}
-
-  .tx-list{display:flex;flex-direction:column;gap:16px;}
-  .tx-item{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border);}
-  .tx-item:last-child{border-bottom:none;padding-bottom:0;}
-  .tx-info h4{font-size:0.95rem;font-weight:500;margin-bottom:4px;}
-  .tx-info p{font-size:0.8rem;color:var(--mut);}
-  .tx-amount{font-weight:700;font-size:1rem;}
-  .tx-in{color:var(--ok);}
-  .tx-out{color:var(--txt);}
-
-  .msg{padding:12px;border-radius:8px;font-size:0.9rem;margin-top:12px;display:none;}
-  .msg.success{background:rgba(16,185,129,0.1);color:var(--ok);border:1px solid var(--ok);display:block;}
-  .msg.error{background:rgba(239,68,68,0.1);color:var(--bad);border:1px solid var(--bad);display:block;}
+  .form-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 24px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
+  .form-control { width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: white; font-size: 1rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+  .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.2); }
+  .btn-send { width: 100%; padding: 16px; border-radius: 12px; border: none; background: var(--gradient); color: white; font-weight: 700; font-size: 1rem; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 8px 20px rgba(79, 124, 255, 0.3); }
+  .btn-send:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(79, 124, 255, 0.4); }
+  
+  /* Transaction List Styling */
+  .activity-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+  .tx-item { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .tx-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .tx-info { display: flex; align-items: center; gap: 16px; }
+  .tx-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.05); display: grid; place-items: center; font-size: 1.2rem; }
+  .tx-details h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+  .tx-details p { font-size: 0.8rem; color: var(--muted); }
+  .tx-amount { font-weight: 700; font-size: 1rem; }
+  .tx-in { color: var(--success); }
+  .tx-out { color: var(--text); }
+  
+  .msg { padding: 16px; border-radius: 12px; font-size: 0.9rem; font-weight: 500; margin-top: 20px; display: none; }
+  .msg.success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); display: block; }
+  .msg.error { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); display: block; }
 </style>
 </head>
 <body>
 
   <aside class="sidebar">
-    <div class="logo">⚡ Fluxxbank</div>
-    <div class="nav-item active">🏠 Dashboard</div>
-    <div class="nav-item">💳 Cards</div>
-    <div class="nav-item">📊 Analytics</div>
+    <div class="logo">⚡ Fluxx<span>bank</span></div>
+    <div class="nav-item active">🏠 Overview</div>
+    <div class="nav-item">💳 My Cards</div>
+    <div class="nav-item">📈 Analytics</div>
     <div class="nav-item">⚙️ Settings</div>
-    <button class="logout-btn" onclick="doLogout()">Sign out securely</button>
+    <div class="user-pill">
+      <div class="avatar" id="userInitial">U</div>
+      <div class="user-info">
+        <h4 id="userName">Loading...</h4>
+        <p>Premium Member</p>
+      </div>
+      <button class="logout-btn" onclick="doLogout()" title="Sign Out">⏻</button>
+    </div>
   </aside>
 
   <main class="main">
     <div class="header">
-      <h1>Welcome back, <span id="userName">Loading...</span></h1>
-      <div class="user-profile">
-        <div class="avatar" id="userInitial">U</div>
-      </div>
+      <h1>Good to see you, <span id="headerName">...</span></h1>
     </div>
 
-    <div class="grid">
-      <div style="display:flex;flex-direction:column;gap:24px;">
-        <div class="card">
-          <div class="card-title">Total Available Balance</div>
+    <div class="dashboard-grid">
+      <div style="display:flex; flex-direction:column; gap:32px;">
+        <div class="glass-panel">
+          <div class="balance-label">Total Available Balance</div>
           <div class="balance-amount" id="mainBalance">€0.00</div>
-          <div class="account-num">IBAN: DE89 3704 0044 0532 0130 00</div>
+          <div class="account-details">
+            <span>IBAN: DE89 3704 0044 0532 0130 00</span>
+            <span>BIC: FLUXXDEFFXXX</span>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="card-title">Recent Activity</div>
-          <div class="tx-list" id="txList">
-            <div style="color:var(--mut);font-size:0.9rem;">Loading transactions...</div>
+        <!-- FULL TRANSACTION HISTORY -->
+        <div class="glass-panel">
+          <div class="form-title">Transaction History</div>
+          <div class="activity-list" id="txList">
+            <div style="color:var(--muted); font-size:0.9rem;">Loading transactions...</div>
           </div>
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:24px;">
-        <div class="card">
-          <div class="card-title">Send Money</div>
+      <div style="display:flex; flex-direction:column; gap:32px;">
+        <div class="card-visual">
+          <div class="card-top">
+            <div class="card-chip"></div>
+            <div class="card-logo">Fluxx</div>
+          </div>
+          <div class="card-number">•••• •••• •••• 4021</div>
+          <div class="card-bottom">
+            <div class="card-holder">
+              Card Holder
+              <div id="cardName">USER NAME</div>
+            </div>
+            <div class="card-expiry">
+              Expires
+              <div>12/28</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-panel">
+          <div class="form-title">Send Money</div>
           <form onsubmit="return handleSend(event)">
             <div class="form-group">
               <label>Recipient</label>
-              <select id="sendTo" required>
-                <option value="" disabled selected>Select recipient</option>
+              <select id="sendTo" class="form-control" required>
+                <option value="" disabled selected>Choose a contact</option>
                 <option value="Maya Chen">Maya Chen</option>
                 <option value="Jonas Weber">Jonas Weber</option>
                 <option value="Luna Ortiz">Luna Ortiz</option>
@@ -103,20 +151,11 @@
             </div>
             <div class="form-group">
               <label>Amount (€)</label>
-              <input type="number" id="sendAmt" min="0.01" step="0.01" placeholder="0.00" required>
+              <input type="number" id="sendAmt" class="form-control" min="0.01" step="0.01" placeholder="0.00" required>
             </div>
-            <button type="submit" class="btn-send">Send Instantly</button>
+            <button type="submit" class="btn-send">Send Instantly ⚡</button>
             <div id="sendMsg" class="msg"></div>
           </form>
-        </div>
-
-        <div class="card" style="background:linear-gradient(135deg,#1e293b,#0f172a);">
-          <div class="card-title">Virtual Debit Card</div>
-          <div style="font-family:monospace;font-size:1.2rem;letter-spacing:2px;margin:20px 0;">•••• •••• •••• 4021</div>
-          <div style="display:flex;justify-content:space-between;color:var(--mut);font-size:0.8rem;">
-            <span id="userNameCard">USER NAME</span>
-            <span>12/28</span>
-          </div>
         </div>
       </div>
     </div>
@@ -127,41 +166,37 @@
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
     const eur = n => "€" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
     let currentBalance = 0;
 
     async function init() {
-      // 1. Check if user is here to reset password
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('reset') === 'true') {
         const newPassword = prompt("Please enter your new password (min 6 characters):");
         if (newPassword && newPassword.length >= 6) {
           const { error } = await sb.auth.updateUser({ password: newPassword });
-          if (error) {
-            alert("Error updating password: " + error.message);
-          } else {
-            alert("✅ Password updated successfully! You can now use the app.");
+          if (error) alert("Error updating password: " + error.message);
+          else {
+            alert("✅ Password updated successfully!");
             window.history.replaceState({}, document.title, window.location.pathname);
           }
-        } else if (newPassword !== null) {
-          alert("Password must be at least 6 characters.");
         }
       }
 
-      // 2. Check login session
       const { data: { session } } = await sb.auth.getSession();
-      if (!session) { 
-        window.location.href = "index.html"; 
-        return; 
-      }
+      if (!session) { window.location.href = "index.html"; return; }
 
-      // 3. Load user data
       const { data: profile } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
       if (profile) {
         const firstName = profile.name ? profile.name.split(" ")[0] : "Customer";
+        const fullName = profile.name ? profile.name.toUpperCase() : "USER";
+        
         document.getElementById("userName").textContent = firstName;
+        document.getElementById("headerName").textContent = firstName;
         document.getElementById("userInitial").textContent = firstName[0].toUpperCase();
-        document.getElementById("userNameCard").textContent = profile.name ? profile.name.toUpperCase() : "USER";
+        document.getElementById("cardName").textContent = fullName;
+        
         document.getElementById("mainBalance").textContent = eur(profile.balance);
         currentBalance = profile.balance;
       }
@@ -169,22 +204,32 @@
       loadTransactions(session.user.id);
     }
 
+    // --- DISPLAYS FULL HISTORY WITH DATE & TIME ---
     async function loadTransactions(userId) {
-      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(5);
+      const { data: txs } = await sb.from("transactions").select("*").eq("user_id", userId).order("created_at", { ascending: false }).limit(10);
       const list = document.getElementById("txList");
       
       if (!txs || txs.length === 0) {
-        list.innerHTML = '<div style="color:var(--mut);font-size:0.9rem;">No recent activity.</div>';
+        list.innerHTML = '<div style="color:var(--muted);font-size:0.9rem;">No recent activity.</div>';
         return;
       }
 
       list.innerHTML = txs.map(t => {
         const isIncoming = t.type === 'deposit';
+        
+        // Format the date and time beautifully
+        const dateObj = new Date(t.created_at);
+        const formattedDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        const formattedTime = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        
         return `
           <div class="tx-item">
             <div class="tx-info">
-              <h4>${t.description}</h4>
-              <p>${new Date(t.created_at).toLocaleDateString()}</p>
+              <div class="tx-icon">${isIncoming ? '📥' : '📤'}</div>
+              <div class="tx-details">
+                <h4>${t.description}</h4>
+                <p>${formattedDate} at ${formattedTime}</p> <!-- Shows backdated time! -->
+              </div>
             </div>
             <div class="tx-amount ${isIncoming ? 'tx-in' : 'tx-out'}">
               ${isIncoming ? '+' : '−'}${eur(t.amount)}
@@ -202,10 +247,12 @@
       
       if (amt > currentBalance) {
         msg.className = "msg error";
-        msg.textContent = "Insufficient funds.";
+        msg.textContent = "Insufficient funds to complete this transfer.";
         return false;
       }
 
+      msg.className = "msg"; 
+      
       const { data: { session } } = await sb.auth.getSession();
       const newBal = currentBalance - amt;
       
@@ -228,7 +275,7 @@
       document.getElementById("sendAmt").value = "";
       
       msg.className = "msg success";
-      msg.textContent = `Successfully sent ${eur(amt)} to ${to}`;
+      msg.textContent = `Successfully sent ${eur(amt)} to ${to}.`;
       
       loadTransactions(session.user.id); 
       return false;
