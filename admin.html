@@ -15,23 +15,24 @@
     button, input { font: inherit; }
     button { cursor: pointer; }
     .hidden { display: none !important; }
+    
+    /* Login Screen */
     #loginScreen { min-height: 100vh; display: grid; place-items: center; padding: 20px; background: radial-gradient(ellipse at top, #192c4c 0%, var(--bg) 65%); }
     .login-box { width: 100%; max-width: 410px; padding: 32px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 20px 70px #0005; }
     .brand { color: var(--orange); font-size: 25px; font-weight: 800; letter-spacing: .3px; }
     .subtitle { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 9px 0 25px; }
     label { display: block; margin: 16px 0 7px; font-size: 13px; color: #c8d5e9; }
-    input { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; outline: none; }
+    input { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; outline: none; margin-bottom: 12px;}
     input:focus { border-color: var(--orange); }
     .btn { border: 0; border-radius: 8px; padding: 11px 15px; font-weight: 700; background: var(--orange); color: #111827; }
     .btn:disabled { opacity: .6; cursor: wait; }
-    .full { width: 100%; margin-top: 20px; }
+    .full { width: 100%; margin-top: 10px; }
     .secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
-    .small { padding: 7px 10px; font-size: 12px; }
+    .small { padding: 6px 10px; font-size: 12px; }
     .error { color: var(--red); font-size: 13px; line-height: 1.5; margin-top: 12px; overflow-wrap: anywhere; }
     .success { color: var(--green); }
-    .login-links { display: flex; justify-content: flex-end; margin-top: 12px; }
-    .text-btn { padding: 4px 0; border: 0; background: transparent; color: #ffb16f; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
-    .text-btn:hover { color: #ffd0a5; }
+    
+    /* App Layout */
     #app { min-height: 100vh; }
     .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
     .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
@@ -40,7 +41,6 @@
     .side-btn { display: block; width: 100%; margin: 5px 0; padding: 12px; text-align: left; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #b9c7dd; }
     .side-btn:hover, .side-btn.on { background: #172742; border-color: #293d5e; color: white; }
     .side-btn.on { box-shadow: inset 3px 0 var(--orange); }
-    .sidebar-note { margin: 28px 10px 0; color: var(--muted); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
     main { min-width: 0; }
     .topbar { min-height: 82px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border-bottom: 1px solid var(--border); background: #0c1526; }
     .topbar h1 { margin: 0; font-size: 21px; }
@@ -49,78 +49,53 @@
     .view { display: none; }
     .view.on { display: block; }
     .section-title { margin: 0 0 8px; font-size: 20px; }
-    .section-desc { margin: 0 0 23px; color: var(--muted); font-size: 13px; line-height: 1.6; }
     .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 25px; }
     .stat, .panel { min-width: 0; padding: 21px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; }
     .stat-label { color: var(--muted); font-size: 13px; }
-    .stat-value { margin-top: 12px; font-size: 30px; font-weight: 800; overflow-wrap: anywhere; }
+    .stat-value { margin-top: 12px; font-size: 30px; font-weight: 800; }
     .panel h2 { margin: 0 0 17px; font-size: 16px; }
     .table-wrap { width: 100%; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
     th { color: var(--muted); font-weight: 600; white-space: nowrap; }
-    td small { display: block; margin-top: 5px; color: var(--muted); overflow-wrap: anywhere; }
-    .status { display: inline-block; padding: 5px 8px; border-radius: 6px; background: #26344c; color: #dce7f8; font-size: 11px; white-space: nowrap; }
+    td small { display: block; marginbrand-top: 5px; color:"> var(--muted); }
+    .status { displayFl: inline-block; padding: ux5px 8px; border-radiusx: 6px; background: #26344c; color: #dce7f8; font-size: 11px; text-transform: capitalize; }
     .status.active { background: #103a32; color: #72e4bb; }
     .status.pending { background: #49341b; color: #ffd18c; }
     .empty { padding: 25px 10px; color: var(--muted); text-align: center; font-size: 13px; }
-    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; overflow-wrap: anywhere; }
-    @media (max-width: 760px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar { padding: 15px; border-right: 0; border-bottom: 1px solid var(--border); }
-      .sidebar .brand { padding: 4px 5px 14px; }
-      .side-label, .sidebar-note { display: none; }
-      .side-nav { display: flex; gap: 7px; overflow-x: auto; }
-      .side-btn { width: auto; min-width: max-content; margin: 0; }
-      .content { padding: 18px 14px; }
-      .topbar { padding: 16px; }
-      .stats { gap: 10px; }
-      .stat, .panel { padding: 15px; }
-      .stat-value { font-size: 24px; }
-      .login-box { padding: 24px; }
-    }
+    
+    /* Toast Notification */
+    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; transition: opacity 0.3s; }
   </style>
 </head>
 <body>
+  <!-- LOGIN SCREEN -->
   <section id="loginScreen">
     <div class="login-box">
-      <div class="brand">FluxxBank</div>
-      <p class="subtitle" id="loginSubtitle">Administrator access. Sign in using your authorized Supabase account.</p>
+      <div class="Bank</div>
+      <p class="subtitle">Administrator access. Sign in using your authorized Supabase account.</p>
       <form id="loginForm">
         <label for="aEmail">Administrator email</label>
-        <input type="email" id="aEmail" autocomplete="username" placeholder="Enter your email" required>
+        <input type="email" id="aEmail" placeholder="Enter your email" required>
         <label for="aPass">Password</label>
-        <input type="password" id="aPass" autocomplete="current-password" placeholder="Enter your password" required>
+        <input type="password" id="aPass" placeholder="Enter your password" required>
         <div id="loginErr" class="error" role="alert"></div>
         <button class="btn full" id="loginBtn" type="submit">Sign in</button>
-      </form>
-      <div class="login-links" id="forgotWrap">
-        <button class="text-btn" id="forgotPasswordBtn" type="button">Forgot password?</button>
-      </div>
-      <div id="loginMessage" class="error" role="status" aria-live="polite"></div>
-      <form id="newPasswordForm" class="hidden">
-        <label for="newPassword">New password</label>
-        <input type="password" id="newPassword" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
-        <label for="confirmNewPassword">Confirm new password</label>
-        <input type="password" id="confirmNewPassword" autocomplete="new-password" minlength="8" required placeholder="Enter the new password again">
-        <div id="passwordResetErr" class="error" role="alert"></div>
-        <button class="btn full" id="saveNewPasswordBtn" type="submit">Save new password</button>
-        <button class="btn secondary full" id="backToLoginBtn" type="button">Back to sign in</button>
       </form>
     </div>
   </section>
 
+  <!-- MAIN ADMIN APP -->
   <div id="app" class="hidden">
     <div class="layout">
       <aside class="sidebar">
         <div class="brand">FluxxBank</div>
         <div class="side-label">Administration</div>
-        <nav class="side-nav" aria-label="Admin navigation">
+        <nav class="side-nav">
           <button class="side-btn on" data-view="dash" type="button">Overview</button>
           <button class="side-btn" data-view="cust" type="button">Customers</button>
           <button class="side-btn" data-view="appr" type="button">Approvals</button>
         </nav>
-        <div class="sidebar-note">Restricted administrator area.<br>Access is checked against your Supabase profile.</div>
       </aside>
 
       <main>
@@ -130,9 +105,9 @@
         </header>
 
         <div class="content">
+          <!-- OVERVIEW TAB -->
           <section id="view-dash" class="view on">
             <h2 class="section-title">Overview</h2>
-            <p class="section-desc">Customer profile and application status from your database.</p>
             <div class="stats">
               <div class="stat"><div class="stat-label">Customer profiles</div><div class="stat-value" id="kCustomers">—</div></div>
               <div class="stat"><div class="stat-label">Pending applications</div><div class="stat-value" id="kAppr">—</div></div>
@@ -141,58 +116,106 @@
               <h2>Recent customer profiles</h2>
               <div class="table-wrap"><table>
                 <thead><tr><th>Customer</th><th>Status</th><th>Role</th></tr></thead>
-                <tbody id="recentBody"><tr><td colspan="3">Loading records…</td></tr></tbody>
+                <tbody id="recentBody"><tr><td colspan="3">Loading...</td></tr></tbody>
               </table></div>
             </div>
           </section>
 
+          <!-- CUSTOMERS TAB -->
           <section id="view-cust" class="view">
             <h2 class="section-title">Customers</h2>
-            <p class="section-desc">View customer profiles, balances, and manage their accounts.</p>
+            <p class="subtitle">View customer profiles, balances, and manage their accounts.</p>
             <div class="panel"><div class="table-wrap"><table>
               <thead><tr><th>Customer</th><th>Status</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead>
-              <tbody id="custBody"><tr><td colspan="5">Loading records…</td></tr></tbody>
+              <tbody id="custBody"><tr><td colspan="5">Loading...</td></tr></tbody>
             </table></div></div>
           </section>
 
+          <!-- APPROVALS TAB -->
           <section id="view-appr" class="view">
             <h2 class="section-title">Approvals</h2>
-            <p class="section-desc">Review pending customer profiles. Approval changes the profile status in Supabase.</p>
-            <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading applications…</div></div></div>
+            <p class="subtitle">Review pending customer profiles. Approval changes the status and sends a welcome email.</p>
+            <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading...</div></div></div>
           </section>
-          <div id="pageErr" class="error" role="alert"></div>
         </div>
       </main>
     </div>
   </div>
-  <div id="toast" class="hidden" role="status" aria-live="polite"></div>
+  <div id="toast" class="hidden"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    "use strict";
+    // Initialize Supabase
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-    const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
-
-    let sb = null;
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
     let customers = [];
-    let toastTimer = null;
     const $ = id => document.getElementById(id);
+    let toastTimer = null;
 
+    // Toast Notification Helper
+    function toast(msg) {
+      const el = $("toast"); 
+      el.textContent = msg; 
+      el.classList.remove("hidden");
+      el.style.opacity = "1";
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.style.opacity = "0";
+        setTimeout(() => el.classList.add("hidden"), 300);
+      }, 3500);
+    }
+
+    function escapeHtml(v) { 
+      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]); 
+    }
+    
+    function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
+    
+    function statusBadge(status) {
+      const v = String(status ?? "Unknown"); const l = v.toLowerCase();
+      const css = l === "active" ? "active" : l.includes("pending") ? "pending" : "";
+      return `<span class="status ${css}">${escapeHtml(v)}</span>`;
+    }
+
+    // --- INITIALIZATION ---
     document.addEventListener("DOMContentLoaded", async () => {
       if (!window.supabase) return alert("Supabase failed to load.");
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       
       const { data } = await sb.auth.getSession();
-      if (data.session) { boot(data.session.user); } 
-      else { $("loginScreen").classList.remove("hidden"); }
+      if (data.session) { 
+        boot(data.session.user); 
+      } else { 
+        $("loginScreen").classList.remove("hidden"); 
+      }
 
-      $("loginForm").addEventListener("submit", tryLogin);
-      $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);
-      $("newPasswordForm").addEventListener("submit", saveNewPassword);
-      $("backToLoginBtn").addEventListener("click", () => showSignInForm());
-      $("logoutBtn").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
+      // Login Form
+      $("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
+        $("loginErr").textContent = "";
+        try {
+          const { data, error } = await sb.auth.signInWithPassword({ 
+            email: $("aEmail").value.trim(), 
+            password: $("aPass").value 
+          });
+          if (error) throw error;
+          await boot(data.user);
+        } catch (err) { 
+          $("loginErr").textContent = err.message; 
+        } finally { 
+          btn.disabled = false; btn.textContent = "Sign in"; 
+        }
+      });
 
+      // Logout
+      $("logoutBtn").addEventListener("click", async () => { 
+        await sb.auth.signOut(); 
+        location.reload(); 
+      });
+
+      // Sidebar Navigation
       document.querySelectorAll(".side-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
@@ -203,166 +226,127 @@
         });
       });
 
+      // Handle Approvals (Event Delegation)
       document.addEventListener("click", async (e) => {
         if (e.target.classList.contains("approve-btn")) {
           const index = e.target.getAttribute("data-index");
           const customer = customers[index];
-          
-          e.target.disabled = true;
+          e.target.disabled = true; 
           e.target.textContent = "Approving...";
           
+          // 1. Update status in database
           const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
           if (error) {
             toast("Error: " + error.message);
-            e.target.disabled = false;
+            e.target.disabled = false; 
             e.target.textContent = "Approve";
           } else {
-            toast("Customer approved successfully!");
+            // 2. Trigger Email Function
+            await sb.functions.invoke('send-approval-email', {
+              body: { email: customer.email, name: customer.name }
+            });
+            toast("Approved & email sent! 🚀");
             await loadAll();
-            renderOverview(); renderCustomers(); renderApprovals();
           }
         }
       });
     });
 
-    function showLoginError(msg) { $("loginErr").textContent = msg || ""; }
-    function showPageError(msg) { $("pageErr").textContent = msg || ""; }
-    function showLoginMessage(msg, success = false) {
-      const el = $("loginMessage"); el.textContent = msg || "";
-      el.classList.toggle("success", Boolean(success)); el.classList.toggle("error", !success);
-    }
-    function toast(msg) {
-      const el = $("toast"); el.textContent = msg; el.classList.remove("hidden");
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.add("hidden"), 3500);
-    }
-    function escapeHtml(v) {
-      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
-    }
-    function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
-    function statusBadge(status) {
-      const v = String(status ?? "Unknown"); const l = v.toLowerCase();
-      const css = l === "active" ? "active" : l.includes("pending") ? "pending" : "";
-      return `<span class="status ${css}">${escapeHtml(v)}</span>`;
-    }
-
-    function showSignInForm(msg = "", success = false) {
-      $("loginForm").classList.remove("hidden"); $("forgotWrap").classList.remove("hidden");
-      $("newPasswordForm").classList.add("hidden"); showLoginError("");
-      showLoginMessage(msg, success);
-    }
-
-    async function tryLogin(e) {
-      e.preventDefault(); showLoginError("");
-      const email = $("aEmail").value.trim(), password = $("aPass").value;
-      const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        await boot(data.user);
-      } catch (error) {
-        showLoginError(error.message);
-      } finally { btn.disabled = false; btn.textContent = "Sign in"; }
-    }
-
+    // --- BOOT & DATA FETCHING ---
     async function boot(user) {
-      $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
-      showLoginError(""); showPageError("");
       try {
-        if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }
-        if (!user) throw new Error("Please sign in.");
-        const { data: profile } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
+        const { data: profile } = await sb.from("profiles").select("role, status, name").eq("id", user.id).single();
+        
+        // Security check: Must be an active admin
         if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
-          await sb.auth.signOut(); throw new Error("Not an active admin.");
+          await sb.auth.signOut(); 
+          throw new Error("This account is not an active administrator.");
         }
+        
         $("adminIdentity").textContent = profile.name || "Administrator";
         await loadAll();
-        $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
-        renderOverview(); renderCustomers(); renderApprovals();
-      } catch (error) {
-        $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
-        showLoginError(error.message);
+        
+        $("loginScreen").classList.add("hidden"); 
+        $("app").classList.remove("hidden");
+      } catch (error) { 
+        $("loginErr").textContent = error.message; 
       }
     }
 
     async function loadAll() {
-      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, created_at").order("created_at", { ascending: false });
-      if (error) throw error;
+      const { data } = await sb.from("profiles").select("id, name, email, status, role, balance, created_at").order("created_at", { ascending: false });
       customers = data || [];
+      renderOverview(); 
+      renderCustomers(); 
+      renderApprovals();
     }
 
-    async function requestPasswordReset() {
-      const email = $("aEmail").value.trim();
-      if (!email) return showLoginMessage("Enter your email first.");
-      const btn = $("forgotPasswordBtn"); btn.disabled = true;
-      try {
-        await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });
-        showLoginMessage("Reset link sent. Check your inbox.", true);
-      } catch (e) { showLoginMessage(e.message); } 
-      finally { btn.disabled = false; }
-    }
-    
-    async function saveNewPassword(e) {
-      e.preventDefault();
-      const pw = $("newPassword").value, cpw = $("confirmNewPassword").value;
-      if (pw.length < 8) return $("passwordResetErr").textContent = "Use 8+ characters.";
-      if (pw !== cpw) return $("passwordResetErr").textContent = "Passwords don't match.";
-      try {
-        await sb.auth.updateUser({ password: pw });
-        await sb.auth.signOut(); showSignInForm("Password updated.", true);
-      } catch (error) { $("passwordResetErr").textContent = error.message; }
-    }
-
+    // --- RENDER FUNCTIONS ---
     function renderOverview() {
       $("kCustomers").textContent = customers.length;
       $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
       $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
         <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
+          <td>${escapeHtml(c.name || "Unnamed")}<small>${escapeHtml(c.email || "")}</small></td>
           <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role)}</td>
-        </tr>`).join("") || '<tr><td colspan="3">No profiles.</td></tr>';
+          <td>${escapeHtml(c.role || "customer")}</td>
+        </tr>
+      `).join("") || '<tr><td colspan="3">No profiles found.</td></tr>';
     }
 
     function renderCustomers() {
       $("custBody").innerHTML = customers.map((c, i) => `
         <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
+          <td>${escapeHtml(c.name || "Unnamed")}<small>${escapeHtml(c.email || "")}</small></td>
           <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role)}</td>
+          <td>${escapeHtml(c.role || "customer")}</td>
           <td style="font-weight:bold; color:var(--green);">$${Number(c.balance || 0).toFixed(2)}</td>
           <td>
             ${isPending(c.status) ? `<button class="btn small approve-btn" type="button" data-index="${i}">Approve</button>` : ""}
             <button class="btn small" style="background:var(--orange); color:#000; margin-left:5px;" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button>
           </td>
-        </tr>`).join("") || '<tr><td colspan="5">No profiles.</td></tr>';
+        </tr>
+      `).join("") || '<tr><td colspan="5">No profiles found.</td></tr>';
     }
 
     function renderApprovals() {
       const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
       $("apprList").innerHTML = pending.map(({ customer, index }) => `
-        <div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--border)">
-          <div><strong>${escapeHtml(customer.name)}</strong><div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email)}</div></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <strong>${escapeHtml(customer.name || "Unnamed")}</strong>
+            <div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email || "")}</div>
+          </div>
           <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
-        </div>`).join("") || '<div class="empty">No pending applications.</div>';
+        </div>
+      `).join("") || '<div class="empty">No pending applications.</div>';
     }
 
+    // --- ADMIN ACTIONS ---
     async function depositMoney(userId, userName) {
       const amountStr = prompt(`How much to deposit for ${userName}? (e.g. 500)`);
       if (!amountStr) return;
       const amount = parseFloat(amountStr);
       if (isNaN(amount) || amount <= 0) return alert("Invalid amount");
 
+      // Get current balance
       const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
       const newBalance = Number(profile.balance || 0) + amount;
 
+      // Update balance
       const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
       if (err1) return toast("Error: " + err1.message);
 
-      await sb.from("transactions").insert({ user_id: userId, type: 'deposit', amount: amount, description: 'Admin manual deposit' });
+      // Log transaction
+      await sb.from("transactions").insert({ 
+        user_id: userId, 
+        type: 'deposit', 
+        amount: amount, 
+        description: 'Admin manual deposit' 
+      });
       
       toast(`✅ Deposited $${amount} to ${userName}`);
-      await loadAll(); renderCustomers();
+      await loadAll(); 
     }
   </script>
 </body>
