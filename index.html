@@ -561,32 +561,6 @@
 
 <button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
 
-<!-- PRINTABLE RECEIPT -->
-<div id="receiptWrap" onclick="if(event.target===this)closeReceipt()">
-  <div id="receipt">
-    <div class="r-logo"><span class="bolt">⚡</span> FLUXXBANK</div>
-    <div class="r-sub">Official Transaction Receipt</div>
-    <hr class="r-rule">
-    <table class="r-table">
-      <tr><td>Date</td><td id="rDate">–</td></tr>
-      <tr><td>Time</td><td id="rTime">–</td></tr>
-      <tr><td>From</td><td>Fluxx Everyday<br><span style="font-weight:400;color:#8a90a3;font-size:.78rem">DE89 3704 0044 0532 0130 00</span></td></tr>
-      <tr><td>To</td><td id="rTo">–</td></tr>
-      <tr><td>Note</td><td id="rNote">–</td></tr>
-      <tr><td>Reference</td><td id="rRef">–</td></tr>
-      <tr><td>Status</td><td style="color:#059669">✔ Completed</td></tr>
-    </table>
-    <hr class="r-rule">
-    <div class="r-total"><small>Amount sent</small><b id="rAmt">–</b></div>
-    <div class="r-bar"></div>
-    <div class="r-foot">Fluxxbank AG · fluxxbank.netlify.app<br>Thank you for banking in motion ⚡</div>
-    <div class="r-actions">
-      <button class="r-print" onclick="window.print()">🖨️ Print receipt</button>
-      <button class="r-close" onclick="closeReceipt()">Close</button>
-    </div>
-  </div>
-</div>
-
 <!-- LOGIN MODAL -->
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -604,7 +578,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   /* ------- state ------- */
-  let income = 5850, spending = 1932.45, cashback = 86.40;
   const spend = [420,380,510,460,300,390,450,340,410,380,290,340];
   const eur = n => "€" + n.toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -626,21 +599,6 @@
       ctx.fillStyle = i===n-1 ? "#22d3ee" : "#4f7cff"; ctx.fill(); });
   }
 
-  /* ------- printable receipt ------- */
-  let lastTx = null;
-  function showReceipt(){
-    if(!lastTx) return;
-    const e = new Intl.NumberFormat("en-IE",{style:"currency",currency:"EUR"});
-    document.getElementById("rDate").textContent = lastTx.when.toLocaleDateString("en-IE",{day:"2-digit",month:"long",year:"numeric"});
-    document.getElementById("rTime").textContent = lastTx.when.toLocaleTimeString("en-IE",{hour:"2-digit",minute:"2-digit"});
-    document.getElementById("rTo").textContent = lastTx.to;
-    document.getElementById("rNote").textContent = lastTx.note;
-    document.getElementById("rRef").textContent = lastTx.ref;
-    document.getElementById("rAmt").textContent = e.format(lastTx.amt);
-    document.getElementById("receiptWrap").classList.add("on");
-  }
-  function closeReceipt(){ document.getElementById("receiptWrap").classList.remove("on"); }
-
   /* ------- ticker ------- */
   const rates = [["EUR/USD","1.087","+0.12%"],["BTC","$98,420","+2.4%"],["ETH","$3,910","+1.1%"],["S&P 500","6,842","+0.6%"],["Gold","$2,915","−0.3%"],["NASDAQ","22,410","+0.9%"],["GBP/EUR","1.174","−0.08%"]];
   document.getElementById("ticker").innerHTML = rates.map(r=>`
@@ -660,14 +618,12 @@
   const bg = document.getElementById("modalBg");
   function openModal(){ bg.classList.add("show"); }
   function closeModal(){ bg.classList.remove("show"); }
+  
   const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
   const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-  let sb = null;
-  if (SUPABASE_KEY !== "PASTE_YOUR_KEY_HERE" && window.supabase) {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  
   let authMode = "login";
-  const eur2 = n => "€" + Number(n).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
   function switchAuthMode(e){
     e.preventDefault();
@@ -688,12 +644,7 @@
     const err = document.getElementById("authErr");
     err.style.color = "var(--bad)";
     if(!em.includes("@")){ err.textContent = "Please enter a valid email address."; return; }
-    if(!sb){ 
-      closeModal();
-      document.getElementById("authArea").innerHTML = '<button class="btn ghost" onclick="openModal()">👋 ' + (nm || em.split("@")[0]) + '</button>';
-      document.getElementById("dashboard").scrollIntoView({behavior:"smooth"});
-      return;
-    }
+    
     try{
       if(authMode === "signup"){
         if(pw.length < 6){ err.textContent = "Password needs at least 6 characters."; return; }
@@ -701,11 +652,11 @@
         if(error) throw error;
         if(su.user){
           await sb.from("profiles").insert({
-            id: su.user.id, name: nm || "Customer", email: em, balance: 0, plan: "Basic", status: "Pending", color: "#34d399"
+            id: su.user.id, name: nm || "Customer", email: em, balance: 0, status: "pending"
           });
         }
         err.style.color = "var(--ok)";
-        err.textContent = "✅ Account created! Confirm the email, then wait for admin activation — usually minutes! 🚀";
+        err.textContent = "✅ Account created! Confirm the email, then wait for admin approval. 🚀";
       } else {
         const { data: authData, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
         if(error) throw error;
@@ -718,9 +669,8 @@
           throw new Error("⏳ Account awaiting approval — an admin must activate it first.");
         }
         
-        closeModal();
-        await refreshAuthUI();
-        document.getElementById("dashboard").scrollIntoView({behavior:"smooth"});
+        // REDIRECT TO THE SECURE INTERIOR APP
+        window.location.href = "app.html";
       }
     }catch(e){
       err.textContent = e.message || "Something went wrong. Try again.";
@@ -728,44 +678,17 @@
   }
 
   async function refreshAuthUI(){
-    if(!sb) return;
     const { data: { session } } = await sb.auth.getSession();
     const area = document.getElementById("authArea");
     
     if(session && session.user){
-      const { data: p } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
-      
-      if(p){
-        document.getElementById("dashBal").textContent = eur2(p.balance);
-        document.getElementById("phBal").textContent = eur2(p.balance);
-        document.getElementById("dashHello").textContent = "Good to see you, " + p.name.split(" ")[0] + " 👋";
-      }
-      
-      const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false }).limit(5);
-        
-      if(txData && txData.length > 0) {
-        document.getElementById("txlist").innerHTML = txData.map(t => `
-          <div class="tx">
-            <div class="who">
-              <div class="dot">${t.type === 'deposit' ? 'IN' : 'OUT'}</div>
-              <div>${t.description}<small>${new Date(t.created_at).toLocaleDateString()}</small></div>
-            </div>
-            <span class="${t.type === 'deposit' ? 'up' : 'dn'}" style="font-weight:700">
-              ${t.type === 'deposit' ? '+' : '−'}${eur(Math.abs(t.amount))}
-            </span>
-          </div>
-        `).join("");
-      } else {
-        document.getElementById("txlist").innerHTML = '<div style="color:var(--mut);font-size:0.85rem;padding:10px 0;">No recent activity.</div>';
-      }
-
-      area.innerHTML = '<button class="btn ghost" onclick="doLogout()" title="Log out">⏻ ' + (p ? p.name.split(" ")[0] : "User") + '</button>';
+      area.innerHTML = '<button class="btn ghost" onclick="window.location.href=\'app.html\'">Go to App</button>';
     } else {
       area.innerHTML = '<button class="btn ghost" onclick="openModal()">Log in</button>';
     }
   }
   
-  async function doLogout(){ if(sb) await sb.auth.signOut(); location.reload(); }
+  async function doLogout(){ await sb.auth.signOut(); location.reload(); }
 
   async function doPay(e){
     e.preventDefault();
@@ -780,7 +703,7 @@
     const { data: p } = await sb.from("profiles").select("balance").eq("id", session.user.id).single();
     if(p.balance < amt) {
       msg.style.color = "var(--bad)";
-      msg.textContent = "Insufficient funds! Balance: " + eur2(p.balance);
+      msg.textContent = "Insufficient funds! Balance: " + eur(p.balance);
       return false;
     }
 
@@ -788,9 +711,7 @@
     await sb.from("transactions").insert({ user_id: session.user.id, type: 'transfer', amount: amt, description: `Sent to ${who} (${note})` });
 
     msg.style.color="var(--ok)"; 
-    msg.innerHTML = `⚡ Sent ${eur(amt)} to ${who}. <button class="btn ghost" style="padding:7px 14px;font-size:.78rem" onclick="showReceipt()">🧾 Print receipt</button>`;
-    
-    lastTx = { to: who, amt: amt, note: note, when: new Date(), ref: "FLX-" + Date.now().toString(36).toUpperCase().slice(-8) };
+    msg.textContent = `⚡ Sent ${eur(amt)} to ${who}.`;
     
     document.getElementById("pAmt").value=""; document.getElementById("pNote").value="";
     await refreshAuthUI(); 
