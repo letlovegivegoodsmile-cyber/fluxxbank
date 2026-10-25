@@ -5,11 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>FluxxBank Admin Console</title>
   <style>
     :root {
       --bg: #080e1c; --panel: #101a2e; --panel2: #15223b; --border: #263653;
-      --text: #edf3ff; --muted: #98a8c2; --orange: #f58220; --green: #32c997; --red: #ff7070; --gold: #f5c451;
+      --text: #edf3ff; --muted: #98a8c2; --orange: #f58220; --green: #32c997; --red: #ff7070;
     }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font-family: Arial, Helvetica, sans-serif; }
@@ -30,6 +32,9 @@
     .small { padding: 7px 10px; font-size: 12px; }
     .error { color: var(--red); font-size: 13px; line-height: 1.5; margin-top: 12px; overflow-wrap: anywhere; }
     .success { color: var(--green); }
+    .login-links { display: flex; justify-content: flex-end; margin-top: 12px; }
+    .text-btn { padding: 4px 0; border: 0; background: transparent; color: #ffb16f; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+    .text-btn:hover { color: #ffd0a5; }
     #app { min-height: 100vh; }
     .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
     .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
@@ -66,7 +71,7 @@
       .layout { grid-template-columns: 1fr; }
       .sidebar { padding: 15px; border-right: 0; border-bottom: 1px solid var(--border); }
       .sidebar .brand { padding: 4px 5px 14px; }
-      .side-label { display: none; }
+      .side-label, .sidebar-note { display: none; }
       .side-nav { display: flex; gap: 7px; overflow-x: auto; }
       .side-btn { width: auto; min-width: max-content; margin: 0; }
       .content { padding: 18px 14px; }
@@ -79,7 +84,7 @@
   </style>
 </head>
 <body>
-  <section id="loginScreen" class="hidden">
+  <section id="loginScreen">
     <div class="login-box">
       <div class="brand">FluxxBank</div>
       <p class="subtitle" id="loginSubtitle">Administrator access. Sign in using your authorized Supabase account.</p>
@@ -90,6 +95,19 @@
         <input type="password" id="aPass" autocomplete="current-password" placeholder="Enter your password" required>
         <div id="loginErr" class="error" role="alert"></div>
         <button class="btn full" id="loginBtn" type="submit">Sign in</button>
+      </form>
+      <div class="login-links" id="forgotWrap">
+        <button class="text-btn" id="forgotPasswordBtn" type="button">Forgot password?</button>
+      </div>
+      <div id="loginMessage" class="error" role="status" aria-live="polite"></div>
+      <form id="newPasswordForm" class="hidden">
+        <label for="newPassword">New password</label>
+        <input type="password" id="newPassword" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
+        <label for="confirmNewPassword">Confirm new password</label>
+        <input type="password" id="confirmNewPassword" autocomplete="new-password" minlength="8" required placeholder="Enter the new password again">
+        <div id="passwordResetErr" class="error" role="alert"></div>
+        <button class="btn full" id="saveNewPasswordBtn" type="submit">Save new password</button>
+        <button class="btn secondary full" id="backToLoginBtn" type="button">Back to sign in</button>
       </form>
     </div>
   </section>
@@ -103,7 +121,7 @@
           <button class="side-btn on" data-view="dash" type="button">Overview</button>
           <button class="side-btn" data-view="cust" type="button">Customers</button>
           <button class="side-btn" data-view="appr" type="button">Approvals</button>
-          <button class="side-btn" data-view="tx" type="button">Pending Transfers</button>
+          <button class="side-btn" data-view="transfers" type="button">Pending Transfers</button>
         </nav>
       </aside>
 
@@ -114,37 +132,55 @@
         </header>
 
         <div class="content">
+          <!-- OVERVIEW -->
           <section id="view-dash" class="view on">
             <h2 class="section-title">Overview</h2>
+            <p class="section-desc">Customer profile and application status from your database.</p>
             <div class="stats">
               <div class="stat"><div class="stat-label">Customer profiles</div><div class="stat-value" id="kCustomers">—</div></div>
               <div class="stat"><div class="stat-label">Pending applications</div><div class="stat-value" id="kAppr">—</div></div>
             </div>
+            <div class="panel">
+              <h2>Recent customer profiles</h2>
+              <div class="table-wrap"><table>
+                <thead><tr><th>Customer</th><th>Status</th><th>Role</th></tr></thead>
+                <tbody id="recentBody"><tr><td colspan="3">Loading records…</td></tr></tbody>
+              </table></div>
+            </div>
           </section>
 
+          <!-- CUSTOMERS -->
           <section id="view-cust" class="view">
             <h2 class="section-title">Customers</h2>
             <p class="section-desc">View customer profiles, balances, and manage their accounts.</p>
             <div class="panel"><div class="table-wrap"><table>
               <thead><tr><th>Customer</th><th>Status</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead>
-              <tbody id="custBody"></tbody>
+              <tbody id="custBody"><tr><td colspan="5">Loading records…</td></tr></tbody>
             </table></div></div>
           </section>
 
+          <!-- APPROVALS -->
           <section id="view-appr" class="view">
             <h2 class="section-title">Approvals</h2>
-            <p class="section-desc">Review pending customer profiles.</p>
-            <div class="panel"><h2>Pending applications</h2><div id="apprList"></div></div>
+            <p class="section-desc">Review pending customers. Generate a 2FA code for them to log in.</p>
+            <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading applications…</div></div></div>
           </section>
 
-          <section id="view-tx" class="view">
+          <!-- PENDING TRANSFERS -->
+          <section id="view-transfers" class="view">
             <h2 class="section-title">Pending Transfers</h2>
             <p class="section-desc">Customers have requested transfers. Generate an OTP for them to complete the transaction.</p>
-            <div class="panel"><div class="table-wrap"><table>
-              <thead><tr><th>Customer</th><th>Description</th><th>Amount</th><th>OTP</th><th>Action</th></tr></thead>
-              <tbody id="txBody"></tbody>
-            </table></div></div>
+            <div class="panel">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Customer</th><th>Description</th><th>Amount</th><th>OTP</th><th>Action</th></tr></thead>
+                  <tbody id="pendingTransfersBody"><tr><td colspan="5">Loading transfers…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
           </section>
+          
+          <div id="pageErr" class="error" role="alert"></div>
         </div>
       </main>
     </div>
@@ -156,6 +192,7 @@
     "use strict";
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+    const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
 
     let sb = null;
     let customers = [];
@@ -171,6 +208,9 @@
       else { $("loginScreen").classList.remove("hidden"); }
 
       $("loginForm").addEventListener("submit", tryLogin);
+      $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);
+      $("newPasswordForm").addEventListener("submit", saveNewPassword);
+      $("backToLoginBtn").addEventListener("click", () => showSignInForm());
       $("logoutBtn").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
 
       document.querySelectorAll(".side-btn").forEach(btn => {
@@ -180,28 +220,59 @@
           document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
           $("view-" + btn.dataset.view).classList.add("on");
           $("pageTitle").textContent = btn.textContent;
-          if(btn.dataset.view === 'tx') loadTransfers(); 
+
+          // If switching to transfers tab, reload the table
+          if(btn.dataset.view === "transfers") loadPendingTransfers();
         });
+      });
+
+      document.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("approve-btn")) {
+          const index = e.target.getAttribute("data-index");
+          const customer = customers[index];
+          
+          e.target.disabled = true;
+          e.target.textContent = "Approving...";
+          
+          const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
+          if (error) {
+            toast("Error: " + error.message);
+            e.target.disabled = false;
+            e.target.textContent = "Approve";
+          } else {
+            toast("Customer approved successfully!");
+            await loadAll();
+            renderOverview(); renderCustomers(); renderApprovals();
+          }
+        }
       });
     });
 
     function showLoginError(msg) { $("loginErr").textContent = msg || ""; }
-    
+    function showPageError(msg) { $("pageErr").textContent = msg || ""; }
+    function showLoginMessage(msg, success = false) {
+      const el = $("loginMessage"); el.textContent = msg || "";
+      el.classList.toggle("success", Boolean(success)); el.classList.toggle("error", !success);
+    }
     function toast(msg) {
       const el = $("toast"); el.textContent = msg; el.classList.remove("hidden");
       if (toastTimer) clearTimeout(toastTimer);
       toastTimer = setTimeout(() => el.classList.add("hidden"), 3500);
     }
-
     function escapeHtml(v) {
       return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
     }
-
     function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
     function statusBadge(status) {
       const v = String(status ?? "Unknown"); const l = v.toLowerCase();
       const css = l === "active" ? "active" : l.includes("pending") ? "pending" : "";
       return `<span class="status ${css}">${escapeHtml(v)}</span>`;
+    }
+
+    function showSignInForm(msg = "", success = false) {
+      $("loginForm").classList.remove("hidden"); $("forgotWrap").classList.remove("hidden");
+      $("newPasswordForm").classList.add("hidden"); showLoginError("");
+      showLoginMessage(msg, success);
     }
 
     async function tryLogin(e) {
@@ -219,10 +290,11 @@
 
     async function boot(user) {
       $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
+      showLoginError(""); showPageError("");
       try {
         if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }
         if (!user) throw new Error("Please sign in.");
-        const { data: profile } = await sb.from("profiles").select("id, name, role, status").eq("id", user.id).single();
+        const { data: profile } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
         if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
           await sb.auth.signOut(); throw new Error("Not an active admin.");
         }
@@ -237,14 +309,42 @@
     }
 
     async function loadAll() {
-      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance").order("created_at", { ascending: false });
+      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, created_at").order("created_at", { ascending: false });
       if (error) throw error;
       customers = data || [];
+    }
+
+    async function requestPasswordReset() {
+      const email = $("aEmail").value.trim();
+      if (!email) return showLoginMessage("Enter your email first.");
+      const btn = $("forgotPasswordBtn"); btn.disabled = true;
+      try {
+        await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });
+        showLoginMessage("Reset link sent. Check your inbox.", true);
+      } catch (e) { showLoginMessage(e.message); } 
+      finally { btn.disabled = false; }
+    }
+    
+    async function saveNewPassword(e) {
+      e.preventDefault();
+      const pw = $("newPassword").value, cpw = $("confirmNewPassword").value;
+      if (pw.length < 8) return $("passwordResetErr").textContent = "Use 8+ characters.";
+      if (pw !== cpw) return $("passwordResetErr").textContent = "Passwords don't match.";
+      try {
+        await sb.auth.updateUser({ password: pw });
+        await sb.auth.signOut(); showSignInForm("Password updated.", true);
+      } catch (error) { $("passwordResetErr").textContent = error.message; }
     }
 
     function renderOverview() {
       $("kCustomers").textContent = customers.length;
       $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
+      $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
+        <tr>
+          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
+          <td>${statusBadge(c.status)}</td>
+          <td>${escapeHtml(c.role)}</td>
+        </tr>`).join("") || '<tr><td colspan="3">No profiles.</td></tr>';
     }
 
     function renderCustomers() {
@@ -261,89 +361,97 @@
         </tr>`).join("") || '<tr><td colspan="5">No profiles.</td></tr>';
     }
 
+    function renderApprovals() {
+      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
+      $("apprList").innerHTML = pending.map(({ customer, index }) => {
+        const has2FA = customer.role && customer.role.startsWith("2FA-");
+        const codeDisplay = has2FA ? `<div style="color:var(--orange); font-size:12px; margin-top:5px;">Login 2FA Code: <b>${customer.role.replace("2FA-", "")}</b></div>` : '';
+
+        return `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--border)">
+          <div style="min-width:0">
+            <strong>${escapeHtml(customer.name || "Unnamed")}</strong>
+            <div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email || "")}</div>
+            ${codeDisplay}
+          </div>
+          <div style="display:flex; gap:5px;">
+            <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
+            <button class="btn small" style="background:var(--panel2); color:white; border:1px solid var(--border);" onclick="generate2FA('${customer.id}', '${customer.name}')">Generate 2FA</button>
+          </div>
+        </div>`;
+      }).join("") || '<div class="empty">No pending applications.</div>';
+    }
+
+    async function generate2FA(userId, userName) {
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const { error } = await sb.from("profiles").update({ role: `2FA-${code}` }).eq("id", userId);
+      
+      if (error) {
+        toast("Error generating code: " + error.message);
+      } else {
+        toast(`🔑 2FA Code for ${userName} is: ${code}`);
+        await loadAll();
+        renderApprovals();
+      }
+    }
+
     async function depositMoney(userId, userName) {
-      const amountStr = prompt(`Deposit amount for ${userName}?`);
+      const amountStr = prompt(`How much to deposit for ${userName}? (e.g. 500)`);
       if (!amountStr) return;
       const amount = parseFloat(amountStr);
       if (isNaN(amount) || amount <= 0) return alert("Invalid amount");
 
       const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
       const newBalance = Number(profile.balance || 0) + amount;
-      
-      const refCode = "DEP-" + Date.now().toString(36).toUpperCase().slice(-8);
 
       const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
       if (err1) return toast("Error: " + err1.message);
 
-      await sb.from("transactions").insert({ 
-        user_id: userId, 
-        type: 'deposit', 
-        amount: amount, 
-        description: 'Admin manual deposit', 
-        status: 'completed',
-        reference: refCode 
-      });
+      await sb.from("transactions").insert({ user_id: userId, type: 'deposit', amount: amount, description: 'Admin manual deposit', status: 'completed' });
       
       toast(`✅ Deposited $${amount} to ${userName}`);
       await loadAll(); renderCustomers();
     }
 
-    function renderApprovals() {
-      const pending = customers.filter(c => isPending(c.status));
-      $("apprList").innerHTML = pending.map((customer) => {
-        const has2FA = customer.role && customer.role.startsWith("2FA-");
-        const codeDisplay = has2FA ? `<div style="color:var(--orange); font-size:12px;">Login OTP: <b>${customer.role.replace("2FA-", "")}</b></div>` : '';
-        return `
-        <div style="display:flex;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--border)">
-          <div><strong>${escapeHtml(customer.name)}</strong><div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email)}</div>${codeDisplay}</div>
-          <div style="display:flex; gap:5px;">
-            <button class="btn small" style="background:var(--green)" onclick="approveUser('${customer.id}')">Approve Directly</button>
-            <button class="btn small secondary" onclick="generateLogin2FA('${customer.id}')">Gen Login OTP</button>
-          </div>
-        </div>`;
-      }).join("") || '<div class="empty">No pending applications.</div>';
-    }
+    // --- PENDING TRANSFERS LOGIC ---
+    async function loadPendingTransfers() {
+      const tbody = $("pendingTransfersBody");
+      tbody.innerHTML = '<tr><td colspan="5">Loading transfers…</td></tr>';
 
-    async function approveUser(userId) {
-       await sb.from("profiles").update({ status: "active" }).eq("id", userId);
-       toast("User approved!"); await loadAll(); renderCustomers(); renderApprovals();
-    }
-
-    async function generateLogin2FA(userId) {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      await sb.from("profiles").update({ role: `2FA-${code}` }).eq("id", userId);
-      toast(`Login OTP: ${code}`);
-      await loadAll(); renderApprovals();
-    }
-
-    async function loadTransfers() {
-      const { data, error } = await sb.from("transactions")
+      const { data, error } = await sb
+        .from("transactions")
         .select("*, profiles(name, email)")
         .eq("status", "pending")
         .order("created_at", { ascending: false });
-      
-      if (error) return toast("Error loading transfers");
-      
-      $("txBody").innerHTML = data.map(tx => `
+
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--red)">Error: ${error.message}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(tx => `
         <tr>
-          <td>${escapeHtml(tx.profiles.name)}<small>${escapeHtml(tx.profiles.email)}</small></td>
+          <td>${tx.profiles ? tx.profiles.name : "Unknown"}<br><small>${tx.profiles?.email || ""}</small></td>
           <td>${escapeHtml(tx.description)}</td>
-          <td style="color:var(--gold); font-weight:bold;">$${tx.amount.toFixed(2)}</td>
-          <td>${tx.otp_code ? `<span style="color:var(--green); font-weight:bold; font-size:16px;">${tx.otp_code}</span>` : '—'}</td>
+          <td>$${Number(tx.amount).toFixed(2)}</td>
+          <td>${tx.otp_code ? `<b style="color:var(--orange); font-size: 16px;">${tx.otp_code}</b>` : '<span style="color:var(--muted)">Not generated</span>'}</td>
           <td>
-            <button class="btn small" style="background:var(--accent); color:white;" onclick="generateTxOTP('${tx.id}')">Generate OTP</button>
+            ${!tx.otp_code ? `<button class="btn small" style="background:var(--orange); color:#000;" onclick="generateTransferOTP('${tx.id}')">Generate OTP</button>` : '<span style="color:var(--green); font-size:12px;">Waiting for customer...</span>'}
           </td>
         </tr>
       `).join("") || '<tr><td colspan="5">No pending transfers.</td></tr>';
     }
 
-    async function generateTxOTP(txId) {
+    async function generateTransferOTP(txId) {
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const { error } = await sb.from("transactions").update({ otp_code: code }).eq("id", txId);
-      if (error) return toast("Error: " + error.message);
       
-      toast(`Transfer OTP Generated: ${code}`);
-      loadTransfers();
+      if (error) {
+        toast("Error generating OTP: " + error.message);
+      } else {
+        toast(`✅ Transaction OTP: ${code}`);
+        await loadPendingTransfers();
+      }
     }
   </script>
 </body>
