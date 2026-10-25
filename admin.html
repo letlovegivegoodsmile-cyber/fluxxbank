@@ -423,33 +423,58 @@
       await loadAll(); renderCustomers();
     }
 
-    // --- PENDING TRANSFERS LOGIC ---
+    // --- PENDING TRANSFERS LOGIC (TWO-QUERY FALLBACK) ---
     async function loadPendingTransfers() {
       const tbody = $("pendingTransfersBody");
       tbody.innerHTML = '<tr><td colspan="5">Loading transfers…</td></tr>';
 
-      const { data, error } = await sb
+      // 1. Fetch pending transactions
+      const { data: txData, error: txError } = await sb
         .from("transactions")
-        .select("*, profiles(name, email)")
+        .select("*")
         .eq("status", "pending")
         .order("created_at", { ascending: false });
 
-      if (error) {
-        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--red)">Error: ${error.message}</td></tr>`;
+      if (txError) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--red)">Error: ${txError.message}</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = data.map(tx => `
-        <tr>
-          <td>${tx.profiles ? tx.profiles.name : "Unknown"}<br><small>${tx.profiles?.email || ""}</small></td>
-          <td>${escapeHtml(tx.description)}</td>
-          <td>$${Number(tx.amount).toFixed(2)}</td>
-          <td>${tx.otp_code ? `<b style="color:var(--orange); font-size: 16px;">${tx.otp_code}</b>` : '<span style="color:var(--muted)">Not generated</span>'}</td>
-          <td>
-            ${!tx.otp_code ? `<button class="btn small" style="background:var(--orange); color:#000;" onclick="generateTransferOTP('${tx.id}')">Generate OTP</button>` : '<span style="color:var(--green); font-size:12px;">Waiting for customer...</span>'}
-          </td>
-        </tr>
-      `).join("") || '<tr><td colspan="5">No pending transfers.</td></tr>';
+      if (!txData || txData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">No pending transfers.</td></tr>';
+        return;
+      }
+
+      // 2. Get all unique user IDs from the transactions
+      const userIds = [...new Set(txData.map(tx => tx.user_id))];
+
+      // 3. Fetch the corresponding profiles
+      const { data: profilesData, error: profileError } = await sb
+        .from("profiles")
+        .select("id, name, email")
+        .in("id", userIds);
+
+      // 4. Create a lookup map for quick access
+      const profileMap = {};
+      if (!profileError && profilesData) {
+        profilesData.forEach(p => profileMap[p.id] = p);
+      }
+
+      // 5. Render the table
+      tbody.innerHTML = txData.map(tx => {
+        const profile = profileMap[tx.user_id] || {};
+        return `
+          <tr>
+            <td>${profile.name || "Unknown"}<br><small>${profile.email || ""}</small></td>
+            <td>${escapeHtml(tx.description)}</td>
+            <td>$${Number(tx.amount).toFixed(2)}</td>
+            <td>${tx.otp_code ? `<b style="color:var(--orange); font-size: 16px;">${tx.otp_code}</b>` : '<span style="color:var(--muted)">Not generated</span>'}</td>
+            <td>
+              ${!tx.otp_code ? `<button class="btn small" style="background:var(--orange); color:#000;" onclick="generateTransferOTP('${tx.id}')">Generate OTP</button>` : '<span style="color:var(--green); font-size:12px;">Waiting for customer...</span>'}
+            </td>
+          </tr>
+        `;
+      }).join("");
     }
 
     async function generateTransferOTP(txId) {
