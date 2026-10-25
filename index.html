@@ -451,13 +451,17 @@
         return false;
       }
 
-      // CREATE PENDING TRANSACTION (Do NOT deduct balance yet)
+      // --- GENERATE UNIQUE REFERENCE CODE ---
+      const referenceCode = "FLX-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 100);
+
+      // CREATE PENDING TRANSACTION (Now includes the reference)
       const { data: txData, error: txError } = await sb.from("transactions").insert({ 
         user_id: session.user.id, 
         type: 'transfer', 
         amount: amt, 
         description: `Sent to ${who} (${note})`,
-        status: 'pending'
+        status: 'pending',
+        reference: referenceCode // <--- FIX: Added reference code here
       }).select().single();
 
       if(txError) throw new Error(txError.message);
