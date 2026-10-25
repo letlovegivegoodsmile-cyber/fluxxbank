@@ -52,7 +52,23 @@
   h1 .grad{background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
   .hero p.lead{margin:22px 0 30px;color:var(--mut);font-size:1.1rem;max-width:520px;line-height:1.7}
   .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
-  
+
+  /* PHONE MOCKUP CSS */
+  .phone-wrap{display:flex;justify-content:center}
+  .phone{width:300px;border-radius:36px;border:1px solid var(--line);background:linear-gradient(160deg,var(--ink2),#0d1330);
+      padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 6px #05070f}
+  .ph-top{display:flex;justify-content:space-between;color:var(--mut);font-size:.75rem;margin-bottom:18px}
+  .ph-bal{background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:20px;padding:20px;margin-bottom:16px}
+  .ph-bal small{opacity:.85;font-size:.75rem}
+  .ph-bal b{font-size:1.5rem;display:block;margin-top:6px}
+  .ph-bal .chip{width:34px;height:24px;border-radius:6px;background:linear-gradient(135deg,#ffe9a8,#f5c451);margin-top:12px}
+  .ph-row{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
+      border-radius:14px;padding:12px 14px;margin-bottom:10px;font-size:.85rem}
+  .ph-row span:last-child{font-weight:700}
+  .up{color:var(--ok)} .dn{color:var(--bad)}
+  .ph-actions{display:flex;gap:10px;margin-top:14px}
+  .ph-actions div{flex:1;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 0;font-size:.8rem;color:var(--mut)}
+
   /* MODALS */
   .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200}
   .modal-bg.show{display:grid}
@@ -115,6 +131,12 @@
   .tx-amount.neg { color: var(--txt); }
 
   @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding-top: 120px; text-align: center; }
+    .hero-cta { justify-content: center; }
+    .hero p.lead { margin: 22px auto 30px; }
+    .phone-wrap { display: none; } /* Hides phone on mobile to save space */
+  }
   @media (max-width: 768px) {
     #appDashboard { flex-direction: column; }
     .sidebar { display: none; }
@@ -151,6 +173,24 @@
       <div class="hero-cta">
         <button class="btn gold" onclick="openModal()">Open your account →</button>
         <button class="btn ghost" onclick="openModal()">Log in to Dashboard</button>
+      </div>
+    </div>
+    
+    <!-- PHONE MOCKUP (Restored) -->
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="ph-top"><span>9:41</span><span>⚡ FluxxPay</span></div>
+        <div class="ph-bal">
+          <small>Total balance</small>
+          <b>€24,806.12</b>
+          <div class="chip"></div>
+        </div>
+        <div class="ph-row"><span>Nordwind Salary</span><span class="up">+€3,850</span></div>
+        <div class="ph-row"><span>Blue Bottle Coffee</span><span class="dn">−€4.80</span></div>
+        <div class="ph-row"><span>Metro Transit</span><span class="dn">−€2.40</span></div>
+        <div class="ph-actions">
+          <div>⇄ Send</div><div>＋ Top up</div><div>◔ Stats</div>
+        </div>
       </div>
     </div>
   </header>
@@ -463,7 +503,7 @@
         description: `Sent to ${who} (${note})`,
         status: 'pending',
         reference: referenceCode,
-        balance_after: expectedBalance // <--- FIX: Added the required column
+        balance_after: expectedBalance
       }).select().single();
 
       if(txError) throw new Error(txError.message);
