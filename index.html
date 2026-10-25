@@ -35,7 +35,7 @@
   .hidden{display:none !important}
 
   /* =========================================
-     WELCOME SCREEN (8 SECONDS)
+     WELCOME SCREEN
      ========================================= */
   #welcomeScreen {
     position: fixed; inset: 0; background: var(--ink); z-index: 9999;
@@ -92,7 +92,6 @@
   .stat b{font-size:1.6rem;display:block}
   .stat span{color:var(--mut);font-size:.85rem}
 
-  /* PHONE MOCKUP */
   .phone-wrap{display:flex;justify-content:center}
   .phone{width:300px;border-radius:36px;border:1px solid var(--line);background:linear-gradient(160deg,var(--ink2),#0d1330);
       padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 6px #05070f}
@@ -108,7 +107,6 @@
   .ph-actions{display:flex;gap:10px;margin-top:14px}
   .ph-actions div{flex:1;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 0;font-size:.8rem;color:var(--mut)}
 
-  /* SECTIONS */
   section{padding:90px 5%}
   .sec-head{text-align:center;max-width:640px;margin:0 auto 56px}
   .sec-head h2{font-size:2.2rem;margin-bottom:14px}
@@ -239,7 +237,9 @@
   .rev-count{position:absolute;z-index:3;top:24px;right:28px;font-size:.85rem;color:rgba(255,255,255,.75);
       background:rgba(11,16,32,.5);border:1px solid var(--line);border-radius:999px;padding:6px 14px;backdrop-filter:blur(6px)}
 
-  /* DASHBOARD APP */
+  /* =========================================
+     DASHBOARD APP STYLES
+     ========================================= */
   #appDashboard { min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
   .sidebar { width: 260px; background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10; }
   .sidebar .logo { margin-bottom: 40px; padding-left: 10px; }
@@ -249,7 +249,11 @@
   .side-menu a:hover, .side-menu a.active { background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
   .side-menu a.active { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
   .user-profile { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); margin-top: auto; }
-  .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent3)); display: grid; place-items: center; font-weight: bold; }
+  
+  .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent3)); display: grid; place-items: center; font-weight: bold; cursor: pointer; overflow: hidden; position: relative; border: 2px solid transparent; transition: 0.2s;}
+  .user-avatar:hover { border-color: var(--accent2); }
+  .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
   .user-info { flex: 1; overflow: hidden; }
   .user-info h4 { font-size: 0.9rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .user-info p { font-size: 0.75rem; color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -300,7 +304,44 @@
   .modal .btn{width:100%;justify-content:center}
   .modal .error{color:var(--bad); font-size:.85rem; margin-bottom:10px; min-height:18px; text-align: center;}
 
-  /* RESPONSIVE */
+  /* PROCESSING MODAL */
+  #processingModal { background: rgba(11, 16, 32, 0.95); z-index: 500; text-align: center;}
+  .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent2); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* RECEIPT STYLES */
+  #receiptModal { background: rgba(5, 7, 15, 0.85); z-index: 600; padding: 20px; }
+  .receipt-paper {
+    background: #fff; color: #141824; width: min(430px, 92vw); border-radius: 16px; padding: 34px 32px 26px;
+    font-family: 'Courier New', Courier, monospace; box-shadow: 0 30px 80px rgba(0,0,0,.6); position: relative;
+  }
+  .receipt-logo { font-family: "Segoe UI", sans-serif; font-weight: 800; font-size: 1.35rem; color: #1a2b6d; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;}
+  .receipt-logo .bolt { width: 26px; height: 26px; border-radius: 7px; display: inline-grid; place-items: center; background: #4f7cff; color: #fff; font-size: .9rem;}
+  .r-sub { color: #8a90a3; font-size: .78rem; letter-spacing: 2px; text-transform: uppercase; text-align: center; margin-bottom: 20px;}
+  .r-rule { border: none; border-top: 2px dashed #d8dbe6; margin: 18px 0; }
+  .r-table { width: 100%; border-collapse: collapse; font-size: 0.9rem;}
+  .r-table td { padding: 7px 0; vertical-align: top; }
+  .r-table td:first-child { color: #8a90a3; width: 45%; }
+  .r-table td:last-child { font-weight: 600; text-align: right; }
+  .r-total { text-align: center; margin: 18px 0 6px; }
+  .r-total small { display: block; color: #8a90a3; letter-spacing: 2px; font-size: .7rem; }
+  .r-total b { font-size: 1.7rem; color: #141824; font-family: "Segoe UI", sans-serif;}
+  .r-bar { height: 42px; margin: 16px 0 10px; background: repeating-linear-gradient(90deg,#141824 0 2px,transparent 2px 5px,#141824 5px 6px,transparent 6px 11px); }
+  .r-foot { text-align: center; color: #8a90a3; font-size: .72rem; line-height: 1.6; }
+  .r-actions { display: flex; gap: 10px; justify-content: center; margin-top: 25px; }
+  .r-actions button { padding: 12px 20px; border-radius: 10px; font-weight: 700; font-family: "Segoe UI", sans-serif;}
+  .r-print { background: #4f7cff; color: #fff; }
+  .r-close { background: #eef0f6; color: #141824; }
+
+  /* PRINT CSS (Hides everything except the receipt) */
+  @media print {
+    body * { visibility: hidden; }
+    #receiptModal, #receiptModal * { visibility: visible; }
+    #receiptModal { position: absolute; left: 0; top: 0; background: transparent; padding: 0; display: block; }
+    .receipt-paper { box-shadow: none; margin: 0 auto; border-radius: 0; width: 100%; max-width: 100%; }
+    .r-actions { display: none; }
+  }
+
   @media(max-width:900px){
     .hero{grid-template-columns:1fr;padding-top:120px;text-align:center}
     .hero-cta{justify-content:center}
@@ -329,13 +370,14 @@
 </head>
 <body>
 
-<!-- WELCOME SCREEN (8 SECONDS) -->
+<!-- WELCOME SCREEN -->
 <div id="welcomeScreen" class="hidden">
   <div class="welcome-text" id="welcomeText">Welcome</div>
-  <div class="progress-bar-container">
-    <div class="progress-bar"></div>
-  </div>
+  <div class="progress-bar-container"><div class="progress-bar"></div></div>
 </div>
+
+<!-- HIDDEN FILE INPUT FOR AVATAR -->
+<input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
 
 <!-- LANDING PAGE -->
 <div id="landingPage">
@@ -372,7 +414,6 @@
       </div>
     </div>
     
-    <!-- STATIC ATM / PHONE MOCKUP -->
     <div class="phone-wrap">
       <div class="phone">
         <div class="ph-top"><span>9:41</span><span>⚡ FluxxPay</span></div>
@@ -401,50 +442,20 @@
     </div>
   </section>
 
-  <!-- LIVE RATES -->
   <section style="padding-top:0"><div class="ticker" id="ticker"></div></section>
-
-  <!-- TRUST STRIP -->
-  <div class="trust">
-    <p>Powered by trusted networks worldwide</p>
-    <div class="trust-row"><span>VISA</span><span>Mastercard</span><span>Apple Pay</span><span>Google Pay</span><span>SEPA</span><span>SWIFT</span></div>
-  </div>
+  <div class="trust"><p>Powered by trusted networks worldwide</p><div class="trust-row"><span>VISA</span><span>Mastercard</span><span>Apple Pay</span><span>Google Pay</span><span>SEPA</span><span>SWIFT</span></div></div>
 
   <!-- ACCOUNTS -->
   <section id="accounts">
     <div class="sec-head"><h2>Pick your Fluxx</h2><p>Transparent pricing. No maintenance fees, no minimum balance, no asterisks.</p></div>
     <div class="acc-grid">
-      <div class="acc">
-        <h3>Fluxx Basic</h3><p style="color:var(--mut);font-size:.9rem">Everyday banking, done right.</p>
-        <div class="price">€0<small>/month</small></div>
-        <ul><li>Free EUR account & IBAN</li><li>1 virtual card</li><li>FluxxPay transfers</li><li>Standard support</li></ul>
-        <a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Basic</a>
-      </div>
-      <div class="acc pop">
-        <span class="tag">MOST POPULAR</span>
-        <h3>Fluxx Plus</h3><p style="color:var(--mut);font-size:.9rem">For people whose money moves.</p>
-        <div class="price">€4.99<small>/month</small></div>
-        <ul><li>Everything in Basic</li><li>Metal card + 3 virtuals</li><li>1.5% cashback worldwide</li><li>4.1% savings vaults</li><li>Priority 24/7 support</li></ul>
-        <a class="btn gold" href="#open" style="width:100%;justify-content:center">Choose Plus</a>
-      </div>
-      <div class="acc">
-        <h3>Fluxx Metal</h3><p style="color:var(--mut);font-size:.9rem">Premium banking without the premium attitude.</p>
-        <div class="price">€12.99<small>/month</small></div>
-        <ul><li>Everything in Plus</li><li>Obsidian metal card</li><li>3% cashback + lounge access</li><li>Free global transfers</li><li>Dedicated banker</li></ul>
-        <a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Metal</a>
-      </div>
+      <div class="acc"><h3>Fluxx Basic</h3><p style="color:var(--mut);font-size:.9rem">Everyday banking, done right.</p><div class="price">€0<small>/month</small></div><ul><li>Free EUR account & IBAN</li><li>1 virtual card</li><li>FluxxPay transfers</li><li>Standard support</li></ul><a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Basic</a></div>
+      <div class="acc pop"><span class="tag">MOST POPULAR</span><h3>Fluxx Plus</h3><p style="color:var(--mut);font-size:.9rem">For people whose money moves.</p><div class="price">€4.99<small>/month</small></div><ul><li>Everything in Basic</li><li>Metal card + 3 virtuals</li><li>1.5% cashback worldwide</li><li>4.1% savings vaults</li><li>Priority 24/7 support</li></ul><a class="btn gold" href="#open" style="width:100%;justify-content:center">Choose Plus</a></div>
+      <div class="acc"><h3>Fluxx Metal</h3><p style="color:var(--mut);font-size:.9rem">Premium banking without the premium attitude.</p><div class="price">€12.99<small>/month</small></div><ul><li>Everything in Plus</li><li>Obsidian metal card</li><li>3% cashback + lounge access</li><li>Free global transfers</li><li>Dedicated banker</li></ul><a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Metal</a></div>
     </div>
   </section>
 
-  <!-- STATS BAND -->
-  <div class="band">
-    <div class="band-grid">
-      <div><b>€8.2B+</b><span>Deposits protected up to €100,000</span></div>
-      <div><b>99.99%</b><span>Uptime — banking that never sleeps</span></div>
-      <div><b>1,200/s</b><span>Transactions processed per second</span></div>
-      <div><b>5.0 ★</b><span>Average rating from 310k reviews</span></div>
-    </div>
-  </div>
+  <div class="band"><div class="band-grid"><div><b>€8.2B+</b><span>Deposits protected</span></div><div><b>99.99%</b><span>Uptime</span></div><div><b>1,200/s</b><span>Transactions per sec</span></div><div><b>5.0 ★</b><span>310k reviews</span></div></div></div>
 
   <!-- REVIEWS -->
   <section class="reviews" id="reviews">
@@ -468,29 +479,6 @@
     <div class="rev-count" id="revCount">1 / 4</div>
   </section>
 
-  <!-- STEPS -->
-  <section id="open">
-    <div class="sec-head"><h2>Open your account in minutes</h2><p>No paperwork, no branch visits, no waiting. Your card exists before your coffee gets cold.</p></div>
-    <div class="steps">
-      <div class="step"><h3>Verify in seconds</h3><p>Snap a photo of your ID and take a quick selfie. Our AI verifies you in under two minutes.</p></div>
-      <div class="step"><h3>Fund your account</h3><p>Top up instantly from any bank, card, or Apple/Google Pay. Your IBAN is ready immediately.</p></div>
-      <div class="step"><h3>Start Fluxxing</h3><p>Create virtual cards, set up vaults, and send your first FluxxPay transfer — all before lunch.</p></div>
-    </div>
-    <div style="text-align:center;margin-top:50px"><button class="btn gold" style="padding:16px 36px;font-size:1.05rem" onclick="openModal()">Open my Fluxxbank account →</button></div>
-  </section>
-
-  <!-- GALLERY -->
-  <section id="showcase">
-    <div class="sec-head"><h2>Fluxxbank, in pictures</h2><p>Our cards, our buildings, our world — a look at the bank in motion. Auto-plays, or tap a thumbnail to explore.</p></div>
-    <div class="gallery-stage" id="galStage">
-      <div class="gal-count" id="galCount">1 / 10</div>
-      <div class="gal-cap" id="galCap"></div>
-      <button class="gal-nav gal-prev" onclick="goGal(galCur-1)">‹</button>
-      <button class="gal-nav gal-next" onclick="goGal(galCur+1)">›</button>
-    </div>
-    <div class="gal-thumbs" id="galThumbs"></div>
-  </section>
-
   <!-- FAQ -->
   <section id="faq">
     <div class="sec-head"><h2>Questions? Answers.</h2><p>Everything people usually ask before making the switch to Fluxxbank.</p></div>
@@ -501,23 +489,14 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer>
     <div class="foot-grid">
-      <div>
-        <a class="logo" href="#top" style="margin-bottom:14px">
-          <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank
-        </a>
-        <p style="max-width:280px;line-height:1.6">Banking in motion. Licensed European bank — deposits protected up to €100,000.</p>
-      </div>
+      <div><a class="logo" href="#top" style="margin-bottom:14px"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a><p style="max-width:280px;line-height:1.6">Banking in motion. Licensed European bank.</p></div>
       <div><h4>Bank</h4><a href="#">Accounts</a><a href="#">Cards</a><a href="#">Savings</a></div>
       <div><h4>Company</h4><a href="#">About</a><a href="#">Careers</a><a href="#">Press</a></div>
       <div><h4>Support</h4><a href="#">Help center</a><a href="#">Contact</a><a href="#">Security</a></div>
     </div>
-    <div class="foot-bottom">
-      <span>© 2026 Fluxxbank AG. All rights reserved.</span>
-      <span>Privacy · Terms · Imprint</span>
-    </div>
+    <div class="foot-bottom"><span>© 2026 Fluxxbank AG. All rights reserved.</span><span>Privacy · Terms · Imprint</span></div>
   </footer>
 </div>
 
@@ -525,7 +504,8 @@
 <div id="appDashboard" class="hidden">
   <div class="mobile-nav">
     <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a>
-    <div class="user-avatar" id="mobileAvatar">U</div>
+    <!-- CLICKABLE AVATAR FOR MOBILE -->
+    <div class="user-avatar" id="mobileAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
   </div>
 
   <aside class="sidebar">
@@ -537,7 +517,8 @@
       <li><a href="#"><span>⚙️</span> Settings</a></li>
     </ul>
     <div class="user-profile">
-      <div class="user-avatar" id="desktopAvatar">U</div>
+      <!-- CLICKABLE AVATAR FOR DESKTOP -->
+      <div class="user-avatar" id="desktopAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
       <div class="user-info">
         <h4 id="userNameDisplay">Loading...</h4>
         <p>Customer</p>
@@ -635,20 +616,51 @@
   </div>
 </div>
 
-<!-- TRANSFER OTP MODAL (TEXT UPDATED, NO STATIC CODE SHOWN) -->
+<!-- TRANSFER OTP MODAL -->
 <div class="modal-bg" id="otpModal" onclick="if(event.target===this)closeOtpModal()">
   <div class="modal">
     <h3 style="text-align: center;">🔒 Transfer Authorization</h3>
-    
     <p style="text-align: center;">Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">€0.00</strong> to <strong id="transferToDisplay" style="color: var(--txt);">Recipient</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.</p>
-    
     <input type="text" id="transferOtpInput" placeholder="------" maxlength="6" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;">
     <input type="hidden" id="currentTxId">
-    
     <div class="error" id="otpErr" style="margin-top: -5px;"></div>
-    
     <button class="btn" onclick="verifyTransferOTP()" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent));">Verify & Complete</button>
     <button class="btn ghost" onclick="closeOtpModal()" style="margin-top: 10px; width: 100%; justify-content: center;">Cancel</button>
+  </div>
+</div>
+
+<!-- PROCESSING MODAL (7 SECOND DELAY) -->
+<div class="modal-bg" id="processingModal">
+  <div class="modal" style="background: transparent; border: none; box-shadow: none;">
+    <div class="spinner"></div>
+    <h3 style="text-align: center; font-size: 1.5rem;">Processing Transfer...</h3>
+    <p style="text-align: center; margin-top: 10px;">Securing your funds.<br>Please do not close this window.</p>
+  </div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div class="modal-bg" id="receiptModal">
+  <div class="receipt-paper" id="receiptPaper">
+    <div class="receipt-logo"><span class="bolt">⚡</span> FLUXXBANK</div>
+    <div class="r-sub">Official Transaction Receipt</div>
+    <hr class="r-rule">
+    <table class="r-table">
+      <tr><td>Date</td><td id="rDate">–</td></tr>
+      <tr><td>Time</td><td id="rTime">–</td></tr>
+      <tr><td>Reference</td><td id="rRef">–</td></tr>
+      <tr><td>From</td><td id="rFrom">–</td></tr>
+      <tr><td>To</td><td id="rTo">–</td></tr>
+      <tr><td>Note</td><td id="rNote">–</td></tr>
+      <tr><td>Status</td><td style="color:#059669; font-weight:bold;">✔ Completed</td></tr>
+    </table>
+    <hr class="r-rule">
+    <div class="r-total"><small>Amount Transferred</small><b id="rAmt">–</b></div>
+    <div class="r-bar"></div>
+    <div class="r-foot">Fluxxbank AG · fluxxbank.org.uk<br>Thank you for banking in motion ⚡</div>
+    <div class="r-actions">
+      <button class="r-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+      <button class="r-close" onclick="closeReceipt()">Close</button>
+    </div>
   </div>
 </div>
 
@@ -661,7 +673,7 @@
   let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   
   let authMode = "login";
-  let isFirstLogin = true; // Tracks if we need to show the welcome screen
+  let isFirstLogin = true; 
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
   // --- LANDING PAGE SCRIPTS ---
@@ -704,39 +716,6 @@
   function goRev(i){ clearInterval(revTimer); showRev(i); revTimer = setInterval(()=>showRev(cur+1), 5200); }
   if(slides.length > 0) { showRev(0); revTimer = setInterval(()=>showRev(cur+1), 5200); }
 
-  const gallery = [
-    {src:"show 1.png", cap:"Fluxx Debit · Visa", sub:"Your everyday card — free with every account", card:true},
-    {src:"show 2.png", cap:"Fluxx Credit", sub:"Up to 5,000 \u20AC limit · cashback on everything", card:true},
-    {src:"show 3.png", cap:"Fluxx Obsidian Metal", sub:"Our flagship 18g metal card for Metal members", card:true},
-    {src:"show 4.png", cap:"Fluxxbank HQ by night", sub:"Where the magic happens \u2014 Frankfurt flagship"},
-    {src:"show 5.png", cap:"Our flagship lobby", sub:"Marble, brass and zero queues"},
-  ];
-  let galCur = 0, galTimer;
-  const galStage = document.getElementById("galStage");
-  if(galStage) {
-    gallery.forEach((g,i)=>{
-      const s = document.createElement("div");
-      s.className = "gal-slide" + (i===0 ? " active" : "") + (g.card ? " cardish" : "");
-      s.innerHTML = '<img src="'+g.src+'" alt="'+g.cap+'" loading="lazy">';
-      galStage.insertBefore(s, galStage.firstChild);
-    });
-    const galSlides = galStage.querySelectorAll(".gal-slide");
-    document.getElementById("galThumbs").innerHTML = gallery.map((g,i)=>
-      '<button onclick="goGal('+i+')" class="'+(i===0?"on":"")+'"><img src="'+g.src+'" alt="thumb" loading="lazy"></button>').join("");
-    const galThumbBtns = document.querySelectorAll("#galThumbs button");
-    window.showGal = function(i){
-      galCur = (i + gallery.length) % gallery.length;
-      galSlides.forEach((s,k)=>s.classList.toggle("active", k===galCur));
-      galThumbBtns.forEach((b,k)=>b.classList.toggle("on", k===galCur));
-      const g = gallery[galCur];
-      document.getElementById("galCap").innerHTML = g.cap + "<small>" + g.sub + "</small>";
-      document.getElementById("galCount").textContent = (galCur+1) + " / " + gallery.length;
-    }
-    window.goGal = function(i){ clearInterval(galTimer); showGal(i); galTimer = setInterval(()=>showGal(galCur+1), 4500); }
-    showGal(0);
-    galTimer = setInterval(()=>showGal(galCur+1), 4500);
-  }
-
   function toggleQa(btn){
     const qa = btn.parentElement, wasOpen = qa.classList.contains("open");
     document.querySelectorAll(".qa").forEach(q=>q.classList.remove("open"));
@@ -750,9 +729,13 @@
   // --- MODAL LOGIC ---
   const bg = document.getElementById("modalBg");
   const otpBg = document.getElementById("otpModal");
+  const processingBg = document.getElementById("processingModal");
+  const receiptBg = document.getElementById("receiptModal");
+  
   function openModal(){ bg.classList.add("show"); }
   function closeModal(){ bg.classList.remove("show"); }
   function closeOtpModal(){ otpBg.classList.remove("show"); }
+  function closeReceipt(){ receiptBg.classList.remove("show"); }
 
   function switchAuthMode(e){
     e.preventDefault();
@@ -814,7 +797,7 @@
         }
         
         closeModal();
-        isFirstLogin = true; // Reset to true on fresh login
+        isFirstLogin = true; 
         await checkSession(); 
       }
     }catch(e){
@@ -822,15 +805,43 @@
     }
   }
 
+  // --- AVATAR UPLOAD LOGIC ---
+  async function uploadAvatar(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+
+    const { data: { session } } = await sb.auth.getSession();
+    if(!session) return;
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64String = e.target.result;
+      
+      // Update database
+      const { error } = await sb.from("profiles").update({ avatar_url: base64String }).eq("id", session.user.id);
+      if(error) return alert("Failed to upload photo: " + error.message);
+
+      // Update UI immediately
+      const avatarHtml = `<img src="${base64String}" alt="User">`;
+      document.getElementById("desktopAvatar").innerHTML = avatarHtml;
+      document.getElementById("mobileAvatar").innerHTML = avatarHtml;
+    };
+    reader.readAsDataURL(file);
+  }
+
   // --- DASHBOARD LOADING LOGIC ---
   async function loadDashboardData(session, profile) {
     const firstName = profile.name.split(" ")[0];
     document.getElementById("dashBal").textContent = eur(profile.balance);
     document.getElementById("userNameDisplay").textContent = profile.name;
-    document.getElementById("desktopAvatar").textContent = firstName.charAt(0).toUpperCase();
-    document.getElementById("mobileAvatar").textContent = firstName.charAt(0).toUpperCase();
     document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
 
+    // Set Avatar
+    const avatarHtml = profile.avatar_url ? `<img src="${profile.avatar_url}" alt="User">` : firstName.charAt(0).toUpperCase();
+    document.getElementById("desktopAvatar").innerHTML = avatarHtml;
+    document.getElementById("mobileAvatar").innerHTML = avatarHtml;
+
+    // Load Transactions
     const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false }).limit(10);
     
     const txList = document.getElementById("txlist");
@@ -863,16 +874,14 @@
     if (session && session.user) {
       document.getElementById("landingPage").classList.add("hidden");
 
-      const { data: p } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
-      const firstName = p ? p.name.split(" ")[0] : "User";
-
+      const { data: p } = await sb.from("profiles").select("name, balance, avatar_url").eq("id", session.user.id).single();
+      
       if (isFirstLogin) {
-        // Show the 8-second welcome screen
+        const firstName = p ? p.name.split(" ")[0] : "User";
         document.getElementById("welcomeText").textContent = `Welcome, ${firstName}`;
         document.getElementById("welcomeScreen").classList.remove("hidden");
         document.getElementById("appDashboard").classList.add("hidden");
 
-        // Wait 8 seconds before showing dashboard
         setTimeout(async () => {
           document.getElementById("welcomeScreen").classList.add("hidden");
           document.getElementById("appDashboard").classList.remove("hidden");
@@ -882,7 +891,6 @@
         }, 8000);
 
       } else {
-        // Already logged in, just show dashboard
         document.getElementById("appDashboard").classList.remove("hidden");
         if (p) await loadDashboardData(session, p);
       }
@@ -954,7 +962,7 @@
     return false;
   }
 
-  // --- VERIFY OTP LOGIC ---
+  // --- VERIFY OTP & 7-SECOND DELAY ---
   async function verifyTransferOTP() {
     const txId = document.getElementById("currentTxId").value;
     const enteredOTP = document.getElementById("transferOtpInput").value.trim();
@@ -965,30 +973,50 @@
       return;
     }
 
-    errDisplay.style.color = "var(--txt)";
-    errDisplay.textContent = "Verifying...";
-
-    // STATIC OTP CHECK (241800) - Kept hidden from UI
+    // STATIC OTP CHECK (241800)
     if (enteredOTP !== "241800") {
       errDisplay.style.color = "var(--bad)";
       errDisplay.textContent = "❌ Invalid OTP. Please check your code and try again.";
       return;
     }
 
-    const { data: { session } } = await sb.auth.getSession();
-    const { data: tx, error } = await sb.from("transactions").select("amount").eq("id", txId).single();
-    const { data: profile } = await sb.from("profiles").select("balance").eq("id", session.user.id).single();
-    
-    const newBalance = Number(profile.balance) - Number(tx.amount);
-    
-    await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
-    await sb.from("transactions").update({ status: "completed" }).eq("id", txId);
-
-    errDisplay.textContent = "";
-    document.getElementById("transferOtpInput").value = "";
+    // Close OTP modal, show processing modal
     closeOtpModal();
-    
-    await checkSession(); 
+    processingBg.classList.add("show");
+
+    // Wait 7 seconds
+    setTimeout(async () => {
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        const { data: tx } = await sb.from("transactions").select("*").eq("id", txId).single();
+        const { data: profile } = await sb.from("profiles").select("balance, name").eq("id", session.user.id).single();
+        
+        // Deduct funds & mark complete
+        const newBalance = Number(profile.balance) - Number(tx.amount);
+        await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
+        await sb.from("transactions").update({ status: "completed" }).eq("id", txId);
+
+        // Populate Receipt
+        const now = new Date();
+        document.getElementById("rDate").textContent = now.toLocaleDateString("en-IE", {day:'2-digit', month:'long', year:'numeric'});
+        document.getElementById("rTime").textContent = now.toLocaleTimeString("en-IE", {hour:'2-digit', minute:'2-digit'});
+        document.getElementById("rRef").textContent = tx.reference;
+        document.getElementById("rFrom").textContent = profile.name;
+        document.getElementById("rTo").textContent = tx.description.split('(')[0].replace('Sent to ', '').trim();
+        document.getElementById("rNote").textContent = tx.description.match(/\((.*?)\)/)?.[1] || "None";
+        document.getElementById("rAmt").textContent = eur(tx.amount);
+
+        // Hide processing, show receipt
+        processingBg.classList.remove("show");
+        receiptBg.classList.add("show");
+
+        // Refresh dashboard in background
+        await checkSession();
+      } catch (err) {
+        processingBg.classList.remove("show");
+        alert("Something went wrong completing the transaction.");
+      }
+    }, 7000);
   }
 
   window.addEventListener("DOMContentLoaded", () => {
