@@ -166,15 +166,15 @@
             <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading applications…</div></div></div>
           </section>
 
-          <!-- PENDING TRANSFERS -->
+          <!-- PENDING TRANSFERS (STATIC OTP 241800) -->
           <section id="view-transfers" class="view">
             <h2 class="section-title">Pending Transfers</h2>
-            <p class="section-desc">Customers have requested transfers. Generate an OTP for them to complete the transaction.</p>
+            <p class="section-desc">Customers have requested transfers. They will use the static OTP (241800) to complete it.</p>
             <div class="panel">
               <div class="table-wrap">
                 <table>
-                  <thead><tr><th>Customer</th><th>Description</th><th>Amount</th><th>OTP</th><th>Action</th></tr></thead>
-                  <tbody id="pendingTransfersBody"><tr><td colspan="5">Loading transfers…</td></tr></tbody>
+                  <thead><tr><th>Customer</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
+                  <tbody id="pendingTransfersBody"><tr><td colspan="4">Loading transfers…</td></tr></tbody>
                 </table>
               </div>
             </div>
@@ -221,7 +221,6 @@
           $("view-" + btn.dataset.view).classList.add("on");
           $("pageTitle").textContent = btn.textContent;
 
-          // If switching to transfers tab, reload the table
           if(btn.dataset.view === "transfers") loadPendingTransfers();
         });
       });
@@ -407,7 +406,6 @@
       const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
       if (err1) return toast("Error: " + err1.message);
 
-      // FIXED: Added balance_after and reference to the insert
       const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();
       await sb.from("transactions").insert({ 
         user_id: userId, 
@@ -423,12 +421,11 @@
       await loadAll(); renderCustomers();
     }
 
-    // --- PENDING TRANSFERS LOGIC (TWO-QUERY FALLBACK) ---
+    // --- PENDING TRANSFERS LOGIC (STATIC OTP 241800) ---
     async function loadPendingTransfers() {
       const tbody = $("pendingTransfersBody");
-      tbody.innerHTML = '<tr><td colspan="5">Loading transfers…</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4">Loading transfers…</td></tr>';
 
-      // 1. Fetch pending transactions
       const { data: txData, error: txError } = await sb
         .from("transactions")
         .select("*")
@@ -436,31 +433,23 @@
         .order("created_at", { ascending: false });
 
       if (txError) {
-        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--red)">Error: ${txError.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="color:var(--red)">Error: ${txError.message}</td></tr>`;
         return;
       }
 
       if (!txData || txData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5">No pending transfers.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4">No pending transfers.</td></tr>';
         return;
       }
 
-      // 2. Get all unique user IDs from the transactions
       const userIds = [...new Set(txData.map(tx => tx.user_id))];
+      const { data: profilesData } = await sb.from("profiles").select("id, name, email").in("id", userIds);
 
-      // 3. Fetch the corresponding profiles
-      const { data: profilesData, error: profileError } = await sb
-        .from("profiles")
-        .select("id, name, email")
-        .in("id", userIds);
-
-      // 4. Create a lookup map for quick access
       const profileMap = {};
-      if (!profileError && profilesData) {
+      if (profilesData) {
         profilesData.forEach(p => profileMap[p.id] = p);
       }
 
-      // 5. Render the table
       tbody.innerHTML = txData.map(tx => {
         const profile = profileMap[tx.user_id] || {};
         return `
@@ -468,25 +457,10 @@
             <td>${profile.name || "Unknown"}<br><small>${profile.email || ""}</small></td>
             <td>${escapeHtml(tx.description)}</td>
             <td>$${Number(tx.amount).toFixed(2)}</td>
-            <td>${tx.otp_code ? `<b style="color:var(--orange); font-size: 16px;">${tx.otp_code}</b>` : '<span style="color:var(--muted)">Not generated</span>'}</td>
-            <td>
-              ${!tx.otp_code ? `<button class="btn small" style="background:var(--orange); color:#000;" onclick="generateTransferOTP('${tx.id}')">Generate OTP</button>` : '<span style="color:var(--green); font-size:12px;">Waiting for customer...</span>'}
-            </td>
+            <td><span style="color:var(--orange); font-weight:bold;">Waiting for customer to enter 241800...</span></td>
           </tr>
         `;
       }).join("");
-    }
-
-    async function generateTransferOTP(txId) {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const { error } = await sb.from("transactions").update({ otp_code: code }).eq("id", txId);
-      
-      if (error) {
-        toast("Error generating OTP: " + error.message);
-      } else {
-        toast(`✅ Transaction OTP: ${code}`);
-        await loadPendingTransfers();
-      }
     }
   </script>
 </body>
