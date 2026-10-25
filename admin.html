@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   <title>FluxxBank Admin Console</title>
   <style>
     :root {
@@ -14,7 +12,7 @@
       --text: #edf3ff; --muted: #98a8c2; --orange: #f58220; --green: #32c997; --red: #ff7070;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: Arial, Helvetica, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
     button, input { font: inherit; }
     button { cursor: pointer; }
     .hidden { display: none !important; }
@@ -24,7 +22,7 @@
     .subtitle { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 9px 0 25px; }
     label { display: block; margin: 16px 0 7px; font-size: 13px; color: #c8d5e9; }
     input { width: 100%; padding: 13px; border: 1px solid var(--border); border-radius: 8px; background: #091222; color: white; outline: none; }
-    input:focus { border-color: var(--orange); }
+    input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(245,130,32,.18); }
     .btn { border: 0; border-radius: 8px; padding: 11px 15px; font-weight: 700; background: var(--orange); color: #111827; }
     .btn:disabled { opacity: .6; cursor: wait; }
     .full { width: 100%; margin-top: 20px; }
@@ -34,7 +32,6 @@
     .success { color: var(--green); }
     .login-links { display: flex; justify-content: flex-end; margin-top: 12px; }
     .text-btn { padding: 4px 0; border: 0; background: transparent; color: #ffb16f; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
-    .text-btn:hover { color: #ffd0a5; }
     #app { min-height: 100vh; }
     .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
     .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
@@ -43,7 +40,6 @@
     .side-btn { display: block; width: 100%; margin: 5px 0; padding: 12px; text-align: left; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #b9c7dd; }
     .side-btn:hover, .side-btn.on { background: #172742; border-color: #293d5e; color: white; }
     .side-btn.on { box-shadow: inset 3px 0 var(--orange); }
-    .sidebar-note { margin: 28px 10px 0; color: var(--muted); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
     main { min-width: 0; }
     .topbar { min-height: 82px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border-bottom: 1px solid var(--border); background: #0c1526; }
     .topbar h1 { margin: 0; font-size: 21px; }
@@ -63,16 +59,25 @@
     th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: middle; }
     th { color: var(--muted); font-weight: 600; white-space: nowrap; }
     td small { display: block; margin-top: 5px; color: var(--muted); overflow-wrap: anywhere; }
-    .status { display: inline-block; padding: 5px 8px; border-radius: 6px; background: #26344c; color: #dce7f8; font-size: 11px; white-space: nowrap; }
+    .status { display: inline-block; padding: 5px 8px; border-radius: 6px; background: #26344c; color: #dce7f8; font-size: 11px; white-space: nowrap; text-transform: capitalize; }
     .status.active { background: #103a32; color: #72e4bb; }
     .status.pending { background: #49341b; color: #ffd18c; }
     .empty { padding: 25px 10px; color: var(--muted); text-align: center; font-size: 13px; }
-    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; overflow-wrap: anywhere; }
+    #toast { position: fixed; right: 20px; bottom: 20px; z-index: 60; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; overflow-wrap: anywhere; }
+    .modal-bg { position: fixed; inset: 0; background: rgba(3,6,12,.7); backdrop-filter: blur(4px); display: none; place-items: center; z-index: 50; }
+    .modal-bg.show { display: grid; }
+    .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 28px; width: min(430px, 92vw); }
+    .modal h3 { margin: 0 0 6px; }
+    .modal p { color: var(--muted); font-size: 13px; margin: 0 0 18px; line-height: 1.6; }
+    .modal input { margin-bottom: 6px; }
+    .modal .row { display: flex; gap: 10px; margin-top: 18px; }
+    .modal .row .btn { flex: 1; }
+    .code-box { font-size: 34px; letter-spacing: 10px; text-align: center; color: var(--orange); font-weight: 800; padding: 14px; background: #091222; border: 1px dashed var(--border); border-radius: 10px; margin: 6px 0 4px; }
     @media (max-width: 760px) {
       .layout { grid-template-columns: 1fr; }
       .sidebar { padding: 15px; border-right: 0; border-bottom: 1px solid var(--border); }
       .sidebar .brand { padding: 4px 5px 14px; }
-      .side-label, .sidebar-note { display: none; }
+      .side-label { display: none; }
       .side-nav { display: flex; gap: 7px; overflow-x: auto; }
       .side-btn { width: auto; min-width: max-content; margin: 0; }
       .content { padding: 18px 14px; }
@@ -130,8 +135,10 @@
           <div><h1 id="pageTitle">Overview</h1><small id="adminIdentity">Administrator</small></div>
           <button class="btn secondary" id="logoutBtn" type="button">Sign out</button>
         </header>
-
         <div class="content">
+          <div id="schemaBanner" class="hidden" style="padding:14px 18px;border:1px solid #6b4b1e;background:#241a0c;color:#ffd18c;border-radius:10px;font-size:13px;line-height:1.6;margin-bottom:20px;">
+            ⚠️ Backend schema v2 not detected. Run <code>supabase-schema.sql</code> in the Supabase SQL Editor, then reload. Read-only views still work; approvals, deposits and 2FA are disabled.
+          </div>
           <section id="view-dash" class="view on">
             <h2 class="section-title">Overview</h2>
             <p class="section-desc">Customer profile and application status from your database.</p>
@@ -150,21 +157,33 @@
 
           <section id="view-cust" class="view">
             <h2 class="section-title">Customers</h2>
-            <p class="section-desc">View customer profiles, balances, and manage their accounts.</p>
+            <p class="section-desc">View customer profiles and balances. Deposits are processed server-side and audited.</p>
             <div class="panel"><div class="table-wrap"><table>
-              <thead><tr><th>Customer</th><th>Status</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead>
+              <thead><tr><th>Customer</th><th>Account</th><th>Status</th><th>Balance</th><th>Action</th></tr></thead>
               <tbody id="custBody"><tr><td colspan="5">Loading records…</td></tr></tbody>
             </table></div></div>
           </section>
 
           <section id="view-appr" class="view">
             <h2 class="section-title">Approvals</h2>
-            <p class="section-desc">Review pending customer profiles. Generate a 2FA code for them to log in, or approve them directly.</p>
+            <p class="section-desc">Review pending applications. Generate a one-time login code (15 min validity) or approve directly.</p>
             <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading applications…</div></div></div>
           </section>
           <div id="pageErr" class="error" role="alert"></div>
         </div>
       </main>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modalBg">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3 id="modalTitle">Confirm</h3>
+      <p id="modalText"></p>
+      <div id="modalBody"></div>
+      <div class="row">
+        <button class="btn secondary" id="modalCancel" type="button">Cancel</button>
+        <button class="btn" id="modalOk" type="button">Confirm</button>
+      </div>
     </div>
   </div>
   <div id="toast" class="hidden" role="status" aria-live="polite"></div>
@@ -174,97 +193,104 @@
     "use strict";
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
-    const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
+    const PASSWORD_RESET_REDIRECT = location.origin + location.pathname;
 
-    let sb = null;
-    let customers = [];
-    let toastTimer = null;
+    let sb = null, customers = [], schemaV2 = false, toastTimer = null, modalResolve = null;
     const $ = id => document.getElementById(id);
+
+    function esc(v) { return String(v ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':'"', "'":"&#39;" })[c]); }
+    function toast(msg) {
+      const el = $("toast"); el.textContent = msg; el.classList.remove("hidden");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.add("hidden"), 4000);
+    }
+    function showLoginError(m){ $("loginErr").textContent = m || ""; }
+    function showLoginMessage(m, ok){ const el=$("loginMessage"); el.textContent=m||""; el.classList.toggle("success",!!ok); el.classList.toggle("error",!ok); }
+    function showPageError(m){ $("pageErr").textContent = m || ""; }
+    function isPending(s){ return String(s??"").toLowerCase().includes("pending"); }
+    function badge(s){ const v=String(s??"Unknown"); const l=v.toLowerCase();
+      const css = l==="active" ? "active" : l.includes("pending") ? "pending" : "";
+      return `<span class="status ${css}">${esc(v)}</span>`; }
+
+    function openModal(title, text, okLabel){
+      $("modalTitle").textContent = title; $("modalText").textContent = text;
+      $("modalOk").textContent = okLabel || "Confirm";
+      $("modalBody").innerHTML = "";
+      $("modalBg").classList.add("show");
+      return new Promise(res => { modalResolve = res; });
+    }
+    function closeModal(v){ $("modalBg").classList.remove("show"); if (modalResolve) { modalResolve(v); modalResolve = null; } }
+    function promptDialog(title, text, okLabel, inputHtml){
+      $("modalTitle").textContent = title; $("modalText").textContent = text;
+      $("modalOk").textContent = okLabel || "Confirm";
+      $("modalBody").innerHTML = inputHtml || "";
+      $("modalBg").classList.add("show");
+      return new Promise(res => { modalResolve = res; });
+    }
 
     document.addEventListener("DOMContentLoaded", async () => {
       if (!window.supabase) return alert("Supabase failed to load.");
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      
+      $("modalCancel").addEventListener("click", () => closeModal(false));
+      $("modalOk").addEventListener("click", () => closeModal(true));
+      $("modalBg").addEventListener("click", e => { if (e.target === $("modalBg")) closeModal(false); });
+
       const { data } = await sb.auth.getSession();
-      if (data.session) { boot(data.session.user); } 
-      else { $("loginScreen").classList.remove("hidden"); }
+      const hash = new URLSearchParams(location.hash.replace(/^#/, ""));
+      if (data.session && hash.get("type") === "recovery") {
+        showNewPasswordForm();
+      } else if (data.session) {
+        boot(data.session.user);
+      } else {
+        $("loginScreen").classList.remove("hidden");
+      }
 
       $("loginForm").addEventListener("submit", tryLogin);
       $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);
       $("newPasswordForm").addEventListener("submit", saveNewPassword);
-      $("backToLoginBtn").addEventListener("click", () => showSignInForm());
-      $("logoutBtn").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
+      $("backToLoginBtn").addEventListener("click", () => { showSignInForm(); history.replaceState(null, "", location.pathname); });
+      $("logoutBtn").addEventListener("click", async () => { await sb.auth.signOut(); location.href = "index.html"; });
 
-      document.querySelectorAll(".side-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
-          btn.classList.add("on");
-          document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
-          $("view-" + btn.dataset.view).classList.add("on");
-          $("pageTitle").textContent = btn.textContent;
-        });
-      });
+      document.querySelectorAll(".side-btn").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
+        btn.classList.add("on");
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
+        $("view-" + btn.dataset.view).classList.add("on");
+        $("pageTitle").textContent = btn.textContent;
+      }));
 
-      document.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("approve-btn")) {
-          const index = e.target.getAttribute("data-index");
-          const customer = customers[index];
-          
-          e.target.disabled = true;
-          e.target.textContent = "Approving...";
-          
-          const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
-          if (error) {
-            toast("Error: " + error.message);
-            e.target.disabled = false;
-            e.target.textContent = "Approve";
-          } else {
-            toast("Customer approved successfully!");
-            await loadAll();
-            renderOverview(); renderCustomers(); renderApprovals();
-          }
-        }
+      $("app").addEventListener("click", async e => {
+        const t = e.target.closest("[data-action]");
+        if (!t) return;
+        const id = t.dataset.id, index = customers.findIndex(c => c.id === id);
+        if (index < 0) return;
+        const c = customers[index];
+        if (t.dataset.action === "approve") await approveCustomer(c, t);
+        else if (t.dataset.action === "deposit") await depositFlow(c);
+        else if (t.dataset.action === "code") await createCodeFlow(c);
       });
     });
 
-    function showLoginError(msg) { $("loginErr").textContent = msg || ""; }
-    function showPageError(msg) { $("pageErr").textContent = msg || ""; }
-    function showLoginMessage(msg, success = false) {
-      const el = $("loginMessage"); el.textContent = msg || "";
-      el.classList.toggle("success", Boolean(success)); el.classList.toggle("error", !success);
-    }
-    function toast(msg) {
-      const el = $("toast"); el.textContent = msg; el.classList.remove("hidden");
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.add("hidden"), 3500);
-    }
-    function escapeHtml(v) {
-      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
-    }
-    function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
-    function statusBadge(status) {
-      const v = String(status ?? "Unknown"); const l = v.toLowerCase();
-      const css = l === "active" ? "active" : l.includes("pending") ? "pending" : "";
-      return `<span class="status ${css}">${escapeHtml(v)}</span>`;
-    }
-
-    function showSignInForm(msg = "", success = false) {
+    function showSignInForm(msg = "", ok = false) {
       $("loginForm").classList.remove("hidden"); $("forgotWrap").classList.remove("hidden");
-      $("newPasswordForm").classList.add("hidden"); showLoginError("");
-      showLoginMessage(msg, success);
+      $("newPasswordForm").classList.add("hidden"); showLoginError(""); showLoginMessage(msg, ok);
+    }
+    function showNewPasswordForm() {
+      $("loginForm").classList.add("hidden"); $("forgotWrap").classList.add("hidden");
+      $("loginMessage").textContent = ""; $("newPasswordForm").classList.remove("hidden");
+      showLoginMessage("You are signed in via a recovery link — choose a new password.", true);
     }
 
     async function tryLogin(e) {
       e.preventDefault(); showLoginError("");
-      const email = $("aEmail").value.trim(), password = $("aPass").value;
       const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
       try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        const { data, error } = await sb.auth.signInWithPassword({ email: $("aEmail").value.trim(), password: $("aPass").value });
         if (error) throw error;
+        if (new URLSearchParams(location.hash.replace(/^#/, "")).get("type") === "recovery") { showNewPasswordForm(); return; }
         await boot(data.user);
-      } catch (error) {
-        showLoginError(error.message);
-      } finally { btn.disabled = false; btn.textContent = "Sign in"; }
+      } catch (error) { showLoginError(error.message); }
+      finally { btn.disabled = false; btn.textContent = "Sign in"; }
     }
 
     async function boot(user) {
@@ -274,10 +300,13 @@
         if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }
         if (!user) throw new Error("Please sign in.");
         const { data: profile } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
-        if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
+        if (!profile || String(profile.role).toLowerCase() !== "admin" || String(profile.status).toLowerCase() !== "active") {
           await sb.auth.signOut(); throw new Error("Not an active admin.");
         }
         $("adminIdentity").textContent = profile.name || "Administrator";
+        const probe = await sb.rpc("is_admin");
+        schemaV2 = !probe.error;
+        $("schemaBanner").classList.toggle("hidden", schemaV2);
         await loadAll();
         $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
         renderOverview(); renderCustomers(); renderApprovals();
@@ -288,8 +317,9 @@
     }
 
     async function loadAll() {
-      // We are NOT selecting otp_code here anymore to prevent the error
-      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, created_at").order("created_at", { ascending: false });
+      const { data, error } = await sb.from("profiles")
+        .select("id, name, email, status, role, balance, account_ref, created_at")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       customers = data || [];
     }
@@ -301,98 +331,90 @@
       try {
         await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });
         showLoginMessage("Reset link sent. Check your inbox.", true);
-      } catch (e) { showLoginMessage(e.message); } 
+      } catch (e) { showLoginMessage(e.message); }
       finally { btn.disabled = false; }
     }
-    
+
     async function saveNewPassword(e) {
       e.preventDefault();
       const pw = $("newPassword").value, cpw = $("confirmNewPassword").value;
       if (pw.length < 8) return $("passwordResetErr").textContent = "Use 8+ characters.";
       if (pw !== cpw) return $("passwordResetErr").textContent = "Passwords don't match.";
       try {
-        await sb.auth.updateUser({ password: pw });
-        await sb.auth.signOut(); showSignInForm("Password updated.", true);
+        const { error } = await sb.auth.updateUser({ password: pw });
+        if (error) throw error;
+        history.replaceState(null, "", location.pathname);
+        await sb.auth.signOut(); showSignInForm("Password updated. Please sign in.", true);
       } catch (error) { $("passwordResetErr").textContent = error.message; }
     }
+
+    async function approveCustomer(c, btn) {
+      if (!schemaV2) return toast("Run supabase-schema.sql to enable approvals.");
+      if (!await openModal("Approve customer?", `Activate ${c.name}'s account? They will be able to sign in and transfer.`, "Approve")) return;
+      btn.disabled = true;
+      const { error } = await sb.rpc("admin_set_customer_status", { p_target: c.id, p_status: "active" });
+      if (error) { toast("Error: " + error.message); btn.disabled = false; }
+      else { toast("Customer approved."); await refresh(); }
+    }
+
+    async function depositFlow(c) {
+      if (!schemaV2) return toast("Run supabase-schema.sql to enable deposits.");
+      const ok = await promptDialog("Deposit funds", `Credit money to ${c.name}'s balance. Server-validated and audited.`, "Deposit",
+        `<label for="depAmt" style="margin-top:4px">Amount (EUR)</label><input id="depAmt" type="number" min="0.01" step="0.01" placeholder="e.g. 500">
+         <label for="depNote">Note</label><input id="depNote" type="text" placeholder="e.g. Welcome bonus" maxlength="120">`);
+      if (!ok) return;
+      const amount = parseFloat($("depAmt").value);
+      if (!(amount > 0)) return toast("Enter a valid amount.");
+      const { data, error } = await sb.rpc("deposit_funds", { p_target: c.id, p_amount: amount, p_note: ($("depNote").value || "Admin manual deposit").slice(0,120) });
+      if (error) { toast("Error: " + error.message); await sb.rpc("log_security_event", { p_event: "admin_deposit_failed", p_detail: error.message }); }
+      else { toast(`✅ Deposited €${amount.toFixed(2)} → ${c.name} · Ref ${data.reference}`); await refresh(); }
+    }
+
+    async function createCodeFlow(c) {
+      if (!schemaV2) return toast("Run supabase-schema.sql to enable login codes.");
+      const { data, error } = await sb.rpc("create_login_code", { p_target: c.id });
+      if (error) return toast("Error: " + error.message);
+      await promptDialog("One-time login code", `Give this code to ${c.name} verbally. It is valid for 15 minutes and works once.`, "Done",
+        `<div class="code-box">${esc(data)}</div><p style="margin-top:10px">After entering it, their account activates automatically.</p>`);
+    }
+
+    async function refresh() { await loadAll(); renderOverview(); renderCustomers(); renderApprovals(); }
 
     function renderOverview() {
       $("kCustomers").textContent = customers.length;
       $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
       $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
-        <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role)}</td>
-        </tr>`).join("") || '<tr><td colspan="3">No profiles.</td></tr>';
+        <tr><td>${esc(c.name)}<small>${esc(c.email)}</small></td><td>${badge(c.status)}</td><td>${esc(c.role)}</td></tr>`).join("")
+        || '<tr><td colspan="3">No profiles.</td></tr>';
     }
 
     function renderCustomers() {
-      $("custBody").innerHTML = customers.map((c, i) => `
+      $("custBody").innerHTML = customers.map(c => `
         <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role)}</td>
-          <td style="font-weight:bold; color:var(--green);">$${Number(c.balance || 0).toFixed(2)}</td>
+          <td>${esc(c.name)}<small>${esc(c.email)}</small></td>
+          <td><small style="font-family:monospace">${esc(c.account_ref || "—")}</small></td>
+          <td>${badge(c.status)}</td>
+          <td style="font-weight:bold;color:var(--green)">€${Number(c.balance || 0).toLocaleString("en-IE",{minimumFractionDigits:2})}</td>
           <td>
-            ${isPending(c.status) ? `<button class="btn small approve-btn" type="button" data-index="${i}">Approve</button>` : ""}
-            <button class="btn small" style="background:var(--orange); color:#000; margin-left:5px;" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button>
+            ${isPending(c.status) ? `<button class="btn small" type="button" data-action="approve" data-id="${esc(c.id)}">Approve</button>` : ""}
+            <button class="btn small" type="button" data-action="deposit" data-id="${esc(c.id)}" style="background:var(--orange);color:#000;margin-left:5px">+ Deposit</button>
           </td>
         </tr>`).join("") || '<tr><td colspan="5">No profiles.</td></tr>';
     }
 
     function renderApprovals() {
-      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
-      $("apprList").innerHTML = pending.map(({ customer, index }) => {
-        // Check if the role column contains a 2FA code
-        const has2FA = customer.role && customer.role.startsWith("2FA-");
-        const codeDisplay = has2FA ? `<div style="color:var(--orange); font-size:12px; margin-top:5px;">2FA Code: <b>${customer.role.replace("2FA-", "")}</b></div>` : '';
-
-        return `
+      const pending = customers.filter(c => isPending(c.status));
+      $("apprList").innerHTML = pending.map(c => `
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--border)">
           <div style="min-width:0">
-            <strong>${escapeHtml(customer.name || "Unnamed")}</strong>
-            <div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email || "")}</div>
-            ${codeDisplay}
+            <strong>${esc(c.name || "Unnamed")}</strong>
+            <div style="color:var(--muted);font-size:12px">${esc(c.email || "")}</div>
           </div>
-          <div style="display:flex; gap:5px;">
-            <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
-            <button class="btn small" style="background:var(--panel2); color:white; border:1px solid var(--border);" onclick="generate2FA('${customer.id}', '${customer.name}')">Generate 2FA</button>
+          <div style="display:flex;gap:5px">
+            <button class="btn small" type="button" data-action="approve" data-id="${esc(c.id)}">Approve</button>
+            <button class="btn small secondary" type="button" data-action="code" data-id="${esc(c.id)}">Create login code</button>
           </div>
-        </div>`;
-      }).join("") || '<div class="empty">No pending applications.</div>';
-    }
-
-    async function generate2FA(userId, userName) {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      // We save the 2FA code into the ROLE column to avoid the missing column error!
-      const { error } = await sb.from("profiles").update({ role: `2FA-${code}` }).eq("id", userId);
-      
-      if (error) {
-        toast("Error generating code: " + error.message);
-      } else {
-        toast(`🔑 2FA Code for ${userName} is: ${code}`);
-        await loadAll();
-        renderApprovals();
-      }
-    }
-
-    async function depositMoney(userId, userName) {
-      const amountStr = prompt(`How much to deposit for ${userName}? (e.g. 500)`);
-      if (!amountStr) return;
-      const amount = parseFloat(amountStr);
-      if (isNaN(amount) || amount <= 0) return alert("Invalid amount");
-
-      const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
-      const newBalance = Number(profile.balance || 0) + amount;
-
-      const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
-      if (err1) return toast("Error: " + err1.message);
-
-      await sb.from("transactions").insert({ user_id: userId, type: 'deposit', amount: amount, description: 'Admin manual deposit' });
-      
-      toast(`✅ Deposited $${amount} to ${userName}`);
-      await loadAll(); renderCustomers();
+        </div>`).join("") || '<div class="empty">No pending applications.</div>';
     }
   </script>
 </body>
