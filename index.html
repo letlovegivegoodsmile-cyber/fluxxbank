@@ -26,8 +26,6 @@
   .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;letter-spacing:.5px}
   .logo .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 22px rgba(79,124,255,.55)}
   .logo .mark svg{width:20px;height:20px}
-  .navlinks{display:flex;gap:26px;font-size:.95rem;color:var(--mut)}
-  .navlinks a:hover{color:var(--txt)}
   .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;font-weight:600;font-size:.95rem;background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;box-shadow:0 6px 22px rgba(79,124,255,.35);transition:transform .15s, box-shadow .15s}
   .btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,124,255,.5)}
   .btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--txt)}
@@ -49,8 +47,8 @@
   @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
   @keyframes fadeOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
 
-  /* --- MODAL (Login & OTP) --- */
-  .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200}
+  /* --- MODALS --- */
+  .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:2000}
   .modal-bg.show{display:grid}
   .modal{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:34px;width:min(400px,92vw); box-shadow: 0 30px 80px rgba(0,0,0,.6); text-align:center;}
   .modal h3{margin-bottom:6px}
@@ -67,7 +65,7 @@
   .sidebar .logo { margin-bottom: 40px; padding-left: 10px; }
   .side-menu { list-style: none; flex: 1; }
   .side-menu li { margin-bottom: 8px; }
-  .side-menu a { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; transition: all 0.2s;}
+  .side-menu a { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; transition: all 0.2s; cursor: pointer;}
   .side-menu a:hover, .side-menu a.active { background: rgba(79, 124, 255, 0.1); color: var(--accent2);}
   .side-menu a.active { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
   .user-profile { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); margin-top: auto;}
@@ -80,6 +78,10 @@
 
   /* Main Content */
   .main-content { flex: 1; margin-left: 260px; padding: 40px; max-width: 1400px;}
+  .dashboard-view { display: none; animation: fadeIn 0.3s ease; }
+  .dashboard-view.active { display: block; }
+  @keyframes fadeIn { from{opacity:0; transform: translateY(10px);} to{opacity:1; transform: translateY(0);} }
+
   .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
   .top-header h1 { font-size: 2rem; font-weight: 700; }
   .top-header p { color: var(--mut); margin-top: 5px; }
@@ -93,7 +95,7 @@
   .balance-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
   .balance-amount { font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
   .quick-actions { display: flex; gap: 15px; margin-top: 20px; }
-  .action-btn { flex: 1; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--txt); font-weight: 600; transition: 0.2s;}
+  .action-btn { flex: 1; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--txt); font-weight: 600; transition: 0.2s; cursor: pointer;}
   .action-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
   .action-btn span.icon { font-size: 1.5rem; }
 
@@ -107,7 +109,7 @@
 
   /* Transactions */
   .tx-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-  .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); transition: 0.2s;}
+  .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); transition: 0.2s; cursor: pointer;}
   .tx-item:hover { background: rgba(255,255,255,0.05); }
   .tx-left { display: flex; align-items: center; gap: 15px; }
   .tx-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; background: rgba(79, 124, 255, 0.1); color: var(--accent2);}
@@ -128,7 +130,7 @@
     .top-header h1 { font-size: 1.5rem; }
     .balance-amount { font-size: 2.5rem; }
     .mobile-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11, 16, 32, 0.95); border-top: 1px solid var(--line); padding: 15px; justify-content: space-around; z-index: 50; backdrop-filter: blur(20px);}
-    .mobile-bottom-bar a { color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem;}
+    .mobile-bottom-bar a { color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; cursor: pointer;}
     .mobile-bottom-bar a.active { color: var(--accent2); }
     .mobile-bottom-bar span { font-size: 1.2rem; }
   }
@@ -172,10 +174,10 @@
   <aside class="sidebar">
     <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span> Fluxxbank</a>
     <ul class="side-menu">
-      <li><a href="#" class="active"><span>🏠</span> Dashboard</a></li>
-      <li><a href="#" onclick="showToast('Transfers page coming soon!', 'info')"><span>💸</span> Transfers</a></li>
-      <li><a href="#" onclick="showToast('Analytics coming soon!', 'info')"><span>📊</span> Analytics</a></li>
-      <li><a href="#" onclick="showToast('Settings coming soon!', 'info')"><span>⚙️</span> Settings</a></li>
+      <li><a class="active" onclick="switchView('dashboard', this)"><span>🏠</span> Dashboard</a></li>
+      <li><a onclick="switchView('transfers', this)"><span>💸</span> Transfers</a></li>
+      <li><a onclick="switchView('analytics', this)"><span>📊</span> Analytics</a></li>
+      <li><a onclick="switchView('settings', this)"><span>⚙️</span> Settings</a></li>
     </ul>
     <div class="user-profile">
       <div class="user-avatar" id="desktopAvatar">U</div>
@@ -188,77 +190,118 @@
   </aside>
 
   <main class="main-content">
-    <header class="top-header">
-      <div>
-        <h1 id="welcomeMessage">Good day 👋</h1>
-        <p>Here is what's happening with your money today.</p>
-      </div>
-    </header>
+    
+    <!-- VIEW 1: DASHBOARD -->
+    <div id="view-dashboard" class="dashboard-view active">
+      <header class="top-header">
+        <div>
+          <h1 id="welcomeMessage">Good day 👋</h1>
+          <p>Here is what's happening with your money today.</p>
+        </div>
+      </header>
 
-    <div class="dashboard-grid">
-      <div style="display: flex; flex-direction: column; gap: 24px;">
-        
-        <!-- BALANCE CARD -->
-        <div class="dash-card balance-card">
-          <span class="balance-label">Total Available Balance</span>
-          <div class="balance-amount" id="dashBal">€0.00</div>
-          <div class="quick-actions">
-            <button class="action-btn" onclick="document.getElementById('pAmt').focus()"><span class="icon">⇄</span> Send</button>
-            <button class="action-btn" onclick="showToast('To Top Up, please transfer funds from an external bank.', 'info')"><span class="icon">＋</span> Top Up</button>
-            <button class="action-btn" onclick="showToast('Your spending stats for this month: €0', 'info')"><span class="icon">◔</span> Stats</button>
+      <div class="dashboard-grid">
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <div class="dash-card balance-card">
+            <span class="balance-label">Total Available Balance</span>
+            <div class="balance-amount" id="dashBal">€0.00</div>
+            <div class="quick-actions">
+              <button class="action-btn" onclick="document.getElementById('pAmt').focus()"><span class="icon">⇄</span> Send</button>
+              <button class="action-btn" onclick="openTopUpModal()"><span class="icon">＋</span> Top Up</button>
+              <button class="action-btn" onclick="switchView('analytics', document.querySelector('.side-menu a:nth-child(3)'))"><span class="icon">◔</span> Stats</button>
+            </div>
+          </div>
+
+          <div class="dash-card">
+            <h3 style="margin-bottom: 5px;">Recent Activity</h3>
+            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Your latest transactions</p>
+            <div class="tx-list" id="txlist-dash"></div>
           </div>
         </div>
 
-        <!-- TRANSACTIONS -->
-        <div class="dash-card">
-          <h3 style="margin-bottom: 5px;">Recent Activity</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Your latest transactions</p>
-          <div class="tx-list" id="txlist"></div>
-        </div>
-      </div>
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <div class="dash-card">
+            <h3 style="margin-bottom: 5px;">Send Money</h3>
+            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer</p>
+            
+            <form class="send-form" onsubmit="return doPay(event)">
+              <div class="input-group">
+                <label>Recipient</label>
+                <select id="pWho" required>
+                  <option value="" disabled selected>Choose recipient</option>
+                  <option>Maya Chen</option><option>Jonas Weber</option><option>Luna Ortiz</option><option>Fluxx Vault</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Amount (€)</label>
+                <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+              </div>
+              <div class="input-group">
+                <label>Note (Optional)</label>
+                <input id="pNote" type="text" placeholder="What's it for?">
+              </div>
+              <button class="send-btn" type="submit">⚡ Send Instantly</button>
+            </form>
+          </div>
 
-      <div style="display: flex; flex-direction: column; gap: 24px;">
-        <!-- SEND MONEY WIDGET -->
-        <div class="dash-card">
-          <h3 style="margin-bottom: 5px;">Send Money</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer</p>
-          
-          <form class="send-form" onsubmit="return doPay(event)">
-            <div class="input-group">
-              <label>Recipient</label>
-              <select id="pWho" required>
-                <option value="" disabled selected>Choose recipient</option>
-                <option>Maya Chen</option><option>Jonas Weber</option><option>Luna Ortiz</option><option>Fluxx Vault</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <label>Amount (€)</label>
-              <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="0.00" required>
-            </div>
-            <div class="input-group">
-              <label>Note (Optional)</label>
-              <input id="pNote" type="text" placeholder="What's it for?">
-            </div>
-            <button class="send-btn" type="submit">⚡ Send Instantly</button>
-          </form>
-        </div>
-
-        <!-- VAULT WIDGET -->
-        <div class="dash-card" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(22, 31, 61, 0.7)); border-color: rgba(34, 211, 238, 0.2);">
-          <h3 style="margin-bottom: 5px;">Savings Vault</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Earn 4.1% APY</p>
-          <div style="font-size: 2rem; font-weight: 800; color: var(--accent2); margin-bottom: 20px;">€8,120.00</div>
-          <button class="btn ghost" style="width: 100%; justify-content: center;" onclick="showToast('Vault management coming soon!', 'info')">Manage Vault</button>
+          <div class="dash-card" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(22, 31, 61, 0.7)); border-color: rgba(34, 211, 238, 0.2);">
+            <h3 style="margin-bottom: 5px;">Savings Vault</h3>
+            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Earn 4.1% APY</p>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent2); margin-bottom: 20px;">€8,120.00</div>
+            <button class="btn ghost" style="width: 100%; justify-content: center;" onclick="showToast('Vault deposits coming soon!', 'info')">Manage Vault</button>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- VIEW 2: TRANSFERS -->
+    <div id="view-transfers" class="dashboard-view">
+      <header class="top-header">
+        <div>
+          <h1>Your Transfers</h1>
+          <p>View all your transaction history.</p>
+        </div>
+      </header>
+      <div class="dash-card">
+        <div class="tx-list" id="txlist-all"></div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: ANALYTICS -->
+    <div id="view-analytics" class="dashboard-view">
+      <header class="top-header">
+        <div>
+          <h1>Analytics</h1>
+          <p>Your spending breakdown.</p>
+        </div>
+      </header>
+      <div class="dash-card">
+        <h3>Spending Overview</h3>
+        <p style="color:var(--mut); margin-top:20px;">Coming soon. Once you have more transactions, your spending chart will appear here.</p>
+      </div>
+    </div>
+
+    <!-- VIEW 4: SETTINGS -->
+    <div id="view-settings" class="dashboard-view">
+      <header class="top-header">
+        <div>
+          <h1>Settings</h1>
+          <p>Manage your account preferences.</p>
+        </div>
+      </header>
+      <div class="dash-card">
+        <h3>Profile Details</h3>
+        <p style="color:var(--mut); margin-top:20px;">Profile editing coming soon. Contact support if you need to change your details.</p>
+      </div>
+    </div>
+
   </main>
 
   <div class="mobile-bottom-bar">
-    <a href="#" class="active"><span>🏠</span> Home</a>
-    <a href="#" onclick="showToast('Transfers page coming soon!', 'info')"><span>💸</span> Send</a>
-    <a href="#" onclick="showToast('Analytics coming soon!', 'info')"><span>📊</span> Stats</a>
-    <a href="#" onclick="doLogout()"><span>⏻</span> Logout</a>
+    <a class="active" onclick="switchView('dashboard', this)"><span>🏠</span> Home</a>
+    <a onclick="switchView('transfers', this)"><span>💸</span> Send</a>
+    <a onclick="switchView('analytics', this)"><span>📊</span> Stats</a>
+    <a onclick="doLogout()"><span>⏻</span> Logout</a>
   </div>
 </div>
 
@@ -268,7 +311,7 @@
     <h3 id="authTitle">Welcome back ⚡</h3>
     <p id="authSub">Log in to your Fluxxbank account.</p>
     <input type="text" placeholder="Full name" id="authName" style="display:none" autocomplete="off">
-    <input type="email" placeholder="Email address" id="loginEmail">
+    <input type="email" placeholder="Email address" id="loginEmail" style="text-align: left; letter-spacing: normal; font-size: 1rem;">
     <input type="password" placeholder="Password" id="loginPass" style="text-align: left; letter-spacing: normal; font-size: 1rem;">
     <div class="error" id="authErr"></div>
     <button class="btn" id="authBtn" onclick="submitAuth()">Log in</button>
@@ -283,10 +326,19 @@
   <div class="modal">
     <h3>🔐 Transfer Authorization</h3>
     <p id="otpDesc">Your transfer is pending. Please ask the Admin for your Transaction OTP code.</p>
-    <input type="text" id="transferOtp" placeholder="------" maxlength="6" style="text-align: center;">
+    <input type="text" id="transferOtp" placeholder="------" maxlength="6">
     <div class="error" id="otpErr"></div>
-    <button class="btn" onclick="verifyTransferOTP()">Verify & Complete Transfer</button>
+    <button class="btn" onclick="verifyTransferOTP()">Verify & Complete</button>
     <button class="btn ghost" style="margin-top:10px; border:none;" onclick="closeOtpModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- TOP UP MODAL -->
+<div class="modal-bg" id="topUpModal" onclick="if(event.target===this)closeTopUpModal()">
+  <div class="modal">
+    <h3>Top Up Account</h3>
+    <p>To add funds, please transfer money from your external bank account to your Fluxxbank IBAN. Once transferred, an Admin will credit your balance.</p>
+    <button class="btn" onclick="closeTopUpModal()">Got it</button>
   </div>
 </div>
 
@@ -298,11 +350,15 @@
   
   let authMode = "login";
   let currentPendingTxId = null;
+  let allUserTx = [];
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
   // --- TOAST SYSTEM ---
   function showToast(msg, type = 'info') {
     const container = document.getElementById('toast-container');
+    // Limit to 3 toasts max
+    if (container.children.length >= 3) { container.removeChild(container.firstChild); }
+    
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     let icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
@@ -314,11 +370,38 @@
     }, 4000);
   }
 
+  // --- VIEW ROUTING ---
+  function switchView(viewName, element) {
+    // Hide all views
+    document.querySelectorAll('.dashboard-view').forEach(v => v.classList.remove('active'));
+    // Show selected view
+    document.getElementById(`view-${viewName}`).classList.add('active');
+    
+    // Update active state on sidebar
+    document.querySelectorAll('.side-menu a').forEach(a => a.classList.remove('active'));
+    if(element && element.classList.contains('side-menu')) {
+      element.classList.add('active');
+    } else if (window.innerWidth > 768) {
+      // Find matching desktop sidebar link if clicked from mobile
+      const link = Array.from(document.querySelectorAll('.side-menu a')).find(a => a.textContent.toLowerCase().includes(viewName));
+      if(link) link.classList.add('active');
+    }
+
+    // Update mobile bottom bar
+    document.querySelectorAll('.mobile-bottom-bar a').forEach(a => a.classList.remove('active'));
+    if(window.innerWidth <= 768) {
+       const mobileLink = Array.from(document.querySelectorAll('.mobile-bottom-bar a')).find(a => a.textContent.toLowerCase().includes(viewName === 'transfers' ? 'send' : viewName));
+       if(mobileLink) mobileLink.classList.add('active');
+    }
+  }
+
   // --- MODAL LOGIC ---
   const bg = document.getElementById("modalBg");
   function openModal(){ bg.classList.add("show"); }
   function closeModal(){ bg.classList.remove("show"); }
   function closeOtpModal(){ document.getElementById("otpModal").classList.remove("show"); }
+  function openTopUpModal(){ document.getElementById("topUpModal").classList.add("show"); }
+  function closeTopUpModal(){ document.getElementById("topUpModal").classList.remove("show"); }
 
   function switchAuthMode(e){
     e.preventDefault();
@@ -395,8 +478,7 @@
     if (session && session.user) {
       document.getElementById("landingPage").classList.add("hidden");
       document.getElementById("appDashboard").classList.remove("hidden");
-      document.body.style.overflow = "auto"; 
-
+      
       const { data: p } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
       if(p) {
         const firstName = p.name.split(" ")[0];
@@ -407,35 +489,49 @@
         document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
       }
       
-      const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false }).limit(10);
+      // Fetch all transactions
+      const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false });
+      allUserTx = txData || [];
       
-      const txList = document.getElementById("txlist");
-      if(txData && txData.length > 0) {
-        txList.innerHTML = txData.map(t => {
-          const isPos = t.type === 'deposit';
-          const isPending = t.status === 'pending';
-          return `
-          <div class="tx-item">
-            <div class="tx-left">
-              <div class="tx-icon" style="${isPending ? 'background:rgba(245,196,81,0.1); color:var(--gold);' : ''}">${isPending ? '⏳' : isPos ? '↓' : '↑'}</div>
-              <div class="tx-details">
-                <h4>${t.description}</h4>
-                <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short'})} ${isPending ? '- Awaiting OTP' : ''}</p>
-              </div>
-            </div>
-            <span class="tx-amount ${isPending ? 'pending' : isPos ? 'pos' : 'neg'}">
-              ${isPos ? '+' : '−'}${eur(Math.abs(t.amount))}
-            </span>
-          </div>
-          `;
-        }).join("");
-      } else {
-        txList.innerHTML = '<p style="color: var(--mut); text-align: center; padding: 20px;">No recent activity.</p>';
-      }
+      renderTransactions();
     } else {
       document.getElementById("appDashboard").classList.add("hidden");
       document.getElementById("landingPage").classList.remove("hidden");
     }
+  }
+
+  function renderTransactions() {
+    const txHtml = allUserTx.map(t => {
+      const isPos = t.type === 'deposit';
+      const isPending = t.status === 'pending';
+      
+      let actionHtml = '';
+      if(isPending) {
+         actionHtml = `<button class="btn small" style="margin-left:10px; padding:6px 10px; font-size:0.75rem;" onclick="event.stopPropagation(); openOtpForTx('${t.id}')">Enter OTP</button>`;
+      }
+
+      return `
+      <div class="tx-item" onclick="if('${t.status}' === 'pending') openOtpForTx('${t.id}')">
+        <div class="tx-left">
+          <div class="tx-icon" style="${isPending ? 'background:rgba(245,196,81,0.1); color:var(--gold);' : ''}">${isPending ? '⏳' : isPos ? '↓' : '↑'}</div>
+          <div class="tx-details">
+            <h4>${t.description}</h4>
+            <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short'})} ${isPending ? '- Awaiting OTP' : ''}</p>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center;">
+          <span class="tx-amount ${isPending ? 'pending' : isPos ? 'pos' : 'neg'}">
+            ${isPos ? '+' : '−'}${eur(Math.abs(t.amount))}
+          </span>
+          ${actionHtml}
+        </div>
+      </div>
+      `;
+    }).join("");
+
+    // Populate both dashboard and transfers views
+    document.getElementById("txlist-dash").innerHTML = txHtml || '<p style="color: var(--mut); text-align: center; padding: 20px;">No recent activity.</p>';
+    document.getElementById("txlist-all").innerHTML = txHtml || '<p style="color: var(--mut); text-align: center; padding: 20px;">No transactions found.</p>';
   }
 
   async function doLogout(){
@@ -462,32 +558,37 @@
         return false;
       }
 
-      // 1. Create the transaction with 'pending' status. DO NOT deduct balance yet!
+      // 1. Create the transaction with 'pending' status.
       const { data: newTx, error: txError } = await sb.from("transactions").insert({ 
         user_id: session.user.id, 
         type: 'transfer', 
         amount: amt, 
         description: `Sent to ${who} (${note})`,
-        status: 'pending' // <-- Requires OTP
+        status: 'pending' 
       }).select().single();
       
       if(txError) throw new Error(txError.message);
 
       // 2. Store the ID and open the OTP modal
-      currentPendingTxId = newTx.id;
-      document.getElementById("transferOtp").value = "";
-      document.getElementById("otpErr").textContent = "";
-      document.getElementById("otpModal").classList.add("show");
+      openOtpForTx(newTx.id);
       
       // Clear the form
       document.getElementById("pAmt").value=""; 
       document.getElementById("pNote").value="";
+      await checkSession(); // Refresh lists
 
     } catch (error) {
       showToast(error.message, "error");
     }
     
     return false;
+  }
+
+  function openOtpForTx(txId) {
+    currentPendingTxId = txId;
+    document.getElementById("transferOtp").value = "";
+    document.getElementById("otpErr").textContent = "";
+    document.getElementById("otpModal").classList.add("show");
   }
 
   async function verifyTransferOTP() {
@@ -521,7 +622,7 @@
 
       // 4. Success!
       closeOtpModal();
-      showToast(`⚡ Transfer to ${tx.description.split(' ')[2]} completed!`, "success");
+      showToast(`⚡ Transfer completed successfully!`, "success");
       await checkSession(); // Refresh dashboard
 
     } catch (error) {
