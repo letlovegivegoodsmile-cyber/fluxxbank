@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <!-- CACHE BUSTERS -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -289,7 +288,8 @@
     }
 
     async function loadAll() {
-      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, otp_code, created_at").order("created_at", { ascending: false });
+      // We are NOT selecting otp_code here anymore to prevent the error
+      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, created_at").order("created_at", { ascending: false });
       if (error) throw error;
       customers = data || [];
     }
@@ -343,24 +343,30 @@
 
     function renderApprovals() {
       const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
-      $("apprList").innerHTML = pending.map(({ customer, index }) => `
+      $("apprList").innerHTML = pending.map(({ customer, index }) => {
+        // Check if the role column contains a 2FA code
+        const has2FA = customer.role && customer.role.startsWith("2FA-");
+        const codeDisplay = has2FA ? `<div style="color:var(--orange); font-size:12px; margin-top:5px;">2FA Code: <b>${customer.role.replace("2FA-", "")}</b></div>` : '';
+
+        return `
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--border)">
           <div style="min-width:0">
             <strong>${escapeHtml(customer.name || "Unnamed")}</strong>
             <div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email || "")}</div>
-            ${customer.otp_code ? `<div style="color:var(--orange); font-size:12px; margin-top:5px;">2FA Code: <b>${customer.otp_code}</b></div>` : ''}
+            ${codeDisplay}
           </div>
           <div style="display:flex; gap:5px;">
             <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
             <button class="btn small" style="background:var(--panel2); color:white; border:1px solid var(--border);" onclick="generate2FA('${customer.id}', '${customer.name}')">Generate 2FA</button>
           </div>
-        </div>
-      `).join("") || '<div class="empty">No pending applications.</div>';
+        </div>`;
+      }).join("") || '<div class="empty">No pending applications.</div>';
     }
 
     async function generate2FA(userId, userName) {
       const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const { error } = await sb.from("profiles").update({ otp_code: code }).eq("id", userId);
+      // We save the 2FA code into the ROLE column to avoid the missing column error!
+      const { error } = await sb.from("profiles").update({ role: `2FA-${code}` }).eq("id", userId);
       
       if (error) {
         toast("Error generating code: " + error.message);
