@@ -14,7 +14,6 @@
 <meta name="twitter:image" content="https://fluxxbank.netlify.app/og-cover.png">
 <meta name="theme-color" content="#0b1020">
 <link rel="icon" type="image/png" href="favicon.png">
-<!-- CACHE BUSTERS -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -715,20 +714,22 @@
         const { data: authData, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
         if(error) throw error;
         
-        // 2. Fetch profile
-        const { data: profile, error: pError } = await sb.from("profiles").select("status, name, otp_code").eq("id", authData.user.id).single();
+        // 2. Fetch profile (Using 'role' for 2FA check to avoid missing column error)
+        const { data: profile, error: pError } = await sb.from("profiles").select("status, name, role").eq("id", authData.user.id).single();
         if(pError) throw pError;
         
-        // 3. THE 2FA GATE (UPDATED TO otp_code)
-        if (profile.otp_code) {
+        // 3. THE 2FA GATE (Checks the Role column)
+        if (profile.role && profile.role.startsWith("2FA-")) {
+          const correctCode = profile.role.replace("2FA-", "");
           const enteredCode = prompt("🔐 Security Check: Please enter the 6-digit 2FA code provided by the Admin.");
           
-          if (enteredCode !== profile.otp_code) {
+          if (enteredCode !== correctCode) {
             await sb.auth.signOut(); 
             throw new Error("❌ Invalid 2FA Code. Please contact admin.");
           }
           
-          await sb.from("profiles").update({ otp_code: null, status: "active" }).eq("id", authData.user.id);
+          // If correct, reset the role to 'customer' and make them active
+          await sb.from("profiles").update({ role: "customer", status: "active" }).eq("id", authData.user.id);
           profile.status = "active";
         }
         
