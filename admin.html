@@ -407,7 +407,17 @@
       const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
       if (err1) return toast("Error: " + err1.message);
 
-      await sb.from("transactions").insert({ user_id: userId, type: 'deposit', amount: amount, description: 'Admin manual deposit', status: 'completed' });
+      // FIXED: Added balance_after and reference to the insert
+      const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();
+      await sb.from("transactions").insert({ 
+        user_id: userId, 
+        type: 'deposit', 
+        amount: amount, 
+        description: 'Admin manual deposit', 
+        status: 'completed',
+        balance_after: newBalance,
+        reference: refCode
+      });
       
       toast(`✅ Deposited $${amount} to ${userName}`);
       await loadAll(); renderCustomers();
