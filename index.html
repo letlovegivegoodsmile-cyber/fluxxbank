@@ -14,6 +14,10 @@
 <meta name="twitter:image" content="https://fluxxbank.netlify.app/og-cover.png">
 <meta name="theme-color" content="#0b1020">
 <link rel="icon" type="image/png" href="favicon.png">
+<!-- CACHE BUSTERS -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <title>Fluxxbank — Banking in Motion</title>
 <style>
   :root{
@@ -712,19 +716,19 @@
         if(error) throw error;
         
         // 2. Fetch profile
-        const { data: profile, error: pError } = await sb.from("profiles").select("status, name, two_factor_code").eq("id", authData.user.id).single();
+        const { data: profile, error: pError } = await sb.from("profiles").select("status, name, otp_code").eq("id", authData.user.id).single();
         if(pError) throw pError;
         
-        // 3. THE 2FA GATE
-        if (profile.two_factor_code) {
+        // 3. THE 2FA GATE (UPDATED TO otp_code)
+        if (profile.otp_code) {
           const enteredCode = prompt("🔐 Security Check: Please enter the 6-digit 2FA code provided by the Admin.");
           
-          if (enteredCode !== profile.two_factor_code) {
+          if (enteredCode !== profile.otp_code) {
             await sb.auth.signOut(); 
             throw new Error("❌ Invalid 2FA Code. Please contact admin.");
           }
           
-          await sb.from("profiles").update({ two_factor_code: null, status: "active" }).eq("id", authData.user.id);
+          await sb.from("profiles").update({ otp_code: null, status: "active" }).eq("id", authData.user.id);
           profile.status = "active";
         }
         
