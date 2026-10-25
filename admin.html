@@ -30,9 +30,6 @@
     .small { padding: 7px 10px; font-size: 12px; }
     .error { color: var(--red); font-size: 13px; line-height: 1.5; margin-top: 12px; overflow-wrap: anywhere; }
     .success { color: var(--green); }
-    .login-links { display: flex; justify-content: flex-end; margin-top: 12px; }
-    .text-btn { padding: 4px 0; border: 0; background: transparent; color: #ffb16f; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
-    .text-btn:hover { color: #ffd0a5; }
     #app { min-height: 100vh; }
     .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
     .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
@@ -106,7 +103,7 @@
           <button class="side-btn on" data-view="dash" type="button">Overview</button>
           <button class="side-btn" data-view="cust" type="button">Customers</button>
           <button class="side-btn" data-view="appr" type="button">Approvals</button>
-          <button class="side-btn" data-view="tx" type="button">Transfers</button> <!-- NEW TAB -->
+          <button class="side-btn" data-view="tx" type="button">Pending Transfers</button>
         </nav>
       </aside>
 
@@ -119,7 +116,6 @@
         <div class="content">
           <section id="view-dash" class="view on">
             <h2 class="section-title">Overview</h2>
-            <p class="section-desc">Customer profile and application status from your database.</p>
             <div class="stats">
               <div class="stat"><div class="stat-label">Customer profiles</div><div class="stat-value" id="kCustomers">—</div></div>
               <div class="stat"><div class="stat-label">Pending applications</div><div class="stat-value" id="kAppr">—</div></div>
@@ -141,7 +137,6 @@
             <div class="panel"><h2>Pending applications</h2><div id="apprList"></div></div>
           </section>
 
-          <!-- NEW TRANSFERS VIEW -->
           <section id="view-tx" class="view">
             <h2 class="section-title">Pending Transfers</h2>
             <p class="section-desc">Customers have requested transfers. Generate an OTP for them to complete the transaction.</p>
@@ -164,7 +159,6 @@
 
     let sb = null;
     let customers = [];
-    let pendingTransfers = [];
     let toastTimer = null;
     const $ = id => document.getElementById(id);
 
@@ -186,7 +180,7 @@
           document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
           $("view-" + btn.dataset.view).classList.add("on");
           $("pageTitle").textContent = btn.textContent;
-          if(btn.dataset.view === 'tx') loadTransfers();
+          if(btn.dataset.view === 'tx') loadTransfers(); 
         });
       });
     });
@@ -275,11 +269,21 @@
 
       const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
       const newBalance = Number(profile.balance || 0) + amount;
+      
+      const refCode = "DEP-" + Date.now().toString(36).toUpperCase().slice(-8);
 
       const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
       if (err1) return toast("Error: " + err1.message);
 
-      await sb.from("transactions").insert({ user_id: userId, type: 'deposit', amount: amount, description: 'Admin manual deposit', status: 'completed' });
+      await sb.from("transactions").insert({ 
+        user_id: userId, 
+        type: 'deposit', 
+        amount: amount, 
+        description: 'Admin manual deposit', 
+        status: 'completed',
+        reference: refCode 
+      });
+      
       toast(`✅ Deposited $${amount} to ${userName}`);
       await loadAll(); renderCustomers();
     }
@@ -312,7 +316,6 @@
       await loadAll(); renderApprovals();
     }
 
-    // --- NEW TRANSFER LOGIC ---
     async function loadTransfers() {
       const { data, error } = await sb.from("transactions")
         .select("*, profiles(name, email)")
