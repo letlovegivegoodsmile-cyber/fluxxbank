@@ -451,22 +451,23 @@
         return false;
       }
 
-      // --- GENERATE UNIQUE REFERENCE CODE ---
+      // Calculate what the balance WILL be if this goes through
+      const expectedBalance = Number(p.balance) - amt;
       const referenceCode = "FLX-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 100);
 
-      // CREATE PENDING TRANSACTION (Now includes the reference)
+      // CREATE PENDING TRANSACTION (Includes balance_after)
       const { data: txData, error: txError } = await sb.from("transactions").insert({ 
         user_id: session.user.id, 
         type: 'transfer', 
         amount: amt, 
         description: `Sent to ${who} (${note})`,
         status: 'pending',
-        reference: referenceCode // <--- FIX: Added reference code here
+        reference: referenceCode,
+        balance_after: expectedBalance // <--- FIX: Added the required column
       }).select().single();
 
       if(txError) throw new Error(txError.message);
 
-      // Store data in modal and show it
       document.getElementById("transferAmtDisplay").textContent = eur(amt);
       document.getElementById("transferToDisplay").textContent = who;
       document.getElementById("currentTxId").value = txData.id;
