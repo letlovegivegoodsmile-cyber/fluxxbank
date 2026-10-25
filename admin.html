@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
+  <!-- CACHE BUSTERS -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -288,7 +289,7 @@
     }
 
     async function loadAll() {
-      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, two_factor_code, created_at").order("created_at", { ascending: false });
+      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, otp_code, created_at").order("created_at", { ascending: false });
       if (error) throw error;
       customers = data || [];
     }
@@ -347,7 +348,7 @@
           <div style="min-width:0">
             <strong>${escapeHtml(customer.name || "Unnamed")}</strong>
             <div style="color:var(--muted);font-size:12px">${escapeHtml(customer.email || "")}</div>
-            ${customer.two_factor_code ? `<div style="color:var(--orange); font-size:12px; margin-top:5px;">2FA Code: <b>${customer.two_factor_code}</b></div>` : ''}
+            ${customer.otp_code ? `<div style="color:var(--orange); font-size:12px; margin-top:5px;">2FA Code: <b>${customer.otp_code}</b></div>` : ''}
           </div>
           <div style="display:flex; gap:5px;">
             <button class="btn small approve-btn" type="button" data-index="${index}">Approve</button>
@@ -359,7 +360,7 @@
 
     async function generate2FA(userId, userName) {
       const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const { error } = await sb.from("profiles").update({ two_factor_code: code }).eq("id", userId);
+      const { error } = await sb.from("profiles").update({ otp_code: code }).eq("id", userId);
       
       if (error) {
         toast("Error generating code: " + error.message);
