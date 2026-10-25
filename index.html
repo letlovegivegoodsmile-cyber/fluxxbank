@@ -6,20 +6,13 @@
 <meta name="description" content="Fluxxbank — the digital bank that's always in motion.">
 <link rel="icon" type="image/png" href="favicon.png">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Expires" content="0" />
 <title>Fluxxbank — Banking in Motion</title>
 <style>
-  /* =========================================
-     GLOBAL STYLES & VARIABLES
-     ========================================= */
   :root{
     --ink:#0b1020; --ink2:#131a33; --card:#161f3d;
     --accent:#4f7cff; --accent2:#22d3ee; --accent3:#a855f7;
-    --gold:#f5c451;
-    --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08);
-    --ok:#34d399; --bad:#f87171;
-    --r:16px;
+    --gold:#f5c451; --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08);
+    --ok:#34d399; --bad:#f87171; --r:16px;
   }
   *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}
   html{scroll-behavior:smooth}
@@ -28,255 +21,139 @@
   button{font:inherit;cursor:pointer;border:none}
   .hidden{display:none !important}
 
-  /* =========================================
-     LANDING PAGE STYLES
-     ========================================= */
-  nav.landing-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
-      padding:16px 5%;background:rgba(11,16,32,.75);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  /* --- LANDING PAGE --- */
+  nav.landing-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:rgba(11,16,32,.75);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
   .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;letter-spacing:.5px}
-  .logo .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 22px rgba(79,124,255,.55)}
+  .logo .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 22px rgba(79,124,255,.55)}
   .logo .mark svg{width:20px;height:20px}
   .navlinks{display:flex;gap:26px;font-size:.95rem;color:var(--mut)}
   .navlinks a:hover{color:var(--txt)}
-  
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;font-weight:600;font-size:.95rem;
-      background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;box-shadow:0 6px 22px rgba(79,124,255,.35);
-      transition:transform .15s, box-shadow .15s}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;font-weight:600;font-size:.95rem;background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;box-shadow:0 6px 22px rgba(79,124,255,.35);transition:transform .15s, box-shadow .15s}
   .btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,124,255,.5)}
   .btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--txt)}
   .btn.gold{background:linear-gradient(135deg,#f5c451,#e8a020);color:#241a02;box-shadow:0 6px 22px rgba(245,196,81,.3)}
-
   .hero{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:140px 5% 80px;position:relative}
-  .hero::before{content:"";position:absolute;inset:0;
-      background:radial-gradient(600px 400px at 80% 20%,rgba(79,124,255,.18),transparent 60%),
-                 radial-gradient(500px 400px at 10% 90%,rgba(168,85,247,.12),transparent 60%);pointer-events:none}
-  .eyebrow{display:inline-block;padding:6px 14px;border:1px solid var(--line);border-radius:999px;color:var(--accent2);
-      font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;background:rgba(34,211,238,.06)}
+  .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 400px at 80% 20%,rgba(79,124,255,.18),transparent 60%),radial-gradient(500px 400px at 10% 90%,rgba(168,85,247,.12),transparent 60%);pointer-events:none}
+  .eyebrow{display:inline-block;padding:6px 14px;border:1px solid var(--line);border-radius:999px;color:var(--accent2);font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;background:rgba(34,211,238,.06)}
   h1{font-size:clamp(2.4rem,5vw,4rem);line-height:1.08;font-weight:800}
   h1 .grad{background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
   .hero p.lead{margin:22px 0 30px;color:var(--mut);font-size:1.1rem;max-width:520px;line-height:1.7}
   .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
-  
-  /* MODAL */
+
+  /* --- CUSTOM TOAST NOTIFICATIONS --- */
+  #toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+  .toast{background:rgba(22,31,61,0.95);backdrop-filter:blur(10px);border:1px solid var(--line);border-left:4px solid var(--accent);padding:16px 20px;border-radius:12px;color:white;box-shadow:0 10px 30px rgba(0,0,0,0.5);display:flex;align-items:center;gap:12px;animation:slideIn 0.3s ease-out forwards;min-width:300px;max-width:400px}
+  .toast.error{border-left-color:var(--bad)}
+  .toast.success{border-left-color:var(--ok)}
+  .toast.info{border-left-color:var(--accent2)}
+  @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+  @keyframes fadeOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
+
+  /* --- MODAL (Login & OTP) --- */
   .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200}
   .modal-bg.show{display:grid}
-  .modal{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:34px;width:min(400px,92vw); box-shadow: 0 30px 80px rgba(0,0,0,.6)}
+  .modal{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:34px;width:min(400px,92vw); box-shadow: 0 30px 80px rgba(0,0,0,.6); text-align:center;}
   .modal h3{margin-bottom:6px}
   .modal p{color:var(--mut);font-size:.88rem;margin-bottom:20px}
-  .modal input{width:100%;background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);margin-bottom:12px;outline:none}
+  .modal input{width:100%;background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:14px;color:var(--txt);margin-bottom:12px;outline:none; font-size:1.2rem; text-align:center; letter-spacing:2px;}
   .modal .btn{width:100%;justify-content:center}
   .modal .error{color:var(--bad); font-size:.85rem; margin-bottom:10px; min-height:18px;}
 
-  /* =========================================
-     DASHBOARD APP STYLES
-     ========================================= */
-  #appDashboard {
-    min-height: 100vh;
-    display: flex;
-    background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%);
-  }
-
-  /* SIDEBAR (Desktop) */
-  .sidebar {
-    width: 260px;
-    background: rgba(11, 16, 32, 0.6);
-    backdrop-filter: blur(20px);
-    border-right: 1px solid var(--line);
-    padding: 30px 20px;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    height: 100vh;
-    z-index: 10;
-  }
+  /* --- DASHBOARD APP --- */
+  #appDashboard {min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%);}
+  
+  /* Sidebar */
+  .sidebar {width: 260px; background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10;}
   .sidebar .logo { margin-bottom: 40px; padding-left: 10px; }
   .side-menu { list-style: none; flex: 1; }
   .side-menu li { margin-bottom: 8px; }
-  .side-menu a {
-    display: flex; align-items: center; gap: 14px;
-    padding: 14px 16px; border-radius: 12px;
-    color: var(--mut); font-weight: 500; font-size: 0.95rem;
-    transition: all 0.2s;
-  }
-  .side-menu a:hover, .side-menu a.active {
-    background: rgba(79, 124, 255, 0.1);
-    color: var(--accent2);
-  }
+  .side-menu a { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; transition: all 0.2s;}
+  .side-menu a:hover, .side-menu a.active { background: rgba(79, 124, 255, 0.1); color: var(--accent2);}
   .side-menu a.active { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
-  .user-profile {
-    display: flex; align-items: center; gap: 12px;
-    padding: 16px; border-radius: 12px;
-    background: rgba(255,255,255,0.03); border: 1px solid var(--line);
-    margin-top: auto;
-  }
-  .user-avatar {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent), var(--accent3));
-    display: grid; place-items: center; font-weight: bold;
-  }
+  .user-profile { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); margin-top: auto;}
+  .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent3)); display: grid; place-items: center; font-weight: bold;}
   .user-info { flex: 1; overflow: hidden; }
   .user-info h4 { font-size: 0.9rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .user-info p { font-size: 0.75rem; color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .logout-btn { background: transparent; color: var(--bad); font-size: 1.2rem; padding: 5px; transition: 0.2s;}
   .logout-btn:hover { transform: scale(1.1); }
 
-  /* MAIN CONTENT (Desktop) */
-  .main-content {
-    flex: 1;
-    margin-left: 260px;
-    padding: 40px;
-    max-width: 1400px;
-  }
-
+  /* Main Content */
+  .main-content { flex: 1; margin-left: 260px; padding: 40px; max-width: 1400px;}
   .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
   .top-header h1 { font-size: 2rem; font-weight: 700; }
   .top-header p { color: var(--mut); margin-top: 5px; }
-
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 24px;
-  }
-
-  /* CARDS */
-  .dash-card {
-    background: rgba(22, 31, 61, 0.7);
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    padding: 30px;
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
-  }
   
-  /* BALANCE CARD */
-  .balance-card {
-    background: linear-gradient(135deg, rgba(79, 124, 255, 0.2), rgba(168, 85, 247, 0.1));
-    border: 1px solid rgba(79, 124, 255, 0.3);
-  }
-  .balance-card::before {
-    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
-    pointer-events: none;
-  }
+  .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  .dash-card { background: rgba(22, 31, 61, 0.7); border: 1px solid var(--line); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); position: relative; overflow: hidden;}
+  
+  /* Balance Card */
+  .balance-card { background: linear-gradient(135deg, rgba(79, 124, 255, 0.2), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(79, 124, 255, 0.3);}
+  .balance-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%); pointer-events: none;}
   .balance-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
   .balance-amount { font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
-  .balance-amount span { font-size: 2rem; color: var(--accent2); }
-  
-  /* QUICK ACTIONS */
   .quick-actions { display: flex; gap: 15px; margin-top: 20px; }
-  .action-btn {
-    flex: 1; padding: 15px; border-radius: 12px;
-    background: rgba(255,255,255,0.05); border: 1px solid var(--line);
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    color: var(--txt); font-weight: 600; transition: 0.2s;
-  }
+  .action-btn { flex: 1; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--txt); font-weight: 600; transition: 0.2s;}
   .action-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
   .action-btn span.icon { font-size: 1.5rem; }
 
-  /* SEND MONEY FORM */
+  /* Forms */
   .send-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
   .input-group label { display: block; color: var(--mut); font-size: 0.85rem; margin-bottom: 6px; }
-  .input-group input, .input-group select {
-    width: 100%; padding: 14px; border-radius: 12px;
-    background: rgba(0,0,0,0.2); border: 1px solid var(--line);
-    color: white; font-size: 1rem; outline: none; transition: 0.2s;
-  }
+  .input-group input, .input-group select { width: 100%; padding: 14px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--line); color: white; font-size: 1rem; outline: none; transition: 0.2s;}
   .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
-  .send-btn {
-    background: linear-gradient(135deg, var(--accent), #3b5bdb);
-    color: white; padding: 16px; border-radius: 12px;
-    font-weight: 700; font-size: 1rem; margin-top: 10px;
-    box-shadow: 0 6px 20px rgba(79, 124, 255, 0.4); transition: 0.2s;
-  }
+  .send-btn { background: linear-gradient(135deg, var(--accent), #3b5bdb); color: white; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; margin-top: 10px; box-shadow: 0 6px 20px rgba(79, 124, 255, 0.4); transition: 0.2s;}
   .send-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(79, 124, 255, 0.6); }
 
-  /* TRANSACTIONS LIST */
+  /* Transactions */
   .tx-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-  .tx-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 16px; border-radius: 14px;
-    background: rgba(255,255,255,0.02); border: 1px solid var(--line);
-    transition: 0.2s;
-  }
+  .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); transition: 0.2s;}
   .tx-item:hover { background: rgba(255,255,255,0.05); }
   .tx-left { display: flex; align-items: center; gap: 15px; }
-  .tx-icon {
-    width: 44px; height: 44px; border-radius: 12px;
-    display: grid; place-items: center; font-size: 1.2rem;
-    background: rgba(79, 124, 255, 0.1); color: var(--accent2);
-  }
+  .tx-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; background: rgba(79, 124, 255, 0.1); color: var(--accent2);}
   .tx-details h4 { font-size: 1rem; margin-bottom: 4px; }
   .tx-details p { font-size: 0.8rem; color: var(--mut); }
   .tx-amount { font-weight: 700; font-size: 1.1rem; }
   .tx-amount.pos { color: var(--ok); }
   .tx-amount.neg { color: var(--txt); }
+  .tx-amount.pending { color: var(--gold); font-size: 0.9rem; }
 
-  /* MOBILE RESPONSIVENESS */
-  @media (max-width: 1024px) {
-    .dashboard-grid { grid-template-columns: 1fr; }
-  }
-
+  /* Mobile */
+  @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
   @media (max-width: 768px) {
     #appDashboard { flex-direction: column; }
     .sidebar { display: none; }
-    
-    .mobile-nav {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 20px; background: rgba(11, 16, 32, 0.9);
-      border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50;
-      backdrop-filter: blur(20px);
-    }
-    
+    .mobile-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(11, 16, 32, 0.9); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px);}
     .main-content { margin-left: 0; padding: 20px; padding-bottom: 80px; }
     .top-header h1 { font-size: 1.5rem; }
     .balance-amount { font-size: 2.5rem; }
-    
-    .mobile-bottom-bar {
-      display: flex; position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(11, 16, 32, 0.95); border-top: 1px solid var(--line);
-      padding: 15px; justify-content: space-around; z-index: 50; backdrop-filter: blur(20px);
-    }
-    .mobile-bottom-bar a {
-      color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem;
-    }
+    .mobile-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11, 16, 32, 0.95); border-top: 1px solid var(--line); padding: 15px; justify-content: space-around; z-index: 50; backdrop-filter: blur(20px);}
+    .mobile-bottom-bar a { color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem;}
     .mobile-bottom-bar a.active { color: var(--accent2); }
     .mobile-bottom-bar span { font-size: 1.2rem; }
   }
-
-  @media (min-width: 769px) {
-    .mobile-nav, .mobile-bottom-bar { display: none !important; }
-  }
-
+  @media (min-width: 769px) { .mobile-nav, .mobile-bottom-bar { display: none !important; } }
 </style>
 </head>
 <body>
 
-<!-- =========================================
-     LANDING PAGE VIEW (Shown when logged out)
-     ========================================= -->
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- LANDING PAGE -->
 <div id="landingPage">
   <nav class="landing-nav">
-    <a class="logo" href="#">
-      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
-      Fluxxbank
-    </a>
-    <div class="navlinks">
-      <a href="#">Features</a>
-      <a href="#">Accounts</a>
-    </div>
+    <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span> Fluxxbank</a>
     <div style="display:flex;gap:10px">
       <button class="btn ghost" onclick="openModal()">Log in</button>
       <button class="btn" onclick="openModal()">Get Started</button>
     </div>
   </nav>
-
   <header class="hero">
     <div>
       <span class="eyebrow">◆ Digital-first banking</span>
       <h1>Banking that's<br>always <span class="grad">in motion.</span></h1>
-      <p class="lead">Fluxxbank is the standard for modern money — instant payments, fee-free accounts, and real-time insights, all from one beautiful app.</p>
+      <p class="lead">Fluxxbank is the standard for modern money — instant payments, fee-free accounts, and real-time insights.</p>
       <div class="hero-cta">
         <button class="btn gold" onclick="openModal()">Open your account →</button>
         <button class="btn ghost" onclick="openModal()">Log in to Dashboard</button>
@@ -285,31 +162,20 @@
   </header>
 </div>
 
-<!-- =========================================
-     DASHBOARD APP VIEW (Shown when logged in)
-     ========================================= -->
+<!-- DASHBOARD APP -->
 <div id="appDashboard" class="hidden">
-  
-  <!-- MOBILE TOP NAV -->
   <div class="mobile-nav">
-    <a class="logo" href="#">
-      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
-      Fluxxbank
-    </a>
+    <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span> Fluxxbank</a>
     <div class="user-avatar" id="mobileAvatar">U</div>
   </div>
 
-  <!-- DESKTOP SIDEBAR -->
   <aside class="sidebar">
-    <a class="logo" href="#">
-      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
-      Fluxxbank
-    </a>
+    <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span> Fluxxbank</a>
     <ul class="side-menu">
       <li><a href="#" class="active"><span>🏠</span> Dashboard</a></li>
-      <li><a href="#"><span>💸</span> Transfers</a></li>
-      <li><a href="#"><span>📊</span> Analytics</a></li>
-      <li><a href="#"><span>⚙️</span> Settings</a></li>
+      <li><a href="#" onclick="showToast('Transfers page coming soon!', 'info')"><span>💸</span> Transfers</a></li>
+      <li><a href="#" onclick="showToast('Analytics coming soon!', 'info')"><span>📊</span> Analytics</a></li>
+      <li><a href="#" onclick="showToast('Settings coming soon!', 'info')"><span>⚙️</span> Settings</a></li>
     </ul>
     <div class="user-profile">
       <div class="user-avatar" id="desktopAvatar">U</div>
@@ -321,7 +187,6 @@
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
   <main class="main-content">
     <header class="top-header">
       <div>
@@ -331,7 +196,6 @@
     </header>
 
     <div class="dashboard-grid">
-      <!-- LEFT COLUMN -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
         
         <!-- BALANCE CARD -->
@@ -339,15 +203,9 @@
           <span class="balance-label">Total Available Balance</span>
           <div class="balance-amount" id="dashBal">€0.00</div>
           <div class="quick-actions">
-            <button class="action-btn" onclick="document.getElementById('pAmt').focus()">
-              <span class="icon">⇄</span> Send
-            </button>
-            <button class="action-btn" onclick="alert('Top up feature coming soon!')">
-              <span class="icon">＋</span> Top Up
-            </button>
-            <button class="action-btn" onclick="alert('Stats feature coming soon!')">
-              <span class="icon">◔</span> Stats
-            </button>
+            <button class="action-btn" onclick="document.getElementById('pAmt').focus()"><span class="icon">⇄</span> Send</button>
+            <button class="action-btn" onclick="showToast('To Top Up, please transfer funds from an external bank.', 'info')"><span class="icon">＋</span> Top Up</button>
+            <button class="action-btn" onclick="showToast('Your spending stats for this month: €0', 'info')"><span class="icon">◔</span> Stats</button>
           </div>
         </div>
 
@@ -355,16 +213,11 @@
         <div class="dash-card">
           <h3 style="margin-bottom: 5px;">Recent Activity</h3>
           <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Your latest transactions</p>
-          <div class="tx-list" id="txlist">
-            <p style="color: var(--mut); text-align: center; padding: 20px;">Loading transactions...</p>
-          </div>
+          <div class="tx-list" id="txlist"></div>
         </div>
-
       </div>
 
-      <!-- RIGHT COLUMN -->
       <div style="display: flex; flex-direction: column; gap: 24px;">
-        
         <!-- SEND MONEY WIDGET -->
         <div class="dash-card">
           <h3 style="margin-bottom: 5px;">Send Money</h3>
@@ -387,7 +240,6 @@
               <input id="pNote" type="text" placeholder="What's it for?">
             </div>
             <button class="send-btn" type="submit">⚡ Send Instantly</button>
-            <div class="error" id="paymsg" style="text-align: center; margin-top: 10px;"></div>
           </form>
         </div>
 
@@ -396,33 +248,28 @@
           <h3 style="margin-bottom: 5px;">Savings Vault</h3>
           <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Earn 4.1% APY</p>
           <div style="font-size: 2rem; font-weight: 800; color: var(--accent2); margin-bottom: 20px;">€8,120.00</div>
-          <button class="btn ghost" style="width: 100%; justify-content: center;" onclick="alert('Vault management coming soon!')">Manage Vault</button>
+          <button class="btn ghost" style="width: 100%; justify-content: center;" onclick="showToast('Vault management coming soon!', 'info')">Manage Vault</button>
         </div>
-
       </div>
     </div>
   </main>
 
-  <!-- MOBILE BOTTOM BAR -->
   <div class="mobile-bottom-bar">
     <a href="#" class="active"><span>🏠</span> Home</a>
-    <a href="#"><span>💸</span> Send</a>
-    <a href="#"><span>📊</span> Stats</a>
+    <a href="#" onclick="showToast('Transfers page coming soon!', 'info')"><span>💸</span> Send</a>
+    <a href="#" onclick="showToast('Analytics coming soon!', 'info')"><span>📊</span> Stats</a>
     <a href="#" onclick="doLogout()"><span>⏻</span> Logout</a>
   </div>
-
 </div>
 
-<!-- =========================================
-     LOGIN MODAL
-     ========================================= -->
+<!-- LOGIN MODAL -->
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <h3 id="authTitle">Welcome back ⚡</h3>
     <p id="authSub">Log in to your Fluxxbank account.</p>
     <input type="text" placeholder="Full name" id="authName" style="display:none" autocomplete="off">
     <input type="email" placeholder="Email address" id="loginEmail">
-    <input type="password" placeholder="Password" id="loginPass">
+    <input type="password" placeholder="Password" id="loginPass" style="text-align: left; letter-spacing: normal; font-size: 1rem;">
     <div class="error" id="authErr"></div>
     <button class="btn" id="authBtn" onclick="submitAuth()">Log in</button>
     <p style="margin-top:16px;font-size:.82rem; text-align: center;">
@@ -431,9 +278,18 @@
   </div>
 </div>
 
-<!-- =========================================
-     SCRIPTS & LOGIC
-     ========================================= -->
+<!-- OTP TRANSFER MODAL -->
+<div class="modal-bg" id="otpModal" onclick="if(event.target===this)closeOtpModal()">
+  <div class="modal">
+    <h3>🔐 Transfer Authorization</h3>
+    <p id="otpDesc">Your transfer is pending. Please ask the Admin for your Transaction OTP code.</p>
+    <input type="text" id="transferOtp" placeholder="------" maxlength="6" style="text-align: center;">
+    <div class="error" id="otpErr"></div>
+    <button class="btn" onclick="verifyTransferOTP()">Verify & Complete Transfer</button>
+    <button class="btn ghost" style="margin-top:10px; border:none;" onclick="closeOtpModal()">Cancel</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
@@ -441,12 +297,28 @@
   let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   
   let authMode = "login";
+  let currentPendingTxId = null;
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // --- TOAST SYSTEM ---
+  function showToast(msg, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    let icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+    toast.innerHTML = `<span style="font-size:1.2rem">${icon}</span> <div style="font-size:0.9rem; font-weight:500;">${msg}</div>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.animation = 'fadeOut 0.3s ease-in forwards';
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
 
   // --- MODAL LOGIC ---
   const bg = document.getElementById("modalBg");
   function openModal(){ bg.classList.add("show"); }
   function closeModal(){ bg.classList.remove("show"); }
+  function closeOtpModal(){ document.getElementById("otpModal").classList.remove("show"); }
 
   function switchAuthMode(e){
     e.preventDefault();
@@ -480,6 +352,7 @@
             id: su.user.id, name: nm || "Customer", email: em, balance: 0, plan: "Basic", status: "Pending", color: "#34d399"
           });
         }
+        showToast("Account created! Wait for admin activation.", "success");
         err.style.color = "var(--ok)";
         err.textContent = "✅ Account created! Wait for admin activation.";
       } else {
@@ -489,46 +362,42 @@
         const { data: profile, error: pError } = await sb.from("profiles").select("status, name, role").eq("id", authData.user.id).single();
         if(pError) throw pError;
         
-        // 2FA Gate
         if (profile.role && profile.role.startsWith("2FA-")) {
           const correctCode = profile.role.replace("2FA-", "");
-          const enteredCode = prompt("🔐 Security Check: Please enter the 6-digit 2FA code provided by the Admin.");
-          
+          const enteredCode = prompt("🔐 Login Security Check: Enter the 6-digit code from Admin.");
           if (enteredCode !== correctCode) {
             await sb.auth.signOut(); 
-            throw new Error("❌ Invalid 2FA Code. Please contact admin.");
+            throw new Error("❌ Invalid 2FA Code.");
           }
-          
           await sb.from("profiles").update({ role: "customer", status: "active" }).eq("id", authData.user.id);
           profile.status = "active";
         }
         
         if (profile.status !== "active") {
           await sb.auth.signOut(); 
-          throw new Error("⏳ Account awaiting approval — an admin must activate it first.");
+          throw new Error("⏳ Account awaiting approval — contact admin.");
         }
         
         closeModal();
-        await checkSession(); // Switch to Dashboard view
+        showToast("Welcome back!", "success");
+        await checkSession(); 
       }
     }catch(e){
       err.textContent = e.message || "Something went wrong. Try again.";
+      showToast(e.message, "error");
     }
   }
 
-  // --- UI UPDATES & DASHBOARD LOGIC ---
+  // --- UI UPDATES ---
   async function checkSession() {
     const { data: { session } } = await sb.auth.getSession();
     
     if (session && session.user) {
-      // 1. Switch Views (Hide landing, show dashboard)
       document.getElementById("landingPage").classList.add("hidden");
       document.getElementById("appDashboard").classList.remove("hidden");
-      document.body.style.overflow = "auto"; // Allow scrolling in dashboard
+      document.body.style.overflow = "auto"; 
 
-      // 2. Fetch Profile Data
       const { data: p } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
-      
       if(p) {
         const firstName = p.name.split(" ")[0];
         document.getElementById("dashBal").textContent = eur(p.balance);
@@ -538,23 +407,23 @@
         document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
       }
       
-      // 3. Fetch Transactions
       const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false }).limit(10);
       
       const txList = document.getElementById("txlist");
       if(txData && txData.length > 0) {
         txList.innerHTML = txData.map(t => {
           const isPos = t.type === 'deposit';
+          const isPending = t.status === 'pending';
           return `
           <div class="tx-item">
             <div class="tx-left">
-              <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
+              <div class="tx-icon" style="${isPending ? 'background:rgba(245,196,81,0.1); color:var(--gold);' : ''}">${isPending ? '⏳' : isPos ? '↓' : '↑'}</div>
               <div class="tx-details">
                 <h4>${t.description}</h4>
-                <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})}</p>
+                <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short'})} ${isPending ? '- Awaiting OTP' : ''}</p>
               </div>
             </div>
-            <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
+            <span class="tx-amount ${isPending ? 'pending' : isPos ? 'pos' : 'neg'}">
               ${isPos ? '+' : '−'}${eur(Math.abs(t.amount))}
             </span>
           </div>
@@ -563,30 +432,23 @@
       } else {
         txList.innerHTML = '<p style="color: var(--mut); text-align: center; padding: 20px;">No recent activity.</p>';
       }
-
     } else {
-      // Show Landing Page
       document.getElementById("appDashboard").classList.add("hidden");
       document.getElementById("landingPage").classList.remove("hidden");
     }
   }
 
-  // --- LOGOUT ---
   async function doLogout(){
     await sb.auth.signOut();
     location.reload();
   }
 
-  // --- SEND MONEY LOGIC ---
+  // --- OTP TRANSFER FLOW ---
   async function doPay(e){
     e.preventDefault();
     const who = document.getElementById("pWho").value;
     const amt = parseFloat(document.getElementById("pAmt").value);
     const note = document.getElementById("pNote").value || "FluxxPay";
-    const msg = document.getElementById("paymsg");
-    
-    msg.style.color = "white";
-    msg.textContent = "Processing...";
 
     const { data: { session } } = await sb.auth.getSession();
     if(!session) return;
@@ -596,37 +458,77 @@
       if(pError) throw pError;
 
       if(Number(p.balance) < amt) {
-        msg.style.color = "var(--bad)";
-        msg.textContent = "Insufficient funds! Balance: " + eur(p.balance);
+        showToast("Insufficient funds! Balance: " + eur(p.balance), "error");
         return false;
       }
 
-      const newBalance = Number(p.balance) - amt;
-      const { error: updateError } = await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
-      if(updateError) throw new Error("DB Update Failed");
-
-      const { error: txError } = await sb.from("transactions").insert({ 
-        user_id: session.user.id, type: 'transfer', amount: amt, description: `Sent to ${who} (${note})` 
-      });
-      if(txError) throw new Error("DB Insert Failed");
-
-      msg.style.color = "var(--ok)"; 
-      msg.textContent = `⚡ Sent ${eur(amt)} to ${who} successfully!`;
+      // 1. Create the transaction with 'pending' status. DO NOT deduct balance yet!
+      const { data: newTx, error: txError } = await sb.from("transactions").insert({ 
+        user_id: session.user.id, 
+        type: 'transfer', 
+        amount: amt, 
+        description: `Sent to ${who} (${note})`,
+        status: 'pending' // <-- Requires OTP
+      }).select().single();
       
+      if(txError) throw new Error(txError.message);
+
+      // 2. Store the ID and open the OTP modal
+      currentPendingTxId = newTx.id;
+      document.getElementById("transferOtp").value = "";
+      document.getElementById("otpErr").textContent = "";
+      document.getElementById("otpModal").classList.add("show");
+      
+      // Clear the form
       document.getElementById("pAmt").value=""; 
       document.getElementById("pNote").value="";
-      
-      await checkSession(); 
-      
+
     } catch (error) {
-      msg.style.color = "var(--bad)";
-      msg.textContent = "Error: " + error.message;
+      showToast(error.message, "error");
     }
     
     return false;
   }
 
-  // --- BOOTSTRAP ---
+  async function verifyTransferOTP() {
+    const enteredOtp = document.getElementById("transferOtp").value.trim();
+    const err = document.getElementById("otpErr");
+    
+    if(enteredOtp.length < 6) {
+      err.textContent = "Please enter a 6-digit code.";
+      return;
+    }
+
+    try {
+      // 1. Fetch the pending transaction
+      const { data: tx, error: txErr } = await sb.from("transactions").select("*").eq("id", currentPendingTxId).single();
+      if(txErr) throw txErr;
+
+      if(tx.otp_code !== enteredOtp) {
+        err.textContent = "❌ Invalid OTP. Please ask Admin again.";
+        return;
+      }
+
+      // 2. OTP is correct! Deduct the balance.
+      const { data: { session } } = await sb.auth.getSession();
+      const { data: p } = await sb.from("profiles").select("balance").eq("id", session.user.id).single();
+      const newBalance = Number(p.balance) - Number(tx.amount);
+
+      await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
+
+      // 3. Mark transaction as completed
+      await sb.from("transactions").update({ status: 'completed', otp_code: null }).eq("id", currentPendingTxId);
+
+      // 4. Success!
+      closeOtpModal();
+      showToast(`⚡ Transfer to ${tx.description.split(' ')[2]} completed!`, "success");
+      await checkSession(); // Refresh dashboard
+
+    } catch (error) {
+      err.textContent = "Error: " + error.message;
+    }
+  }
+
   window.addEventListener("DOMContentLoaded", () => {
     checkSession();
   });
