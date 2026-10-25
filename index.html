@@ -356,9 +356,7 @@
   // --- TOAST SYSTEM ---
   function showToast(msg, type = 'info') {
     const container = document.getElementById('toast-container');
-    // Limit to 3 toasts max
     if (container.children.length >= 3) { container.removeChild(container.firstChild); }
-    
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     let icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
@@ -372,22 +370,17 @@
 
   // --- VIEW ROUTING ---
   function switchView(viewName, element) {
-    // Hide all views
     document.querySelectorAll('.dashboard-view').forEach(v => v.classList.remove('active'));
-    // Show selected view
     document.getElementById(`view-${viewName}`).classList.add('active');
     
-    // Update active state on sidebar
     document.querySelectorAll('.side-menu a').forEach(a => a.classList.remove('active'));
     if(element && element.classList.contains('side-menu')) {
       element.classList.add('active');
     } else if (window.innerWidth > 768) {
-      // Find matching desktop sidebar link if clicked from mobile
       const link = Array.from(document.querySelectorAll('.side-menu a')).find(a => a.textContent.toLowerCase().includes(viewName));
       if(link) link.classList.add('active');
     }
 
-    // Update mobile bottom bar
     document.querySelectorAll('.mobile-bottom-bar a').forEach(a => a.classList.remove('active'));
     if(window.innerWidth <= 768) {
        const mobileLink = Array.from(document.querySelectorAll('.mobile-bottom-bar a')).find(a => a.textContent.toLowerCase().includes(viewName === 'transfers' ? 'send' : viewName));
@@ -489,7 +482,6 @@
         document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
       }
       
-      // Fetch all transactions
       const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false });
       allUserTx = txData || [];
       
@@ -529,7 +521,6 @@
       `;
     }).join("");
 
-    // Populate both dashboard and transfers views
     document.getElementById("txlist-dash").innerHTML = txHtml || '<p style="color: var(--mut); text-align: center; padding: 20px;">No recent activity.</p>';
     document.getElementById("txlist-all").innerHTML = txHtml || '<p style="color: var(--mut); text-align: center; padding: 20px;">No transactions found.</p>';
   }
@@ -558,13 +549,17 @@
         return false;
       }
 
-      // 1. Create the transaction with 'pending' status.
+      // Generate a unique reference code like "FLX-8A2B9C"
+      const refCode = "FLX-" + Date.now().toString(36).toUpperCase().slice(-8);
+
+      // 1. Create the transaction with 'pending' status AND the reference code.
       const { data: newTx, error: txError } = await sb.from("transactions").insert({ 
         user_id: session.user.id, 
         type: 'transfer', 
         amount: amt, 
         description: `Sent to ${who} (${note})`,
-        status: 'pending' 
+        status: 'pending',
+        reference: refCode 
       }).select().single();
       
       if(txError) throw new Error(txError.message);
@@ -575,7 +570,7 @@
       // Clear the form
       document.getElementById("pAmt").value=""; 
       document.getElementById("pNote").value="";
-      await checkSession(); // Refresh lists
+      await checkSession(); 
 
     } catch (error) {
       showToast(error.message, "error");
