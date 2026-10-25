@@ -707,12 +707,28 @@
         err.style.color = "var(--ok)";
         err.textContent = "✅ Account created! Confirm the email, then wait for admin activation — usually minutes! 🚀";
       } else {
+        // 1. Try to log in
         const { data: authData, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
         if(error) throw error;
         
-        const { data: profile, error: pError } = await sb.from("profiles").select("status, name").eq("id", authData.user.id).single();
+        // 2. Fetch profile
+        const { data: profile, error: pError } = await sb.from("profiles").select("status, name, two_factor_code").eq("id", authData.user.id).single();
         if(pError) throw pError;
         
+        // 3. THE 2FA GATE
+        if (profile.two_factor_code) {
+          const enteredCode = prompt("🔐 Security Check: Please enter the 6-digit 2FA code provided by the Admin.");
+          
+          if (enteredCode !== profile.two_factor_code) {
+            await sb.auth.signOut(); 
+            throw new Error("❌ Invalid 2FA Code. Please contact admin.");
+          }
+          
+          await sb.from("profiles").update({ two_factor_code: null, status: "active" }).eq("id", authData.user.id);
+          profile.status = "active";
+        }
+        
+        // 4. Check Approval status
         if (profile.status !== "active") {
           await sb.auth.signOut(); 
           throw new Error("⏳ Account awaiting approval — an admin must activate it first.");
@@ -768,7 +784,7 @@
   async function doLogout(){ if(sb) await sb.auth.signOut(); location.reload(); }
 
   async function doPay(e){
-    if(e) e.preventDefault(); // Prevent form reload
+    if(e) e.preventDefault(); 
     const who = document.getElementById("pWho").value;
     const amt = parseFloat(document.getElementById("pAmt").value);
     const note = document.getElementById("pNote").value || "FluxxPay";
@@ -785,23 +801,19 @@
     }
 
     try {
-      // 1. Get current balance
       const { data: p, error: pError } = await sb.from("profiles").select("balance").eq("id", session.user.id).single();
       if(pError) throw pError;
 
-      // 2. Check funds
       if(Number(p.balance) < amt) {
         msg.style.color = "var(--bad)";
         msg.textContent = "Insufficient funds! Balance: " + eur2(p.balance);
         return false;
       }
 
-      // 3. Update balance in DB
       const newBalance = Number(p.balance) - amt;
       const { error: updateError } = await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
       if(updateError) throw new Error("DB Update Failed: " + updateError.message);
 
-      // 4. Save transaction in DB
       const { error: txError } = await sb.from("transactions").insert({ 
         user_id: session.user.id, 
         type: 'transfer', 
@@ -810,32 +822,14 @@
       });
       if(txError) throw new Error("DB Insert Failed: " + txError.message);
 
-      // 5. TRIGGER THE EMAIL RECEIPT
-      try {
-        await sb.functions.invoke('send-receipt-email', {
-          body: { 
-            email: session.user.email, 
-            name: session.user.user_metadata?.name || p.name || "Customer",
-            amount: amt,
-            recipient: who,
-            note: note
-          }
-        });
-      } catch (emailErr) {
-        console.log("Receipt email failed to send, but transfer was successful.", emailErr);
-      }
-
-      // 6. Success! Update screen
       msg.style.color="var(--ok)"; 
       msg.innerHTML = `⚡ Sent ${eur(amt)} to ${who}. <button class="btn ghost" style="padding:7px 14px;font-size:.78rem" onclick="showReceipt()">🧾 Print receipt</button>`;
       
       lastTx = { to: who, amt: amt, note: note, when: new Date(), ref: "FLX-" + Date.now().toString(36).toUpperCase().slice(-8) };
       
-      // Clear inputs
       document.getElementById("pAmt").value=""; 
       document.getElementById("pNote").value="";
       
-      // Force a reload of the UI
       await refreshAuthUI(); 
       
     } catch (error) {
