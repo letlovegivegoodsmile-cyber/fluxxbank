@@ -35,6 +35,31 @@
   .hidden{display:none !important}
 
   /* =========================================
+     WELCOME SCREEN (8 SECONDS)
+     ========================================= */
+  #welcomeScreen {
+    position: fixed; inset: 0; background: var(--ink); z-index: 9999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .welcome-text {
+    font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    opacity: 0; transform: translateY(20px); animation: fadeInScale 2s ease forwards;
+  }
+  .progress-bar-container {
+    width: 250px; height: 6px; background: var(--line);
+    border-radius: 10px; margin-top: 40px; overflow: hidden; opacity: 0; animation: fadeIn 1s 1s forwards;
+  }
+  .progress-bar {
+    width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent));
+    animation: loadProgress 8s linear forwards;
+  }
+  @keyframes fadeInScale { to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes loadProgress { to { width: 100%; } }
+
+  /* =========================================
      LANDING PAGE STYLES
      ========================================= */
   nav.landing-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
@@ -67,6 +92,7 @@
   .stat b{font-size:1.6rem;display:block}
   .stat span{color:var(--mut);font-size:.85rem}
 
+  /* PHONE MOCKUP */
   .phone-wrap{display:flex;justify-content:center}
   .phone{width:300px;border-radius:36px;border:1px solid var(--line);background:linear-gradient(160deg,var(--ink2),#0d1330);
       padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 6px #05070f}
@@ -82,6 +108,7 @@
   .ph-actions{display:flex;gap:10px;margin-top:14px}
   .ph-actions div{flex:1;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 0;font-size:.8rem;color:var(--mut)}
 
+  /* SECTIONS */
   section{padding:90px 5%}
   .sec-head{text-align:center;max-width:640px;margin:0 auto 56px}
   .sec-head h2{font-size:2.2rem;margin-bottom:14px}
@@ -212,9 +239,7 @@
   .rev-count{position:absolute;z-index:3;top:24px;right:28px;font-size:.85rem;color:rgba(255,255,255,.75);
       background:rgba(11,16,32,.5);border:1px solid var(--line);border-radius:999px;padding:6px 14px;backdrop-filter:blur(6px)}
 
-  /* =========================================
-     DASHBOARD APP STYLES
-     ========================================= */
+  /* DASHBOARD APP */
   #appDashboard { min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
   .sidebar { width: 260px; background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10; }
   .sidebar .logo { margin-bottom: 40px; padding-left: 10px; }
@@ -275,14 +300,13 @@
   .modal .btn{width:100%;justify-content:center}
   .modal .error{color:var(--bad); font-size:.85rem; margin-bottom:10px; min-height:18px; text-align: center;}
 
+  /* RESPONSIVE */
   @media(max-width:900px){
     .hero{grid-template-columns:1fr;padding-top:120px;text-align:center}
     .hero-cta{justify-content:center}
     .hero p.lead{margin:22px auto 30px}
-    .phone-wrap{display:none}
+    .phone-wrap{display:flex; justify-content:center; margin-top:30px; margin-bottom:20px;}
     .grid3,.acc-grid,.steps{grid-template-columns:1fr}
-    .kpis{grid-template-columns:repeat(2,1fr)}
-    .dash-body{grid-template-columns:1fr}
     .navlinks{display:none}
     .foot-grid{grid-template-columns:1fr 1fr}
   }
@@ -304,6 +328,14 @@
 </style>
 </head>
 <body>
+
+<!-- WELCOME SCREEN (8 SECONDS) -->
+<div id="welcomeScreen" class="hidden">
+  <div class="welcome-text" id="welcomeText">Welcome</div>
+  <div class="progress-bar-container">
+    <div class="progress-bar"></div>
+  </div>
+</div>
 
 <!-- LANDING PAGE -->
 <div id="landingPage">
@@ -340,6 +372,7 @@
       </div>
     </div>
     
+    <!-- STATIC ATM / PHONE MOCKUP -->
     <div class="phone-wrap">
       <div class="phone">
         <div class="ph-top"><span>9:41</span><span>⚡ FluxxPay</span></div>
@@ -602,12 +635,12 @@
   </div>
 </div>
 
-<!-- TRANSFER OTP MODAL (STATIC OTP 241800) -->
+<!-- TRANSFER OTP MODAL (TEXT UPDATED, NO STATIC CODE SHOWN) -->
 <div class="modal-bg" id="otpModal" onclick="if(event.target===this)closeOtpModal()">
   <div class="modal">
     <h3 style="text-align: center;">🔒 Transfer Authorization</h3>
     
-    <p style="text-align: center;">Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">€0.00</strong> to <strong id="transferToDisplay" style="color: var(--txt);">Recipient</strong> is pending.<br><br>Please enter the static OTP code <b>241800</b> to authorize this transfer.</p>
+    <p style="text-align: center;">Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">€0.00</strong> to <strong id="transferToDisplay" style="color: var(--txt);">Recipient</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.</p>
     
     <input type="text" id="transferOtpInput" placeholder="------" maxlength="6" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;">
     <input type="hidden" id="currentTxId">
@@ -628,6 +661,7 @@
   let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   
   let authMode = "login";
+  let isFirstLogin = true; // Tracks if we need to show the welcome screen
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
   // --- LANDING PAGE SCRIPTS ---
@@ -780,6 +814,7 @@
         }
         
         closeModal();
+        isFirstLogin = true; // Reset to true on fresh login
         await checkSession(); 
       }
     }catch(e){
@@ -787,49 +822,69 @@
     }
   }
 
-  // --- DASHBOARD LOGIC ---
+  // --- DASHBOARD LOADING LOGIC ---
+  async function loadDashboardData(session, profile) {
+    const firstName = profile.name.split(" ")[0];
+    document.getElementById("dashBal").textContent = eur(profile.balance);
+    document.getElementById("userNameDisplay").textContent = profile.name;
+    document.getElementById("desktopAvatar").textContent = firstName.charAt(0).toUpperCase();
+    document.getElementById("mobileAvatar").textContent = firstName.charAt(0).toUpperCase();
+    document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
+
+    const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false }).limit(10);
+    
+    const txList = document.getElementById("txlist");
+    if(txData && txData.length > 0) {
+      txList.innerHTML = txData.map(t => {
+        const isPos = t.type === 'deposit';
+        return `
+        <div class="tx-item">
+          <div class="tx-left">
+            <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
+            <div class="tx-details">
+              <h4>${t.description}</h4>
+              <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})}</p>
+            </div>
+          </div>
+          <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
+            ${isPos ? '+' : '−'}${eur(Math.abs(t.amount))}
+          </span>
+        </div>
+        `;
+      }).join("");
+    } else {
+      txList.innerHTML = '<p style="color: var(--mut); text-align: center; padding: 20px;">No recent activity.</p>';
+    }
+  }
+
   async function checkSession() {
     const { data: { session } } = await sb.auth.getSession();
     
     if (session && session.user) {
       document.getElementById("landingPage").classList.add("hidden");
-      document.getElementById("appDashboard").classList.remove("hidden");
-      document.body.style.overflow = "auto"; 
 
       const { data: p } = await sb.from("profiles").select("name, balance").eq("id", session.user.id).single();
-      
-      if(p) {
-        const firstName = p.name.split(" ")[0];
-        document.getElementById("dashBal").textContent = eur(p.balance);
-        document.getElementById("userNameDisplay").textContent = p.name;
-        document.getElementById("desktopAvatar").textContent = firstName.charAt(0).toUpperCase();
-        document.getElementById("mobileAvatar").textContent = firstName.charAt(0).toUpperCase();
-        document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
-      }
-      
-      const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false }).limit(10);
-      
-      const txList = document.getElementById("txlist");
-      if(txData && txData.length > 0) {
-        txList.innerHTML = txData.map(t => {
-          const isPos = t.type === 'deposit';
-          return `
-          <div class="tx-item">
-            <div class="tx-left">
-              <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
-              <div class="tx-details">
-                <h4>${t.description}</h4>
-                <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})}</p>
-              </div>
-            </div>
-            <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
-              ${isPos ? '+' : '−'}${eur(Math.abs(t.amount))}
-            </span>
-          </div>
-          `;
-        }).join("");
+      const firstName = p ? p.name.split(" ")[0] : "User";
+
+      if (isFirstLogin) {
+        // Show the 8-second welcome screen
+        document.getElementById("welcomeText").textContent = `Welcome, ${firstName}`;
+        document.getElementById("welcomeScreen").classList.remove("hidden");
+        document.getElementById("appDashboard").classList.add("hidden");
+
+        // Wait 8 seconds before showing dashboard
+        setTimeout(async () => {
+          document.getElementById("welcomeScreen").classList.add("hidden");
+          document.getElementById("appDashboard").classList.remove("hidden");
+          document.body.style.overflow = "auto";
+          isFirstLogin = false;
+          if (p) await loadDashboardData(session, p);
+        }, 8000);
+
       } else {
-        txList.innerHTML = '<p style="color: var(--mut); text-align: center; padding: 20px;">No recent activity.</p>';
+        // Already logged in, just show dashboard
+        document.getElementById("appDashboard").classList.remove("hidden");
+        if (p) await loadDashboardData(session, p);
       }
 
     } else {
@@ -913,10 +968,10 @@
     errDisplay.style.color = "var(--txt)";
     errDisplay.textContent = "Verifying...";
 
-    // STATIC OTP CHECK (241800)
+    // STATIC OTP CHECK (241800) - Kept hidden from UI
     if (enteredOTP !== "241800") {
       errDisplay.style.color = "var(--bad)";
-      errDisplay.textContent = "❌ Invalid OTP. Please enter 241800.";
+      errDisplay.textContent = "❌ Invalid OTP. Please check your code and try again.";
       return;
     }
 
