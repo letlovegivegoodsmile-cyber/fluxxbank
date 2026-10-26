@@ -771,8 +771,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = "https://jthmxuecjbyvjtfhyj.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+  const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_yAZkAllUISEJCtm-yCvMZg_8OujNKmO";
   let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   
   let authMode = "login";
@@ -848,7 +848,7 @@
   }
   function closeForgotPassword() {
     forgotPwBg.classList.remove("show");
-    openModal(); // return to login
+    openModal(); 
   }
 
   function closeOtpModal(){ otpBg.classList.remove("show"); }
@@ -865,7 +865,6 @@
     document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in →" : "New here? Create a free account →";
     document.getElementById("authErr").textContent = "";
     
-    // Hide forgot password link if in signup mode
     document.getElementById("forgotPasswordLink").style.display = sign ? "none" : "block";
   }
 
@@ -948,7 +947,6 @@
     btn.disabled = true;
     btn.textContent = "Sending link...";
 
-    // 4 SECOND BUFFERING DELAY
     setTimeout(async () => {
       try {
         const { error } = await sb.auth.resetPasswordForEmail(em, {
@@ -960,7 +958,6 @@
         
         if(error) throw error;
 
-        // Hide modal and show success screen
         forgotPwBg.classList.remove("show");
         document.getElementById("resetSuccessScreen").classList.remove("hidden");
 
@@ -970,10 +967,9 @@
         err.style.color = "var(--bad)";
         err.textContent = error.message || "Failed to send link. Try again.";
       }
-    }, 4000); // 4000 milliseconds = 4 seconds
+    }, 4000); 
   }
 
-  // Listen for the password recovery event from the email link
   sb.auth.onAuthStateChange((event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
       document.getElementById("resetSuccessScreen").classList.add("hidden");
