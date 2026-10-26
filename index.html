@@ -534,7 +534,7 @@
 
   <div class="band"><div class="band-grid"><div><b>€8.2B+</b><span>Deposits protected</span></div><div><b>99.99%</b><span>Uptime</span></div><div><b>1,200/s</b><span>Transactions per sec</span></div><div><b>5.0 ★</b><span>310k reviews</span></div></div></div>
 
-  <!-- CUSTOMER REVIEWS SLIDESHOW (YOUR PICTURES HERE) -->
+  <!-- CUSTOMER REVIEWS SLIDESHOW -->
   <section class="reviews" id="reviews">
     <div class="rev-bg" id="revBg">
       <div class="rev-slide active" style="background-image:url('review 1.png')"></div>
@@ -567,7 +567,7 @@
     <div style="text-align:center;margin-top:50px"><button class="btn gold" style="padding:16px 36px;font-size:1.05rem" onclick="openModal()">Open my Fluxxbank account →</button></div>
   </section>
 
-  <!-- SHOWCASE GALLERY (YOUR PICTURES HERE) -->
+  <!-- SHOWCASE GALLERY -->
   <section id="showcase">
     <div class="sec-head"><h2>Fluxxbank, in pictures</h2><p>Our cards, our buildings, our world — a look at the bank in motion. Auto-plays, or tap a thumbnail to explore.</p></div>
     <div class="gallery-stage" id="galStage">
@@ -703,16 +703,21 @@
   <div class="modal">
     <h3 id="authTitle">Welcome back ⚡</h3>
     <p id="authSub">Log in to your Fluxxbank account.</p>
-    <input type="text" placeholder="Full name" id="authName" style="display:none; text-align:left; font-size:1rem; letter-spacing:normal;" autocomplete="off">
-    <input type="email" placeholder="Email address" id="loginEmail" style="text-align:left; font-size:1rem; letter-spacing:normal;">
-    <input type="password" placeholder="Password" id="loginPass" style="text-align:left; font-size:1rem; letter-spacing:normal;">
-    <div class="error" id="authErr"></div>
     
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-       <a href="#" id="forgotPasswordLink" onclick="showForgotPassword(event)" style="color:var(--accent2); font-size:0.82rem; text-decoration:none;">Forgot password?</a>
-    </div>
+    <!-- FIXED: Wrapped inputs in a <form> to stop the DOM warnings -->
+    <form onsubmit="event.preventDefault(); submitAuth();">
+      <input type="text" placeholder="Full name" id="authName" style="display:none; text-align:left; font-size:1rem; letter-spacing:normal;" autocomplete="off">
+      <input type="email" placeholder="Email address" id="loginEmail" style="text-align:left; font-size:1rem; letter-spacing:normal;">
+      <input type="password" placeholder="Password" id="loginPass" style="text-align:left; font-size:1rem; letter-spacing:normal;">
+      <div class="error" id="authErr"></div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+         <a href="#" id="forgotPasswordLink" onclick="showForgotPassword(event)" style="color:var(--accent2); font-size:0.82rem; text-decoration:none;">Forgot password?</a>
+      </div>
 
-    <button class="btn" id="authBtn" onclick="submitAuth()">Log in</button>
+      <button class="btn" id="authBtn" type="submit">Log in</button>
+    </form>
+    
     <p style="margin-top:16px;font-size:.82rem; text-align: center;">
       <a href="#" id="authSwitch" style="color:var(--accent2)" onclick="switchAuthMode(event)">New here? Create a free account →</a>
     </p>
@@ -724,9 +729,11 @@
   <div class="modal">
     <h3 style="text-align: center;">Reset Password 🔑</h3>
     <p style="text-align: center;">Enter your email address and we'll send you a secure link to reset your password.</p>
-    <input type="email" id="forgotEmail" placeholder="Email address" style="text-align:left; font-size:1rem; letter-spacing:normal;">
-    <div class="error" id="forgotErr" style="text-align:center; margin-bottom:10px;"></div>
-    <button class="btn" id="sendResetBtn" onclick="sendResetLink()" style="margin-top: 10px;">Send Reset Link</button>
+    <form onsubmit="event.preventDefault(); sendResetLink();">
+      <input type="email" id="forgotEmail" placeholder="Email address" style="text-align:left; font-size:1rem; letter-spacing:normal;">
+      <div class="error" id="forgotErr" style="text-align:center; margin-bottom:10px;"></div>
+      <button class="btn" id="sendResetBtn" type="submit" style="margin-top: 10px;">Send Reset Link</button>
+    </form>
     <button class="btn ghost" onclick="closeForgotPassword()" style="margin-top: 10px; width:100%; justify-content:center;">Back to Login</button>
   </div>
 </div>
@@ -736,9 +743,11 @@
   <div class="modal">
     <h3 style="text-align: center;">Create New Password 🔐</h3>
     <p style="text-align: center;">Please enter a strong new password for your Fluxxbank account.</p>
-    <input type="password" id="newPasswordInput" placeholder="New Password (min. 6 chars)" style="text-align:left; font-size:1rem; letter-spacing:normal;">
-    <div class="error" id="resetErr" style="text-align:center; margin-bottom:10px;"></div>
-    <button class="btn" onclick="updatePassword()" style="margin-top: 10px;">Update Password</button>
+    <form onsubmit="event.preventDefault(); updatePassword();">
+      <input type="password" id="newPasswordInput" placeholder="New Password (min. 6 chars)" style="text-align:left; font-size:1rem; letter-spacing:normal;">
+      <div class="error" id="resetErr" style="text-align:center; margin-bottom:10px;"></div>
+      <button class="btn" type="submit" style="margin-top: 10px;">Update Password</button>
+    </form>
   </div>
 </div>
 
@@ -747,10 +756,12 @@
   <div class="modal">
     <h3 style="text-align: center;">🔒 Transfer Authorization</h3>
     <p style="text-align: center;">Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">€0.00</strong> to <strong id="transferToDisplay" style="color: var(--txt);">Recipient</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.</p>
-    <input type="text" id="transferOtpInput" placeholder="------" maxlength="6" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;">
-    <input type="hidden" id="currentTxId">
-    <div class="error" id="otpErr" style="margin-top: -5px;"></div>
-    <button class="btn" onclick="verifyTransferOTP()" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent));">Verify & Complete</button>
+    <form onsubmit="event.preventDefault(); verifyTransferOTP();">
+      <input type="text" id="transferOtpInput" placeholder="------" maxlength="6" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;">
+      <input type="hidden" id="currentTxId">
+      <div class="error" id="otpErr" style="margin-top: -5px;"></div>
+      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent));">Verify & Complete</button>
+    </form>
     <button class="btn ghost" onclick="closeOtpModal()" style="margin-top: 10px; width: 100%; justify-content: center;">Cancel</button>
   </div>
 </div>
@@ -794,9 +805,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // --- CORRECTED URL AND KEY ---
+  // --- NEW CORRECTED URL AND KEY ---
   const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_yAZkAllUISEJCtm-yCvMZg_8OujNKmO";
+  const SUPABASE_KEY = "sb_publishable_WzE8F6fwrln4M3ExyLKKjQ_qzZSlPOe";
   let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   
   let authMode = "login";
