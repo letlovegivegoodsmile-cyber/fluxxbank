@@ -35,6 +35,44 @@
   .hidden{display:none !important}
 
   /* =========================================
+     SUCCESS SCREEN (PASSWORD RESET)
+     ========================================= */
+  #resetSuccessScreen {
+    position: fixed; inset: 0; background: #0d1b3e; z-index: 9999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+  }
+  .success-logo { position: absolute; top: 40px; left: 40px; display: flex; align-items: center; gap: 10px; }
+  .success-logo svg { width: 40px; height: 40px; }
+  .success-logo-text { font-size: 2rem; font-weight: 800; letter-spacing: -.5px;}
+  .success-logo-text span:first-child { color: #fff; }
+  .success-logo-text span:last-child { color: #f58220; }
+  .success-sub { position: absolute; top: 90px; left: 45px; color: #cbd5e1; font-size: 0.9rem; }
+
+  .success-icon-wrap { margin-bottom: 40px; position: relative; }
+  .success-icon-wrap::before {
+    content: ''; position: absolute; inset: -20px; background: rgba(34, 197, 94, 0.2);
+    border-radius: 50%; filter: blur(20px); z-index: -1;
+  }
+  .success-icon {
+    width: 140px; height: 140px; border-radius: 50%; background: #1a3a2a;
+    display: flex; align-items: center; justify-content: center;
+    border: 4px solid #22c55e; box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+  }
+  .success-icon svg { width: 70px; height: 70px; fill: #fff; }
+
+  .success-title { font-size: 2.8rem; font-weight: 700; color: #fff; margin-bottom: 20px; text-align: center; }
+  .success-text { font-size: 1.4rem; color: #cbd5e1; text-align: center; line-height: 1.5; margin-bottom: 50px; }
+  .success-text span { color: #60a5fa; }
+
+  .success-info-box {
+    border: 1px solid #3b82f6; border-radius: 12px; padding: 20px 30px;
+    display: flex; align-items: center; gap: 20px; max-width: 600px; width: 100%;
+    background: rgba(59, 130, 246, 0.1); margin: 0 auto;
+  }
+  .success-info-box svg { width: 40px; height: 40px; fill: #60a5fa; flex-shrink: 0; }
+  .success-info-box p { color: #cbd5e1; font-size: 1rem; line-height: 1.5; }
+
+  /* =========================================
      WELCOME SCREEN
      ========================================= */
   #welcomeScreen {
@@ -284,7 +322,6 @@
   .send-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(79, 124, 255, 0.6); }
 
   .tx-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-  /* Added cursor pointer and hover effect to indicate clickability */
   .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); transition: 0.2s; cursor: pointer; }
   .tx-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(79,124,255,.3); }
   .tx-left { display: flex; align-items: center; gap: 15px; }
@@ -367,9 +404,48 @@
     .mobile-bottom-bar span { font-size: 1.2rem; }
   }
   @media (min-width: 769px) { .mobile-nav, .mobile-bottom-bar { display: none !important; } }
+
+  /* Responsive Success Screen */
+  @media (max-width: 600px) {
+    .success-logo { top: 20px; left: 20px; }
+    .success-logo-text { font-size: 1.5rem; }
+    .success-sub { display: none; }
+    .success-title { font-size: 2rem; }
+    .success-text { font-size: 1.1rem; }
+    .success-icon { width: 100px; height: 100px; }
+    .success-icon svg { width: 50px; height: 50px; }
+    .success-info-box { flex-direction: column; text-align: center; gap: 10px; padding: 15px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- =========================================
+     PASSWORD RESET SUCCESS SCREEN
+     ========================================= -->
+<div id="resetSuccessScreen" class="hidden">
+  <div class="success-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#f58220" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" fill="#f58220"/>
+    </svg>
+    <div class="success-logo-text"><span>Fluxx</span><span>Bank</span></div>
+  </div>
+  <div class="success-sub">Secure Banking. Brighter Future.</div>
+
+  <div class="success-icon-wrap">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    </div>
+  </div>
+  
+  <h1 class="success-title">Password Reset Email Sent</h1>
+  <p class="success-text">Please click on the link in your email<br>for <span>password reset.</span></p>
+
+  <div class="success-info-box">
+    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    <p>If you don't see the email within a few minutes, please check your spam or junk folder.</p>
+  </div>
+</div>
 
 <!-- WELCOME SCREEN -->
 <div id="welcomeScreen" class="hidden">
@@ -608,10 +684,38 @@
     <input type="email" placeholder="Email address" id="loginEmail" style="text-align:left; font-size:1rem; letter-spacing:normal;">
     <input type="password" placeholder="Password" id="loginPass" style="text-align:left; font-size:1rem; letter-spacing:normal;">
     <div class="error" id="authErr"></div>
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+       <a href="#" id="forgotPasswordLink" onclick="showForgotPassword(event)" style="color:var(--accent2); font-size:0.82rem; text-decoration:none;">Forgot password?</a>
+    </div>
+
     <button class="btn" id="authBtn" onclick="submitAuth()">Log in</button>
     <p style="margin-top:16px;font-size:.82rem; text-align: center;">
       <a href="#" id="authSwitch" style="color:var(--accent2)" onclick="switchAuthMode(event)">New here? Create a free account →</a>
     </p>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-bg" id="forgotPasswordModal" onclick="if(event.target===this)closeForgotPassword()">
+  <div class="modal">
+    <h3 style="text-align: center;">Reset Password 🔑</h3>
+    <p style="text-align: center;">Enter your email address and we'll send you a secure link to reset your password.</p>
+    <input type="email" id="forgotEmail" placeholder="Email address" style="text-align:left; font-size:1rem; letter-spacing:normal;">
+    <div class="error" id="forgotErr" style="text-align:center; margin-bottom:10px;"></div>
+    <button class="btn" id="sendResetBtn" onclick="sendResetLink()" style="margin-top: 10px;">Send Reset Link</button>
+    <button class="btn ghost" onclick="closeForgotPassword()" style="margin-top: 10px; width:100%; justify-content:center;">Back to Login</button>
+  </div>
+</div>
+
+<!-- CREATE NEW PASSWORD MODAL (AFTER CLICKING EMAIL LINK) -->
+<div class="modal-bg" id="newPasswordModal" onclick="if(event.target===this)return;">
+  <div class="modal">
+    <h3 style="text-align: center;">Create New Password 🔐</h3>
+    <p style="text-align: center;">Please enter a strong new password for your Fluxxbank account.</p>
+    <input type="password" id="newPasswordInput" placeholder="New Password (min. 6 chars)" style="text-align:left; font-size:1rem; letter-spacing:normal;">
+    <div class="error" id="resetErr" style="text-align:center; margin-bottom:10px;"></div>
+    <button class="btn" onclick="updatePassword()" style="margin-top: 10px;">Update Password</button>
   </div>
 </div>
 
@@ -667,13 +771,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+  const SUPABASE_URL = "https://jthmxuecjbyvjtfhyj.supabase.co";
   const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
   let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   
   let authMode = "login";
   let isFirstLogin = true; 
-  let userTransactions = []; // Stores transactions for clickable receipts
+  let userTransactions = []; 
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
   // --- LANDING PAGE SCRIPTS ---
@@ -728,12 +832,25 @@
 
   // --- MODAL LOGIC ---
   const bg = document.getElementById("modalBg");
+  const forgotPwBg = document.getElementById("forgotPasswordModal");
+  const newPwBg = document.getElementById("newPasswordModal");
   const otpBg = document.getElementById("otpModal");
   const processingBg = document.getElementById("processingModal");
   const receiptBg = document.getElementById("receiptModal");
   
   function openModal(){ bg.classList.add("show"); }
   function closeModal(){ bg.classList.remove("show"); }
+  
+  function showForgotPassword(e) {
+    e.preventDefault();
+    closeModal();
+    forgotPwBg.classList.add("show");
+  }
+  function closeForgotPassword() {
+    forgotPwBg.classList.remove("show");
+    openModal(); // return to login
+  }
+
   function closeOtpModal(){ otpBg.classList.remove("show"); }
   function closeReceipt(){ receiptBg.classList.remove("show"); }
 
@@ -747,6 +864,9 @@
     document.getElementById("authBtn").textContent = sign ? "Create account" : "Log in";
     document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in →" : "New here? Create a free account →";
     document.getElementById("authErr").textContent = "";
+    
+    // Hide forgot password link if in signup mode
+    document.getElementById("forgotPasswordLink").style.display = sign ? "none" : "block";
   }
 
   // --- AUTHENTICATION ---
@@ -764,10 +884,17 @@
         if(pw.length < 6){ err.textContent = "Password needs at least 6 characters."; return; }
         const { data: su, error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm || "Customer" } } });
         if(error) throw error;
+        
         if(su.user){
-          await sb.from("profiles").insert({
-            id: su.user.id, name: nm || "Customer", email: em, balance: 0, plan: "Basic", status: "Pending", color: "#34d399"
+          const { error: insertErr } = await sb.from("profiles").insert({
+            id: su.user.id, 
+            name: nm || "Customer", 
+            email: em, 
+            balance: 0, 
+            status: "pending"
           });
+          
+          if (insertErr) console.error("Profile insert error:", insertErr);
         }
         err.style.color = "var(--ok)";
         err.textContent = "✅ Account created! Wait for admin activation.";
@@ -805,6 +932,83 @@
     }
   }
 
+  // --- PASSWORD RESET LOGIC ---
+  async function sendResetLink() {
+    const em = document.getElementById("forgotEmail").value.trim();
+    const err = document.getElementById("forgotErr");
+    const btn = document.getElementById("sendResetBtn");
+    
+    if(!em.includes("@")){
+      err.style.color = "var(--bad)";
+      err.textContent = "Please enter a valid email address.";
+      return;
+    }
+    
+    err.textContent = "";
+    btn.disabled = true;
+    btn.textContent = "Sending link...";
+
+    // 4 SECOND BUFFERING DELAY
+    setTimeout(async () => {
+      try {
+        const { error } = await sb.auth.resetPasswordForEmail(em, {
+          redirectTo: 'https://fluxxbank.org.uk/index.html' 
+        });
+        
+        btn.disabled = false;
+        btn.textContent = "Send Reset Link";
+        
+        if(error) throw error;
+
+        // Hide modal and show success screen
+        forgotPwBg.classList.remove("show");
+        document.getElementById("resetSuccessScreen").classList.remove("hidden");
+
+      } catch(error) {
+        btn.disabled = false;
+        btn.textContent = "Send Reset Link";
+        err.style.color = "var(--bad)";
+        err.textContent = error.message || "Failed to send link. Try again.";
+      }
+    }, 4000); // 4000 milliseconds = 4 seconds
+  }
+
+  // Listen for the password recovery event from the email link
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      document.getElementById("resetSuccessScreen").classList.add("hidden");
+      newPwBg.classList.add("show");
+    }
+  });
+
+  async function updatePassword() {
+    const newPw = document.getElementById('newPasswordInput').value;
+    const err = document.getElementById('resetErr');
+    
+    if (newPw.length < 6) {
+      err.style.color = "var(--bad)";
+      err.textContent = "Password needs at least 6 characters.";
+      return;
+    }
+    
+    err.style.color = "var(--txt)";
+    err.textContent = "Updating...";
+
+    const { error } = await sb.auth.updateUser({ password: newPw });
+    
+    if (error) {
+      err.style.color = "var(--bad)";
+      err.textContent = error.message;
+    } else {
+      err.style.color = "var(--ok)";
+      err.textContent = "✅ Password updated successfully! Redirecting to login...";
+      setTimeout(async () => {
+        await sb.auth.signOut();
+        window.location.reload();
+      }, 2000);
+    }
+  }
+
   // --- AVATAR UPLOAD LOGIC ---
   async function uploadAvatar(event) {
     const file = event.target.files[0];
@@ -838,16 +1042,14 @@
     document.getElementById("desktopAvatar").innerHTML = avatarHtml;
     document.getElementById("mobileAvatar").innerHTML = avatarHtml;
 
-    // Load Transactions
     const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false }).limit(10);
     
-    userTransactions = txData || []; // Store for clickable receipts
+    userTransactions = txData || []; 
 
     const txList = document.getElementById("txlist");
     if(userTransactions.length > 0) {
       txList.innerHTML = userTransactions.map(t => {
         const isPos = t.type === 'deposit';
-        // Add onclick to view receipt
         return `
         <div class="tx-item" onclick="viewReceipt('${t.id}')">
           <div class="tx-left">
@@ -994,10 +1196,8 @@
 
         processingBg.classList.remove("show");
         
-        // Show the receipt immediately
         populateAndShowReceipt(tx, profile.name);
 
-        // Refresh dashboard in background
         await checkSession();
       } catch (err) {
         processingBg.classList.remove("show");
@@ -1021,14 +1221,12 @@
     document.getElementById("rRef").textContent = tx.reference || "N/A";
     document.getElementById("rFrom").textContent = profileName;
     
-    // Extract To and Note
     let to = "Unknown";
     let note = "None";
     if (tx.type === 'deposit') {
         to = "Admin Deposit";
         note = tx.description;
     } else {
-        // Match "Sent to Maya Chen (Family)"
         const match = tx.description.match(/Sent to (.*?) \((.*?)\)/);
         if (match) {
             to = match[1];
