@@ -166,7 +166,7 @@
             <div class="panel"><h2>Pending applications</h2><div id="apprList"><div class="empty">Loading applications…</div></div></div>
           </section>
 
-          <!-- PENDING TRANSFERS (STATIC OTP 241800) -->
+          <!-- PENDING TRANSFERS -->
           <section id="view-transfers" class="view">
             <h2 class="section-title">Pending Transfers</h2>
             <p class="section-desc">Customers have requested transfers. They will use the static OTP (241800) to complete it.</p>
@@ -190,8 +190,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     "use strict";
+    // --- CORRECTED URL AND KEY ---
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+    const SUPABASE_KEY = "sb_publishable_yAZkAllUISEJCtm-yCvMZg_8OujNKmO";
     const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
 
     let sb = null;
@@ -356,6 +357,7 @@
           <td>
             ${isPending(c.status) ? `<button class="btn small approve-btn" type="button" data-index="${i}">Approve</button>` : ""}
             <button class="btn small" style="background:var(--orange); color:#000; margin-left:5px;" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button>
+            <button class="btn small" style="background:var(--panel2); color:white; border:1px solid var(--border); margin-left:5px;" onclick="sendPasswordReset('${c.email}')">Reset PW</button>
           </td>
         </tr>`).join("") || '<tr><td colspan="5">No profiles.</td></tr>';
     }
@@ -419,6 +421,20 @@
       
       toast(`✅ Deposited $${amount} to ${userName}`);
       await loadAll(); renderCustomers();
+    }
+
+    async function sendPasswordReset(email) {
+      if(!confirm(`Send a secure password reset link to ${email}?`)) return;
+      
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://fluxxbank.org.uk/index.html'
+      });
+      
+      if (error) {
+        toast("Error: " + error.message);
+      } else {
+        toast(`✅ Reset link sent to ${email}`);
+      }
     }
 
     // --- PENDING TRANSFERS LOGIC (STATIC OTP 241800) ---
