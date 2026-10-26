@@ -284,8 +284,9 @@
   .send-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(79, 124, 255, 0.6); }
 
   .tx-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-  .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); transition: 0.2s; }
-  .tx-item:hover { background: rgba(255,255,255,0.05); }
+  /* Added cursor pointer and hover effect to indicate clickability */
+  .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); transition: 0.2s; cursor: pointer; }
+  .tx-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(79,124,255,.3); }
   .tx-left { display: flex; align-items: center; gap: 15px; }
   .tx-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
   .tx-details h4 { font-size: 1rem; margin-bottom: 4px; }
@@ -333,7 +334,7 @@
   .r-print { background: #4f7cff; color: #fff; }
   .r-close { background: #eef0f6; color: #141824; }
 
-  /* PRINT CSS (Hides everything except the receipt) */
+  /* PRINT CSS */
   @media print {
     body * { visibility: hidden; }
     #receiptModal, #receiptModal * { visibility: visible; }
@@ -504,7 +505,6 @@
 <div id="appDashboard" class="hidden">
   <div class="mobile-nav">
     <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a>
-    <!-- CLICKABLE AVATAR FOR MOBILE -->
     <div class="user-avatar" id="mobileAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
   </div>
 
@@ -517,7 +517,6 @@
       <li><a href="#"><span>⚙️</span> Settings</a></li>
     </ul>
     <div class="user-profile">
-      <!-- CLICKABLE AVATAR FOR DESKTOP -->
       <div class="user-avatar" id="desktopAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
       <div class="user-info">
         <h4 id="userNameDisplay">Loading...</h4>
@@ -549,7 +548,7 @@
 
         <div class="dash-card">
           <h3 style="margin-bottom: 5px;">Recent Activity</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Your latest completed transactions</p>
+          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Your latest completed transactions (Click to view receipt)</p>
           <div class="tx-list" id="txlist">
             <p style="color: var(--mut); text-align: center; padding: 20px;">Loading transactions...</p>
           </div>
@@ -674,6 +673,7 @@
   
   let authMode = "login";
   let isFirstLogin = true; 
+  let userTransactions = []; // Stores transactions for clickable receipts
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
   // --- LANDING PAGE SCRIPTS ---
@@ -817,11 +817,9 @@
     reader.onload = async function(e) {
       const base64String = e.target.result;
       
-      // Update database
       const { error } = await sb.from("profiles").update({ avatar_url: base64String }).eq("id", session.user.id);
       if(error) return alert("Failed to upload photo: " + error.message);
 
-      // Update UI immediately
       const avatarHtml = `<img src="${base64String}" alt="User">`;
       document.getElementById("desktopAvatar").innerHTML = avatarHtml;
       document.getElementById("mobileAvatar").innerHTML = avatarHtml;
@@ -836,7 +834,6 @@
     document.getElementById("userNameDisplay").textContent = profile.name;
     document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
 
-    // Set Avatar
     const avatarHtml = profile.avatar_url ? `<img src="${profile.avatar_url}" alt="User">` : firstName.charAt(0).toUpperCase();
     document.getElementById("desktopAvatar").innerHTML = avatarHtml;
     document.getElementById("mobileAvatar").innerHTML = avatarHtml;
@@ -844,12 +841,15 @@
     // Load Transactions
     const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false }).limit(10);
     
+    userTransactions = txData || []; // Store for clickable receipts
+
     const txList = document.getElementById("txlist");
-    if(txData && txData.length > 0) {
-      txList.innerHTML = txData.map(t => {
+    if(userTransactions.length > 0) {
+      txList.innerHTML = userTransactions.map(t => {
         const isPos = t.type === 'deposit';
+        // Add onclick to view receipt
         return `
-        <div class="tx-item">
+        <div class="tx-item" onclick="viewReceipt('${t.id}')">
           <div class="tx-left">
             <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
             <div class="tx-details">
@@ -973,42 +973,29 @@
       return;
     }
 
-    // STATIC OTP CHECK (241800)
     if (enteredOTP !== "241800") {
       errDisplay.style.color = "var(--bad)";
       errDisplay.textContent = "❌ Invalid OTP. Please check your code and try again.";
       return;
     }
 
-    // Close OTP modal, show processing modal
     closeOtpModal();
     processingBg.classList.add("show");
 
-    // Wait 7 seconds
     setTimeout(async () => {
       try {
         const { data: { session } } = await sb.auth.getSession();
         const { data: tx } = await sb.from("transactions").select("*").eq("id", txId).single();
         const { data: profile } = await sb.from("profiles").select("balance, name").eq("id", session.user.id).single();
         
-        // Deduct funds & mark complete
         const newBalance = Number(profile.balance) - Number(tx.amount);
         await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
         await sb.from("transactions").update({ status: "completed" }).eq("id", txId);
 
-        // Populate Receipt
-        const now = new Date();
-        document.getElementById("rDate").textContent = now.toLocaleDateString("en-IE", {day:'2-digit', month:'long', year:'numeric'});
-        document.getElementById("rTime").textContent = now.toLocaleTimeString("en-IE", {hour:'2-digit', minute:'2-digit'});
-        document.getElementById("rRef").textContent = tx.reference;
-        document.getElementById("rFrom").textContent = profile.name;
-        document.getElementById("rTo").textContent = tx.description.split('(')[0].replace('Sent to ', '').trim();
-        document.getElementById("rNote").textContent = tx.description.match(/\((.*?)\)/)?.[1] || "None";
-        document.getElementById("rAmt").textContent = eur(tx.amount);
-
-        // Hide processing, show receipt
         processingBg.classList.remove("show");
-        receiptBg.classList.add("show");
+        
+        // Show the receipt immediately
+        populateAndShowReceipt(tx, profile.name);
 
         // Refresh dashboard in background
         await checkSession();
@@ -1017,6 +1004,45 @@
         alert("Something went wrong completing the transaction.");
       }
     }, 7000);
+  }
+
+  // --- REUSABLE RECEIPT VIEWER ---
+  function viewReceipt(txId) {
+    const tx = userTransactions.find(t => t.id === txId);
+    if(!tx) return;
+    const profileName = document.getElementById("userNameDisplay").textContent;
+    populateAndShowReceipt(tx, profileName);
+  }
+
+  function populateAndShowReceipt(tx, profileName) {
+    const dateObj = new Date(tx.created_at); 
+    document.getElementById("rDate").textContent = dateObj.toLocaleDateString("en-IE", {day:'2-digit', month:'long', year:'numeric'});
+    document.getElementById("rTime").textContent = dateObj.toLocaleTimeString("en-IE", {hour:'2-digit', minute:'2-digit'});
+    document.getElementById("rRef").textContent = tx.reference || "N/A";
+    document.getElementById("rFrom").textContent = profileName;
+    
+    // Extract To and Note
+    let to = "Unknown";
+    let note = "None";
+    if (tx.type === 'deposit') {
+        to = "Admin Deposit";
+        note = tx.description;
+    } else {
+        // Match "Sent to Maya Chen (Family)"
+        const match = tx.description.match(/Sent to (.*?) \((.*?)\)/);
+        if (match) {
+            to = match[1];
+            note = match[2] || "None";
+        } else {
+            to = tx.description;
+        }
+    }
+
+    document.getElementById("rTo").textContent = to;
+    document.getElementById("rNote").textContent = note;
+    document.getElementById("rAmt").textContent = eur(tx.amount);
+
+    document.getElementById("receiptModal").classList.add("show");
   }
 
   window.addEventListener("DOMContentLoaded", () => {
