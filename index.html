@@ -3,1246 +3,402 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Fluxxbank — the digital bank that's always in motion. Free accounts, instant FluxxPay, 5.0 rated.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://fluxxbank.org.uk/">
-<meta property="og:title" content="Fluxxbank — Banking in Motion">
-<meta property="og:description" content="Free accounts, instant payments, smart savings. Rated 5.0 by 310,000+ customers.">
-<meta property="og:image" content="https://fluxxbank.org.uk/og-cover.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Fluxxbank — Banking in Motion">
-<meta name="twitter:image" content="https://fluxxbank.org.uk/og-cover.png">
-<meta name="theme-color" content="#0b1020">
-<link rel="icon" type="image/png" href="favicon.png">
+<meta name="description" content="Fluxxbank — the digital bank that is always in motion. Instant payments, fee-free accounts, and real-time insights.">
+<meta name="robots" content="noindex">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Expires" content="0" />
+<meta name="theme-color" content="#0b1020">
 <title>Fluxxbank — Banking in Motion</title>
 <style>
-  :root{
-    --ink:#0b1020; --ink2:#131a33; --card:#161f3d;
-    --accent:#4f7cff; --accent2:#22d3ee; --accent3:#a855f7;
-    --gold:#f5c451;
-    --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08);
-    --ok:#34d399; --bad:#f87171;
-    --r:16px;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}
-  html{scroll-behavior:smooth}
-  body{background:var(--ink);color:var(--txt);overflow-x:hidden; transition: background 0.3s;}
-  a{color:inherit;text-decoration:none}
-  button{font:inherit;cursor:pointer;border:none}
-  .hidden{display:none !important}
-
-  /* =========================================
-     SUCCESS SCREEN (PASSWORD RESET)
-     ========================================= */
-  #resetSuccessScreen {
-    position: fixed; inset: 0; background: #0d1b3e; z-index: 9999;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
-  }
-  .success-logo { position: absolute; top: 40px; left: 40px; display: flex; align-items: center; gap: 10px; }
-  .success-logo svg { width: 40px; height: 40px; }
-  .success-logo-text { font-size: 2rem; font-weight: 800; letter-spacing: -.5px;}
-  .success-logo-text span:first-child { color: #fff; }
-  .success-logo-text span:last-child { color: #f58220; }
-  .success-sub { position: absolute; top: 90px; left: 45px; color: #cbd5e1; font-size: 0.9rem; }
-
-  .success-icon-wrap { margin-bottom: 40px; position: relative; }
-  .success-icon-wrap::before {
-    content: ''; position: absolute; inset: -20px; background: rgba(34, 197, 94, 0.2);
-    border-radius: 50%; filter: blur(20px); z-index: -1;
-  }
-  .success-icon {
-    width: 140px; height: 140px; border-radius: 50%; background: #1a3a2a;
-    display: flex; align-items: center; justify-content: center;
-    border: 4px solid #22c55e; box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
-  }
-  .success-icon svg { width: 70px; height: 70px; fill: #fff; }
-
-  .success-title { font-size: 2.8rem; font-weight: 700; color: #fff; margin-bottom: 20px; text-align: center; }
-  .success-text { font-size: 1.4rem; color: #cbd5e1; text-align: center; line-height: 1.5; margin-bottom: 50px; }
-  .success-text span { color: #60a5fa; }
-
-  .success-info-box {
-    border: 1px solid #3b82f6; border-radius: 12px; padding: 20px 30px;
-    display: flex; align-items: center; gap: 20px; max-width: 600px; width: 100%;
-    background: rgba(59, 130, 246, 0.1); margin: 0 auto;
-  }
-  .success-info-box svg { width: 40px; height: 40px; fill: #60a5fa; flex-shrink: 0; }
-  .success-info-box p { color: #cbd5e1; font-size: 1rem; line-height: 1.5; }
-
-  /* =========================================
-     WELCOME SCREEN
-     ========================================= */
-  #welcomeScreen {
-    position: fixed; inset: 0; background: var(--ink); z-index: 9999;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-  }
-  .welcome-text {
-    font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800;
-    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    opacity: 0; transform: translateY(20px); animation: fadeInScale 2s ease forwards;
-  }
-  .progress-bar-container {
-    width: 250px; height: 6px; background: var(--line);
-    border-radius: 10px; margin-top: 40px; overflow: hidden; opacity: 0; animation: fadeIn 1s 1s forwards;
-  }
-  .progress-bar {
-    width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent));
-    animation: loadProgress 8s linear forwards;
-  }
-  @keyframes fadeInScale { to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { to { opacity: 1; } }
-  @keyframes loadProgress { to { width: 100%; } }
-
-  /* =========================================
-     LANDING PAGE STYLES
-     ========================================= */
-  nav.landing-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
-      padding:16px 5%;background:rgba(11,16,32,.75);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;letter-spacing:.5px}
-  .logo .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 22px rgba(79,124,255,.55)}
-  .logo .mark svg{width:20px;height:20px}
-  .navlinks{display:flex;gap:26px;font-size:.95rem;color:var(--mut)}
-  .navlinks a:hover{color:var(--txt)}
-  
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;font-weight:600;font-size:.95rem;
-      background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;box-shadow:0 6px 22px rgba(79,124,255,.35);
-      transition:transform .15s, box-shadow .15s}
-  .btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,124,255,.5)}
-  .btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--txt)}
-  .btn.gold{background:linear-gradient(135deg,#f5c451,#e8a020);color:#241a02;box-shadow:0 6px 22px rgba(245,196,81,.3)}
-
-  .hero{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:140px 5% 80px;position:relative}
-  .hero::before{content:"";position:absolute;inset:0;
-      background:radial-gradient(600px 400px at 80% 20%,rgba(79,124,255,.18),transparent 60%),
-                 radial-gradient(500px 400px at 10% 90%,rgba(168,85,247,.12),transparent 60%);pointer-events:none}
-  .eyebrow{display:inline-block;padding:6px 14px;border:1px solid var(--line);border-radius:999px;color:var(--accent2);
-      font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;background:rgba(34,211,238,.06)}
-  h1{font-size:clamp(2.4rem,5vw,4rem);line-height:1.08;font-weight:800}
-  h1 .grad{background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .hero p.lead{margin:22px 0 30px;color:var(--mut);font-size:1.1rem;max-width:520px;line-height:1.7}
-  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
-  .stats{display:flex;gap:40px;margin-top:48px}
-  .stat b{font-size:1.6rem;display:block}
-  .stat span{color:var(--mut);font-size:.85rem}
-
-  .phone-wrap{display:flex;justify-content:center}
-  .phone{width:300px;border-radius:36px;border:1px solid var(--line);background:linear-gradient(160deg,var(--ink2),#0d1330);
-      padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 6px #05070f}
-  .ph-top{display:flex;justify-content:space-between;color:var(--mut);font-size:.75rem;margin-bottom:18px}
-  .ph-bal{background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:20px;padding:20px;margin-bottom:16px}
-  .ph-bal small{opacity:.85;font-size:.75rem}
-  .ph-bal b{font-size:1.5rem;display:block;margin-top:6px}
-  .ph-bal .chip{width:34px;height:24px;border-radius:6px;background:linear-gradient(135deg,#ffe9a8,#f5c451);margin-top:12px}
-  .ph-row{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
-      border-radius:14px;padding:12px 14px;margin-bottom:10px;font-size:.85rem}
-  .ph-row span:last-child{font-weight:700}
-  .up{color:var(--ok)} .dn{color:var(--bad)}
-  .ph-actions{display:flex;gap:10px;margin-top:14px}
-  .ph-actions div{flex:1;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 0;font-size:.8rem;color:var(--mut)}
-
-  section{padding:90px 5%}
-  .sec-head{text-align:center;max-width:640px;margin:0 auto 56px}
-  .sec-head h2{font-size:2.2rem;margin-bottom:14px}
-  .sec-head p{color:var(--mut);line-height:1.7}
-
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px;transition:transform .2s,border-color .2s}
-  .card:hover{transform:translateY(-6px);border-color:rgba(79,124,255,.4)}
-  .card .icon{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;margin-bottom:18px;
-      background:rgba(79,124,255,.12);color:var(--accent)}
-  .card h3{margin-bottom:10px;font-size:1.15rem}
-  .card p{color:var(--mut);font-size:.92rem;line-height:1.65}
-
-  .acc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-  .acc{position:relative;overflow:hidden;border-radius:var(--r);padding:30px;border:1px solid var(--line);background:var(--card)}
-  .acc.pop{border-color:var(--gold)}
-  .acc .tag{position:absolute;top:18px;right:18px;background:var(--gold);color:#241a02;font-size:.7rem;font-weight:700;
-      padding:4px 10px;border-radius:999px;letter-spacing:1px}
-  .acc h3{font-size:1.3rem;margin-bottom:6px}
-  .acc .price{font-size:2.2rem;font-weight:800;margin:14px 0 4px}
-  .acc .price small{font-size:.85rem;color:var(--mut);font-weight:400}
-  .acc ul{list-style:none;margin:18px 0 24px;color:var(--mut);font-size:.9rem}
-  .acc li{padding:7px 0;border-bottom:1px dashed var(--line)}
-  .acc li::before{content:"✓  ";color:var(--ok);font-weight:700}
-
-  .ticker{display:flex;gap:16px;overflow-x:auto;padding:8px 0 4px;scrollbar-width:none}
-  .ticker::-webkit-scrollbar{display:none}
-  .tick{flex:0 0 auto;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
-      border-radius:999px;padding:10px 20px;font-size:.9rem}
-  .tick b{font-weight:700}
-
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;counter-reset:s}
-  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px;position:relative}
-  .step::before{counter-increment:s;content:counter(s);position:absolute;top:-16px;left:24px;width:36px;height:36px;border-radius:12px;
-      display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 6px 18px rgba(79,124,255,.4)}
-  .step h3{margin:14px 0 8px}
-  .step p{color:var(--mut);font-size:.9rem;line-height:1.6}
-
-  footer{border-top:1px solid var(--line);padding:50px 5% 30px;color:var(--mut);font-size:.88rem}
-  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;margin-bottom:36px}
-  footer h4{color:var(--txt);margin-bottom:14px}
-  footer a{display:block;padding:4px 0}
-  footer a:hover{color:var(--txt)}
-  .foot-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid var(--line);padding-top:22px}
-
-  .trust{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:34px 5%;text-align:center}
-  .trust p{color:var(--mut);font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
-  .trust-row{display:flex;justify-content:center;gap:44px;flex-wrap:wrap;align-items:center}
-  .trust-row span{font-weight:800;font-size:1.15rem;color:rgba(255,255,255,.45);letter-spacing:.5px;transition:color .2s}
-  .trust-row span:hover{color:var(--txt)}
-
-  .band{background:linear-gradient(135deg,#1a2b6d,#0e1a45);padding:64px 5%;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-  .band-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;max-width:1100px;margin:0 auto;text-align:center}
-  .band-grid b{font-size:clamp(1.8rem,3.4vw,2.6rem);display:block;background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .band-grid span{color:var(--mut);font-size:.9rem}
-
-  .faq{max-width:760px;margin:0 auto}
-  .qa{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
-  .qa button{width:100%;background:none;border:none;color:var(--txt);text-align:left;padding:20px 24px;font-size:1rem;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:16px}
-  .qa .chev{transition:transform .3s;color:var(--accent2);font-size:1.2rem;flex:0 0 auto}
-  .qa.open .chev{transform:rotate(180deg)}
-  .qa .ans{max-height:0;overflow:hidden;transition:max-height .35s ease;color:var(--mut);font-size:.92rem;line-height:1.65}
-  .qa .ans div{padding:0 24px 20px}
-  .qa.open .ans{max-height:220px}
-
-  .cta{background:radial-gradient(700px 300px at 50% 0%,rgba(79,124,255,.25),transparent 70%),var(--ink2);text-align:center;padding:90px 5%;border-top:1px solid var(--line)}
-  .cta h2{font-size:clamp(1.9rem,4vw,2.8rem);margin-bottom:14px}
-  .cta p{color:var(--mut);margin-bottom:30px}
-  .news{display:flex;gap:10px;max-width:480px;margin:0 auto}
-  .news input{flex:1;background:#0d1330;border:1px solid var(--line);border-radius:12px;padding:14px 18px;color:var(--txt);font-size:.95rem;outline:none}
-  .news input:focus{border-color:var(--accent)}
-  .news-msg{margin-top:14px;font-size:.88rem;min-height:20px}
-
-  #toTop{position:fixed;right:24px;bottom:24px;width:46px;height:46px;border-radius:50%;z-index:150;
-      background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;font-size:1.2rem;box-shadow:0 8px 24px rgba(79,124,255,.45);
-      opacity:0;pointer-events:none;transition:opacity .3s, transform .3s;transform:translateY(10px)}
-  #toTop.show{opacity:1;pointer-events:auto;transform:translateY(0)}
-  #toTop:hover{transform:translateY(-3px)}
-
-  .rating-badge{display:inline-flex;align-items:center;gap:12px;margin-top:34px;background:rgba(245,196,81,.08);
-      border:1px solid rgba(245,196,81,.35);border-radius:999px;padding:10px 22px}
-  .rating-badge .stars-big{color:var(--gold);font-size:1.15rem;letter-spacing:3px;text-shadow:0 0 14px rgba(245,196,81,.6)}
-  .rating-badge b{font-size:1.05rem}
-  .rating-badge span{color:var(--mut);font-size:.85rem}
-
-  .gallery-stage{position:relative;max-width:1000px;margin:0 auto;border-radius:22px;overflow:hidden;
-      border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);aspect-ratio:16/9;background:#0a0e1c}
-  .gal-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.1s ease;transform:scale(1.04)}
-  .gal-slide.active{opacity:1;transform:scale(1);transition:opacity 1.1s ease, transform 5.5s linear}
-  .gal-slide img{width:100%;height:100%;object-fit:cover;display:block}
-  .gal-slide.cardish img{object-fit:contain;padding:6%;background:radial-gradient(600px 300px at 50% 30%,rgba(79,124,255,.18),transparent 70%),#0a0e1c}
-  .gal-cap{position:absolute;left:0;right:0;bottom:0;padding:40px 28px 18px;z-index:2;
-      background:linear-gradient(transparent,rgba(5,7,15,.85));font-weight:600;font-size:1.02rem}
-  .gal-cap small{display:block;font-weight:400;color:var(--accent2);font-size:.8rem;margin-top:3px}
-  .gal-nav{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;
-      background:rgba(11,16,32,.6);border:1px solid var(--line);color:#fff;font-size:1.05rem;backdrop-filter:blur(6px)}
-  .gal-nav:hover{background:rgba(79,124,255,.65)}
-  .gal-prev{left:14px}.gal-next{right:14px}
-  .gal-thumbs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
-  .gal-thumbs button{width:64px;height:44px;border-radius:9px;overflow:hidden;padding:0;border:2px solid transparent;
-      opacity:.5;transition:all .25s;background:#0a0e1c}
-  .gal-thumbs button img{width:100%;height:100%;object-fit:cover;display:block}
-  .gal-thumbs button.on{border-color:var(--accent2);opacity:1;transform:translateY(-3px)}
-  .gal-count{position:absolute;z-index:3;top:16px;right:18px;font-size:.8rem;color:rgba(255,255,255,.85);
-      background:rgba(11,16,32,.55);border:1px solid var(--line);border-radius:999px;padding:5px 13px;backdrop-filter:blur(6px)}
-
-  .reviews{position:relative;min-height:78vh;display:grid;place-items:center;overflow:hidden;padding:0}
-  .rev-bg{position:absolute;inset:0}
-  .rev-slide{position:absolute;inset:0;background-size:cover;background-position:center 25%;opacity:0;
-      transform:scale(1.06);transition:opacity 1.2s ease, transform 6s linear}
-  .rev-slide.active{opacity:1;transform:scale(1)}
-  .rev-slide::after{content:"";position:absolute;inset:0;
-      background:linear-gradient(180deg,rgba(11,16,32,.55),rgba(11,16,32,.35) 45%,rgba(11,16,32,.75))}
-  .rev-content{position:relative;z-index:2;text-align:center;max-width:760px;padding:80px 24px}
-  .rev-content .stars{color:var(--gold);font-size:1.3rem;letter-spacing:6px;margin-bottom:18px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
-  .rev-quote{font-size:clamp(1.3rem,2.6vw,1.9rem);font-weight:600;line-height:1.5;text-shadow:0 2px 20px rgba(0,0,0,.55)}
-  .rev-person{margin-top:26px;display:flex;align-items:center;justify-content:center;gap:14px}
-  .rev-person img{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.7);box-shadow:0 4px 16px rgba(0,0,0,.5)}
-  .rev-person .nm{font-weight:700;text-align:left}
-  .rev-person .rl{font-size:.82rem;color:var(--accent2);text-align:left}
-  .rev-nav{position:absolute;z-index:3;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;
-      background:rgba(11,16,32,.55);border:1px solid var(--line);color:#fff;font-size:1.1rem;backdrop-filter:blur(6px);transition:background .2s}
-  .rev-nav:hover{background:rgba(79,124,255,.6)}
-  .rev-prev{left:22px}.rev-next{right:22px}
-  .rev-dots{position:absolute;z-index:3;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:10px}
-  .rev-dots button{width:10px;height:10px;border-radius:999px;border:none;background:rgba(255,255,255,.35);transition:all .3s;padding:0}
-  .rev-dots button.on{width:30px;background:var(--accent2)}
-  .rev-count{position:absolute;z-index:3;top:24px;right:28px;font-size:.85rem;color:rgba(255,255,255,.75);
-      background:rgba(11,16,32,.5);border:1px solid var(--line);border-radius:999px;padding:6px 14px;backdrop-filter:blur(6px)}
-
-  /* =========================================
-     DASHBOARD APP STYLES
-     ========================================= */
-  #appDashboard { min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
-  .sidebar { width: 260px; background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10; }
-  .sidebar .logo { margin-bottom: 40px; padding-left: 10px; }
-  .side-menu { list-style: none; flex: 1; }
-  .side-menu li { margin-bottom: 8px; }
-  .side-menu a { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; transition: all 0.2s; }
-  .side-menu a:hover, .side-menu a.active { background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
-  .side-menu a.active { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
-  .user-profile { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); margin-top: auto; }
-  
-  .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent3)); display: grid; place-items: center; font-weight: bold; cursor: pointer; overflow: hidden; position: relative; border: 2px solid transparent; transition: 0.2s;}
-  .user-avatar:hover { border-color: var(--accent2); }
-  .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-  .user-info { flex: 1; overflow: hidden; }
-  .user-info h4 { font-size: 0.9rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .user-info p { font-size: 0.75rem; color: var(--mut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .logout-btn { background: transparent; color: var(--bad); font-size: 1.2rem; padding: 5px; transition: 0.2s;}
-  .logout-btn:hover { transform: scale(1.1); }
-
-  .main-content { flex: 1; margin-left: 260px; padding: 40px; max-width: 1400px; }
-  .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-  .top-header h1 { font-size: 2rem; font-weight: 700; }
-  .top-header p { color: var(--mut); margin-top: 5px; }
-
-  .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
-  .dash-card { background: rgba(22, 31, 61, 0.7); border: 1px solid var(--line); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
-  .balance-card { background: linear-gradient(135deg, rgba(79, 124, 255, 0.2), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(79, 124, 255, 0.3); }
-  .balance-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%); pointer-events: none; }
-  .balance-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
-  .balance-amount { font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
-  .quick-actions { display: flex; gap: 15px; margin-top: 20px; }
-  .action-btn { flex: 1; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--txt); font-weight: 600; transition: 0.2s; }
-  .action-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
-  .action-btn span.icon { font-size: 1.5rem; }
-
-  .send-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-  .input-group label { display: block; color: var(--mut); font-size: 0.85rem; margin-bottom: 6px; }
-  .input-group input, .input-group select { width: 100%; padding: 14px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--line); color: white; font-size: 1rem; outline: none; transition: 0.2s; }
-  .input-group input:focus, .input-group select:focus { border-color: var(--accent); }
-  .send-btn { background: linear-gradient(135deg, var(--accent), #3b5bdb); color: white; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 1rem; margin-top: 10px; box-shadow: 0 6px 20px rgba(79, 124, 255, 0.4); transition: 0.2s; }
-  .send-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(79, 124, 255, 0.6); }
-
-  .tx-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-  .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); transition: 0.2s; cursor: pointer; }
-  .tx-item:hover { background: rgba(255,255,255,0.08); border-color: rgba(79,124,255,.3); }
-  .tx-left { display: flex; align-items: center; gap: 15px; }
-  .tx-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
-  .tx-details h4 { font-size: 1rem; margin-bottom: 4px; }
-  .tx-details p { font-size: 0.8rem; color: var(--mut); }
-  .tx-amount { font-weight: 700; font-size: 1.1rem; }
-  .tx-amount.pos { color: var(--ok); }
-  .tx-amount.neg { color: var(--txt); }
-
-  /* MODALS */
-  .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200}
-  .modal-bg.show{display:grid}
-  .modal{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:34px;width:min(400px,92vw); box-shadow: 0 30px 80px rgba(0,0,0,.6)}
-  .modal h3{margin-bottom:6px; font-size: 1.3rem;}
-  .modal p{color:var(--mut);font-size:.88rem;margin-bottom:20px; line-height: 1.5;}
-  .modal input{width:100%;background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);margin-bottom:12px;outline:none; text-align: center; font-size: 1.2rem; letter-spacing: 2px;}
-  .modal .btn{width:100%;justify-content:center}
-  .modal .error{color:var(--bad); font-size:.85rem; margin-bottom:10px; min-height:18px; text-align: center;}
-
-  /* PROCESSING MODAL */
-  #processingModal { background: rgba(11, 16, 32, 0.95); z-index: 500; text-align: center;}
-  .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent2); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* RECEIPT STYLES */
-  #receiptModal { background: rgba(5, 7, 15, 0.85); z-index: 600; padding: 20px; }
-  .receipt-paper {
-    background: #fff; color: #141824; width: min(430px, 92vw); border-radius: 16px; padding: 34px 32px 26px;
-    font-family: 'Courier New', Courier, monospace; box-shadow: 0 30px 80px rgba(0,0,0,.6); position: relative;
-  }
-  .receipt-logo { font-family: "Segoe UI", sans-serif; font-weight: 800; font-size: 1.35rem; color: #1a2b6d; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 5px;}
-  .receipt-logo .bolt { width: 26px; height: 26px; border-radius: 7px; display: inline-grid; place-items: center; background: #4f7cff; color: #fff; font-size: .9rem;}
-  .r-sub { color: #8a90a3; font-size: .78rem; letter-spacing: 2px; text-transform: uppercase; text-align: center; margin-bottom: 20px;}
-  .r-rule { border: none; border-top: 2px dashed #d8dbe6; margin: 18px 0; }
-  .r-table { width: 100%; border-collapse: collapse; font-size: 0.9rem;}
-  .r-table td { padding: 7px 0; vertical-align: top; }
-  .r-table td:first-child { color: #8a90a3; width: 45%; }
-  .r-table td:last-child { font-weight: 600; text-align: right; }
-  .r-total { text-align: center; margin: 18px 0 6px; }
-  .r-total small { display: block; color: #8a90a3; letter-spacing: 2px; font-size: .7rem; }
-  .r-total b { font-size: 1.7rem; color: #141824; font-family: "Segoe UI", sans-serif;}
-  .r-bar { height: 42px; margin: 16px 0 10px; background: repeating-linear-gradient(90deg,#141824 0 2px,transparent 2px 5px,#141824 5px 6px,transparent 6px 11px); }
-  .r-foot { text-align: center; color: #8a90a3; font-size: .72rem; line-height: 1.6; }
-  .r-actions { display: flex; gap: 10px; justify-content: center; margin-top: 25px; }
-  .r-actions button { padding: 12px 20px; border-radius: 10px; font-weight: 700; font-family: "Segoe UI", sans-serif;}
-  .r-print { background: #4f7cff; color: #fff; }
-  .r-close { background: #eef0f6; color: #141824; }
-
-  /* PRINT CSS */
-  @media print {
-    body * { visibility: hidden; }
-    #receiptModal, #receiptModal * { visibility: visible; }
-    #receiptModal { position: absolute; left: 0; top: 0; background: transparent; padding: 0; display: block; }
-    .receipt-paper { box-shadow: none; margin: 0 auto; border-radius: 0; width: 100%; max-width: 100%; }
-    .r-actions { display: none; }
-  }
-
-  @media(max-width:900px){
-    .hero{grid-template-columns:1fr;padding-top:120px;text-align:center}
-    .hero-cta{justify-content:center}
-    .hero p.lead{margin:22px auto 30px}
-    .phone-wrap{display:flex; justify-content:center; margin-top:30px; margin-bottom:20px;}
-    .grid3,.acc-grid,.steps{grid-template-columns:1fr}
-    .navlinks{display:none}
-    .foot-grid{grid-template-columns:1fr 1fr}
-  }
-
-  @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
-  @media (max-width: 768px) {
-    #appDashboard { flex-direction: column; }
-    .sidebar { display: none; }
-    .mobile-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(11, 16, 32, 0.9); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); }
-    .main-content { margin-left: 0; padding: 20px; padding-bottom: 80px; }
-    .top-header h1 { font-size: 1.5rem; }
-    .balance-amount { font-size: 2.5rem; }
-    .mobile-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11, 16, 32, 0.95); border-top: 1px solid var(--line); padding: 15px; justify-content: space-around; z-index: 50; backdrop-filter: blur(20px); }
-    .mobile-bottom-bar a { color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; }
-    .mobile-bottom-bar a.active { color: var(--accent2); }
-    .mobile-bottom-bar span { font-size: 1.2rem; }
-  }
-  @media (min-width: 769px) { .mobile-nav, .mobile-bottom-bar { display: none !important; } }
-
-  /* Responsive Success Screen */
-  @media (max-width: 600px) {
-    .success-logo { top: 20px; left: 20px; }
-    .success-logo-text { font-size: 1.5rem; }
-    .success-sub { display: none; }
-    .success-title { font-size: 2rem; }
-    .success-text { font-size: 1.1rem; }
-    .success-icon { width: 100px; height: 100px; }
-    .success-icon svg { width: 50px; height: 50px; }
-    .success-info-box { flex-direction: column; text-align: center; gap: 10px; padding: 15px; }
-  }
+:root{
+  --ink:#0b1020; --ink2:#131a33; --card:#161f3d;
+  --accent:#4f7cff; --accent2:#22d3ee; --accent3:#a855f7;
+  --gold:#f5c451;
+  --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08);
+  --ok:#34d399; --bad:#f87171; --r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--txt);overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:16px 5%;background:rgba(11,16,32,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;letter-spacing:.5px}
+.logo .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 22px rgba(79,124,255,.55)}
+.logo .mark svg{width:20px;height:20px}
+.navlinks{display:flex;gap:26px;font-size:.95rem;color:var(--mut)}
+.navlinks a:hover{color:var(--txt)}
+.demo-pill{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:800;letter-spacing:1.6px;
+  color:var(--gold);border:1px solid rgba(245,196,81,.5);border-radius:999px;padding:5px 13px;margin-left:10px;background:rgba(245,196,81,.07)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:12px;font-weight:600;font-size:.95rem;
+  background:linear-gradient(135deg,var(--accent),#3b5bdb);color:#fff;box-shadow:0 6px 22px rgba(79,124,255,.35);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(79,124,255,.5)}
+.btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--txt)}
+.btn.gold{background:linear-gradient(135deg,#f5c451,#e8a020);color:#241a02;box-shadow:0 6px 22px rgba(245,196,81,.3)}
+.hero{min-height:100vh;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:140px 5% 80px;position:relative}
+.hero::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(600px 400px at 80% 20%,rgba(79,124,255,.18),transparent 60%),
+             radial-gradient(500px 400px at 10% 90%,rgba(168,85,247,.12),transparent 60%);pointer-events:none}
+.eyebrow{display:inline-block;padding:6px 14px;border:1px solid var(--line);border-radius:999px;color:var(--accent2);
+  font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;background:rgba(34,211,238,.06)}
+h1{font-size:clamp(2.4rem,5vw,4rem);line-height:1.08;font-weight:800}
+h1 .grad{background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{margin:22px 0 30px;color:var(--mut);font-size:1.1rem;max-width:540px;line-height:1.7}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.stats{display:flex;gap:40px;margin-top:44px;flex-wrap:wrap}
+.stat b{font-size:1.45rem;display:block}
+.stat span{color:var(--mut);font-size:.85rem}
+.phone-wrap{display:flex;justify-content:center}
+.phone{width:300px;border-radius:36px;border:1px solid var(--line);background:linear-gradient(160deg,var(--ink2),#0d1330);
+  padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 6px #05070f}
+.ph-top{display:flex;justify-content:space-between;color:var(--mut);font-size:.75rem;margin-bottom:18px}
+.ph-bal{background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:20px;padding:20px;margin-bottom:16px}
+.ph-bal small{opacity:.85;font-size:.75rem}
+.ph-bal b{font-size:1.5rem;display:block;margin-top:6px}
+.ph-bal .chip{width:34px;height:24px;border-radius:6px;background:linear-gradient(135deg,#ffe9a8,#f5c451);margin-top:12px}
+.ph-row{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:12px 14px;margin-bottom:10px;font-size:.85rem}
+.ph-row span:last-child{font-weight:700}
+.up{color:var(--ok)} .dn{color:var(--bad)}
+.ph-actions{display:flex;gap:10px;margin-top:14px}
+.ph-actions div{flex:1;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 0;font-size:.8rem;color:var(--mut)}
+section{padding:90px 5%}
+.sec-head{text-align:center;max-width:640px;margin:0 auto 56px}
+.sec-head h2{font-size:2.2rem;margin-bottom:14px}
+.sec-head p{color:var(--mut);line-height:1.7}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-6px);border-color:rgba(79,124,255,.4)}
+.card .icon{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;margin-bottom:18px;
+  background:rgba(79,124,255,.12);font-size:1.3rem}
+.card h3{margin-bottom:10px;font-size:1.15rem}
+.card p{color:var(--mut);font-size:.92rem;line-height:1.65}
+.acc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.acc{position:relative;border-radius:var(--r);padding:30px;border:1px solid var(--line);background:var(--card)}
+.acc.pop{border-color:var(--gold)}
+.acc .tag{position:absolute;top:18px;right:18px;background:var(--gold);color:#241a02;font-size:.7rem;font-weight:700;
+  padding:4px 10px;border-radius:999px;letter-spacing:1px}
+.acc h3{font-size:1.3rem;margin-bottom:6px}
+.acc .price{font-size:2.2rem;font-weight:800;margin:14px 0 4px}
+.acc .price small{font-size:.85rem;color:var(--mut);font-weight:400}
+.acc ul{list-style:none;margin:18px 0 24px;color:var(--mut);font-size:.9rem}
+.acc li{padding:7px 0;border-bottom:1px dashed var(--line)}
+.acc li::before{content:"✓  ";color:var(--ok);font-weight:700}
+.band{background:linear-gradient(135deg,#1a2b6d,#0e1a45);padding:64px 5%;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.band-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;max-width:1100px;margin:0 auto;text-align:center}
+.band-grid b{font-size:clamp(1.4rem,3vw,2rem);display:block;background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+.band-grid span{color:var(--mut);font-size:.88rem;line-height:1.5;display:block;margin-top:8px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;counter-reset:s}
+.step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:28px;position:relative}
+.step::before{counter-increment:s;content:counter(s);position:absolute;top:-16px;left:24px;width:36px;height:36px;border-radius:12px;
+  display:grid;place-items:center;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 6px 18px rgba(79,124,255,.4)}
+.step h3{margin:14px 0 8px}
+.step p{color:var(--mut);font-size:.9rem;line-height:1.6}
+.faq{max-width:760px;margin:0 auto}
+.qa{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.qa button{width:100%;background:none;border:none;color:var(--txt);text-align:left;padding:20px 24px;font-size:1rem;font-weight:600;
+  display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer}
+.qa .chev{transition:transform .3s;color:var(--accent2)}
+.qa.open .chev{transform:rotate(180deg)}
+.qa .ans{max-height:0;overflow:hidden;transition:max-height .35s ease;color:var(--mut);font-size:.92rem;line-height:1.65}
+.qa .ans div{padding:0 24px 20px}
+.qa.open .ans{max-height:240px}
+.cta{background:radial-gradient(700px 300px at 50% 0%,rgba(79,124,255,.25),transparent 70%),var(--ink2);text-align:center;padding:90px 5%;border-top:1px solid var(--line)}
+.cta h2{font-size:clamp(1.9rem,4vw,2.8rem);margin-bottom:14px}
+.cta p{color:var(--mut);margin-bottom:30px}
+.news{display:flex;gap:10px;max-width:480px;margin:0 auto}
+.news input{flex:1;background:#0d1330;border:1px solid var(--line);border-radius:12px;padding:14px 18px;color:var(--txt);font-size:.95rem;outline:none}
+.news input:focus{border-color:var(--accent)}
+.news-msg{margin-top:14px;font-size:.88rem;min-height:20px}
+footer{border-top:1px solid var(--line);padding:50px 5% 30px;color:var(--mut);font-size:.88rem}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px;margin-bottom:36px}
+footer h4{color:var(--txt);margin-bottom:14px}
+footer a{display:block;padding:4px 0;color:var(--mut)}
+footer a:hover{color:var(--txt)}
+.foot-bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid var(--line);padding-top:22px}
+.modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200;padding:20px}
+.modal-bg.show{display:grid}
+.modal{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:34px;width:min(400px,92vw)}
+.modal h3{margin-bottom:6px}
+.modal>p,.modal .m-sub{color:var(--mut);font-size:.88rem;margin-bottom:20px;line-height:1.6}
+.modal input{width:100%;background:#0d1330;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--txt);margin-bottom:12px;outline:none}
+.modal input:focus{border-color:var(--accent)}
+.modal .btn{width:100%;justify-content:center}
+.demo-note{margin-top:18px;padding:14px 18px;border:1px dashed rgba(245,196,81,.45);border-radius:12px;color:var(--gold);
+  font-size:.82rem;line-height:1.6;background:rgba(245,196,81,.06);text-align:left}
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding-top:120px}
+  .grid3,.acc-grid,.steps{grid-template-columns:1fr}
+  .band-grid{grid-template-columns:1fr 1fr}
+  .navlinks{display:none}
+  .foot-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
-<!-- =========================================
-     PASSWORD RESET SUCCESS SCREEN
-     ========================================= -->
-<div id="resetSuccessScreen" class="hidden">
-  <div class="success-logo">
-    <svg viewBox="0 0 24 24" fill="none" stroke="#f58220" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" fill="#f58220"/>
-    </svg>
-    <div class="success-logo-text"><span>Fluxx</span><span>Bank</span></div>
+<nav>
+  <a class="logo" href="#top">
+    <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+    Fluxxbank
+  </a>
+  <div class="navlinks">
+    <a href="#features">Features</a>
+    <a href="#accounts">Accounts</a>
+    <a href="#faq">FAQ</a>
   </div>
-  <div class="success-sub">Secure Banking. Brighter Future.</div>
-
-  <div class="success-icon-wrap">
-    <div class="success-icon">
-      <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-    </div>
+  <div style="display:flex;gap:10px;align-items:center">
+    
+    <span id="authArea"><button class="btn ghost" onclick="openModal()">Log in</button></span>
   </div>
-  
-  <h1 class="success-title">Password Reset Email Sent</h1>
-  <p class="success-text">Please click on the link in your email<br>for <span>password reset.</span></p>
+</nav>
 
-  <div class="success-info-box">
-    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-    <p>If you don't see the email within a few minutes, please check your spam or junk folder.</p>
-  </div>
-</div>
-
-<!-- WELCOME SCREEN -->
-<div id="welcomeScreen" class="hidden">
-  <div class="welcome-text" id="welcomeText">Welcome</div>
-  <div class="progress-bar-container"><div class="progress-bar"></div></div>
-</div>
-
-<!-- HIDDEN FILE INPUT FOR AVATAR -->
-<input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
-
-<!-- LANDING PAGE -->
-<div id="landingPage">
-  <nav class="landing-nav">
-    <a class="logo" href="#top">
-      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank
-    </a>
-    <div class="navlinks">
-      <a href="#features">Features</a><a href="#accounts">Accounts</a><a href="#reviews">Reviews</a><a href="#showcase">Showcase</a>
-    </div>
-    <div style="display:flex;gap:10px">
+<header class="hero" id="top">
+  <div>
+    <span class="eyebrow">◆ Digital-first banking</span>
+    <h1>Banking that's<br>always <span class="grad">in motion.</span></h1>
+    <p class="lead">Fluxxbank is the standard for modern money — instant payments, fee-free accounts, and real-time insights, all from one beautiful app.</p>
+    <div class="hero-cta">
+      <button class="btn gold" onclick="openModal('signup')">Open your account →</button>
       <button class="btn ghost" onclick="openModal()">Log in</button>
-      <button class="btn" onclick="openModal()">Get Started</button>
-    </div>
-  </nav>
-
-  <header class="hero" id="top">
-    <div>
-      <span class="eyebrow">◆ Digital-first banking</span>
-      <h1>Banking that's<br>always <span class="grad">in motion.</span></h1>
-      <p class="lead">Fluxxbank is the standard for modern money — instant payments, fee-free accounts, and real-time insights, all from one beautiful app.</p>
-      <div class="hero-cta">
-        <a class="btn gold" href="#open">Open your account →</a>
-        <a class="btn ghost" onclick="openModal()">Try the live demo</a>
-      </div>
-      <div class="rating-badge">
-        <span class="stars-big">★★★★★</span>
-        <div style="text-align:left"><b>5.0 Rated Excellent</b><br><span>310,000+ verified customer reviews</span></div>
-      </div>
-      <div class="stats">
-        <div class="stat"><b id="st1">0</b><span>Customers</span></div>
-        <div class="stat"><b id="st2">0</b><span>Countries</span></div>
-        <div class="stat"><b>€0</b><span>Monthly fees</span></div>
-      </div>
     </div>
     
-    <div class="phone-wrap">
-      <div class="phone">
-        <div class="ph-top"><span>9:41</span><span>⚡ FluxxPay</span></div>
-        <div class="ph-bal">
-          <small>Total balance</small>
-          <b>€24,806.12</b>
-          <div class="chip"></div>
-        </div>
-        <div class="ph-row"><span>Nordwind Salary</span><span class="up">+€3,850</span></div>
-        <div class="ph-row"><span>Blue Bottle Coffee</span><span class="dn">−€4.80</span></div>
-        <div class="ph-row"><span>Metro Transit</span><span class="dn">−€2.40</span></div>
-        <div class="ph-actions">
-          <div>⇄ Send</div><div>＋ Top up</div><div>◔ Stats</div>
-        </div>
-      </div>
+    <div class="stats">
+      <div class="stat"><b>30+</b><span>Currencies</span></div>
+      <div class="stat"><b>€0</b><span>Monthly fees</span></div>
+      <div class="stat"><b>&lt; 1s</b><span>Member transfers</span></div>
     </div>
-  </header>
-
-  <!-- FEATURES -->
-  <section id="features">
-    <div class="sec-head"><h2>Everything money should do</h2><p>Built for people who move fast. Fluxxbank combines everyday banking, savings, and investing in one seamless experience.</p></div>
-    <div class="grid3">
-      <div class="card"><div class="icon">⚡</div><h3>Instant FluxxPay</h3><p>Send and receive money in under a second, 24/7 — even across borders, with zero hidden FX markup.</p></div>
-      <div class="card"><div class="icon">🛡️</div><h3>Bank-grade security</h3><p>Biometric login, disposable virtual cards, and real-time fraud detection on every single transaction.</p></div>
-      <div class="card"><div class="icon">📈</div><h3>Smart savings</h3><p>Auto-roundups, vaults with up to 4.1% interest, and AI-powered budgets that adapt to your lifestyle.</p></div>
-    </div>
-  </section>
-
-  <section style="padding-top:0"><div class="ticker" id="ticker"></div></section>
-  <div class="trust"><p>Powered by trusted networks worldwide</p><div class="trust-row"><span>VISA</span><span>Mastercard</span><span>Apple Pay</span><span>Google Pay</span><span>SEPA</span><span>SWIFT</span></div></div>
-
-  <!-- ACCOUNTS -->
-  <section id="accounts">
-    <div class="sec-head"><h2>Pick your Fluxx</h2><p>Transparent pricing. No maintenance fees, no minimum balance, no asterisks.</p></div>
-    <div class="acc-grid">
-      <div class="acc"><h3>Fluxx Basic</h3><p style="color:var(--mut);font-size:.9rem">Everyday banking, done right.</p><div class="price">€0<small>/month</small></div><ul><li>Free EUR account & IBAN</li><li>1 virtual card</li><li>FluxxPay transfers</li><li>Standard support</li></ul><a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Basic</a></div>
-      <div class="acc pop"><span class="tag">MOST POPULAR</span><h3>Fluxx Plus</h3><p style="color:var(--mut);font-size:.9rem">For people whose money moves.</p><div class="price">€4.99<small>/month</small></div><ul><li>Everything in Basic</li><li>Metal card + 3 virtuals</li><li>1.5% cashback worldwide</li><li>4.1% savings vaults</li><li>Priority 24/7 support</li></ul><a class="btn gold" href="#open" style="width:100%;justify-content:center">Choose Plus</a></div>
-      <div class="acc"><h3>Fluxx Metal</h3><p style="color:var(--mut);font-size:.9rem">Premium banking without the premium attitude.</p><div class="price">€12.99<small>/month</small></div><ul><li>Everything in Plus</li><li>Obsidian metal card</li><li>3% cashback + lounge access</li><li>Free global transfers</li><li>Dedicated banker</li></ul><a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Metal</a></div>
-    </div>
-  </section>
-
-  <div class="band"><div class="band-grid"><div><b>€8.2B+</b><span>Deposits protected</span></div><div><b>99.99%</b><span>Uptime</span></div><div><b>1,200/s</b><span>Transactions per sec</span></div><div><b>5.0 ★</b><span>310k reviews</span></div></div></div>
-
-  <!-- REVIEWS -->
-  <section class="reviews" id="reviews">
-    <div class="rev-bg" id="revBg">
-      <div class="rev-slide active" style="background-image:url('review 1.png')"></div>
-      <div class="rev-slide" style="background-image:url('review 2.png')"></div>
-      <div class="rev-slide" style="background-image:url('review 3.png')"></div>
-      <div class="rev-slide" style="background-image:url('review 4.png')"></div>
-    </div>
-    <div class="rev-content">
-      <div class="stars">★★★★★</div>
-      <p class="rev-quote" id="revQuote"></p>
-      <div class="rev-person">
-        <img id="revAva" src="review 1.png" alt="customer">
-        <div><div class="nm" id="revName"></div><div class="rl" id="revRole"></div></div>
-      </div>
-    </div>
-    <button class="rev-nav rev-prev" onclick="goRev(cur-1)">‹</button>
-    <button class="rev-nav rev-next" onclick="goRev(cur+1)">›</button>
-    <div class="rev-dots" id="revDots"></div>
-    <div class="rev-count" id="revCount">1 / 4</div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq">
-    <div class="sec-head"><h2>Questions? Answers.</h2><p>Everything people usually ask before making the switch to Fluxxbank.</p></div>
-    <div class="faq">
-      <div class="qa"><button onclick="toggleQa(this)">Is Fluxxbank a real bank?<span class="chev">▾</span></button><div class="ans"><div>Yes — Fluxxbank is a fully licensed European bank. Your deposits are protected up to €100,000 per person.</div></div></div>
-      <div class="qa"><button onclick="toggleQa(this)">How long does it take to open an account?<span class="chev">▾</span></button><div class="ans"><div>Most customers finish in under 5 minutes. Verify with your ID and a quick selfie, fund your account, and you're ready to go.</div></div></div>
-      <div class="qa"><button onclick="toggleQa(this)">Are there really no fees?<span class="chev">▾</span></button><div class="ans"><div>Fluxx Basic is free forever — no maintenance fees, no minimum balance. Plus and Metal are optional upgrades.</div></div></div>
-    </div>
-  </section>
-
-  <footer>
-    <div class="foot-grid">
-      <div><a class="logo" href="#top" style="margin-bottom:14px"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a><p style="max-width:280px;line-height:1.6">Banking in motion. Licensed European bank.</p></div>
-      <div><h4>Bank</h4><a href="#">Accounts</a><a href="#">Cards</a><a href="#">Savings</a></div>
-      <div><h4>Company</h4><a href="#">About</a><a href="#">Careers</a><a href="#">Press</a></div>
-      <div><h4>Support</h4><a href="#">Help center</a><a href="#">Contact</a><a href="#">Security</a></div>
-    </div>
-    <div class="foot-bottom"><span>© 2026 Fluxxbank AG. All rights reserved.</span><span>Privacy · Terms · Imprint</span></div>
-  </footer>
-</div>
-
-<!-- DASHBOARD APP -->
-<div id="appDashboard" class="hidden">
-  <div class="mobile-nav">
-    <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a>
-    <div class="user-avatar" id="mobileAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
   </div>
-
-  <aside class="sidebar">
-    <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a>
-    <ul class="side-menu">
-      <li><a href="#" class="active"><span>🏠</span> Dashboard</a></li>
-      <li><a href="#"><span>💸</span> Transfers</a></li>
-      <li><a href="#"><span>📊</span> Analytics</a></li>
-      <li><a href="#"><span>⚙️</span> Settings</a></li>
-    </ul>
-    <div class="user-profile">
-      <div class="user-avatar" id="desktopAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
-      <div class="user-info">
-        <h4 id="userNameDisplay">Loading...</h4>
-        <p>Customer</p>
+  <div class="phone-wrap">
+    <div class="phone" aria-hidden="true">
+      <div class="ph-top"><span>9:41</span><span>⚡ FluxxPay</span></div>
+      <div class="ph-bal">
+        <small>Available balance (illustration)</small>
+        <b>€1,250.00</b>
+        <div class="chip"></div>
       </div>
-      <button class="logout-btn" onclick="doLogout()" title="Log out">⏻</button>
-    </div>
-  </aside>
-
-  <main class="main-content">
-    <header class="top-header">
-      <div>
-        <h1 id="welcomeMessage">Good day 👋</h1>
-        <p>Here is what's happening with your money today.</p>
-      </div>
-    </header>
-
-    <div class="dashboard-grid">
-      <div style="display: flex; flex-direction: column; gap: 24px;">
-        <div class="dash-card balance-card">
-          <span class="balance-label">Total Available Balance</span>
-          <div class="balance-amount" id="dashBal">€0.00</div>
-          <div class="quick-actions">
-            <button class="action-btn" onclick="document.getElementById('pAmt').focus()"><span class="icon">⇄</span> Send</button>
-            <button class="action-btn" onclick="alert('Top up feature coming soon!')"><span class="icon">＋</span> Top Up</button>
-            <button class="action-btn" onclick="alert('Stats feature coming soon!')"><span class="icon">◔</span> Stats</button>
-          </div>
-        </div>
-
-        <div class="dash-card">
-          <h3 style="margin-bottom: 5px;">Recent Activity</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Your latest completed transactions (Click to view receipt)</p>
-          <div class="tx-list" id="txlist">
-            <p style="color: var(--mut); text-align: center; padding: 20px;">Loading transactions...</p>
-          </div>
-        </div>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 24px;">
-        <div class="dash-card">
-          <h3 style="margin-bottom: 5px;">Send Money</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer</p>
-          
-          <form class="send-form" onsubmit="return doPay(event)">
-            <div class="input-group">
-              <label>Recipient</label>
-              <select id="pWho" required>
-                <option value="" disabled selected>Choose recipient</option>
-                <option>Maya Chen</option><option>Jonas Weber</option><option>Luna Ortiz</option><option>Fluxx Vault</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <label>Amount (€)</label>
-              <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="0.00" required>
-            </div>
-            <div class="input-group">
-              <label>Note (Optional)</label>
-              <input id="pNote" type="text" placeholder="What's it for?">
-            </div>
-            <button class="send-btn" type="submit">⚡ Request Transfer</button>
-            <div class="error" id="paymsg" style="text-align: center; margin-top: 10px;"></div>
-          </form>
-        </div>
-
-        <div class="dash-card" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(22, 31, 61, 0.7)); border-color: rgba(34, 211, 238, 0.2);">
-          <h3 style="margin-bottom: 5px;">Savings Vault</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Earn 4.1% APY</p>
-          <div style="font-size: 2rem; font-weight: 800; color: var(--accent2); margin-bottom: 20px;">€8,120.00</div>
-          <button class="btn ghost" style="width: 100%; justify-content: center;" onclick="alert('Vault management coming soon!')">Manage Vault</button>
-        </div>
+      <div class="ph-row"><span>Member transfer</span><span class="up">+€120.00</span></div>
+      <div class="ph-row"><span>Vault top-up</span><span class="dn">−€50.00</span></div>
+      <div class="ph-row"><span>Deposit</span><span class="up">+€500.00</span></div>
+      <div class="ph-actions">
+        <div>⇄ Send</div><div>＋ Add</div><div>◔ Stats</div>
       </div>
     </div>
-  </main>
+  </div>
+</header>
 
-  <div class="mobile-bottom-bar">
-    <a href="#" class="active"><span>🏠</span> Home</a>
-    <a href="#"><span>💸</span> Send</a>
-    <a href="#"><span>📊</span> Stats</a>
-    <a href="#" onclick="doLogout()"><span>⏻</span> Logout</a>
+<section id="features">
+  <div class="sec-head">
+    <h2>Everything money should do</h2>
+    <p>The customer portal includes real dashboards, transfers between member accounts, card controls and support tickets — all wired to a live backend with per-customer data isolation.</p>
+  </div>
+  <div class="grid3">
+    <div class="card"><div class="icon">⚡</div><h3>Instant member transfers</h3><p>Send money to other Fluxxbank members in under a second. Server-side balance updates with idempotency — double-clicks can't double-pay.</p></div>
+    <div class="card"><div class="icon">🛡️</div><h3>Server-managed money</h3><p>Balances can only change through audited database functions. The browser can never edit a balance, status or role directly.</p></div>
+    <div class="card"><div class="icon">📈</div><h3>Savings goals</h3><p>Set a target and track your vault progress with live charts built from your real activity.</p></div>
+    <div class="card"><div class="icon">🔎</div><h3>Full transaction history</h3><p>Search, filter by date, type and status, sort by amount, and export genuine records to CSV.</p></div>
+    <div class="card"><div class="icon">💳</div><h3>Card controls</h3><p>Freeze and unfreeze instantly, set monthly spending limits, and request replacements — reflected in real records.</p></div>
+    <div class="card"><div class="icon">🎫</div><h3>Support centre</h3><p>Searchable help articles, ticket creation with reference numbers, private attachments and threaded conversations.</p></div>
+  </div>
+</section>
+
+<section id="accounts">
+  <div class="sec-head">
+    <h2>Pick your Fluxx</h2>
+    <p>Choose the plan that fits how you move money.</p>
+  </div>
+  <div class="acc-grid">
+    <div class="acc">
+      <h3>Fluxx Basic</h3><p style="color:var(--mut);font-size:.9rem">Everyday banking.</p>
+      <div class="price">€0<small>/month</small></div>
+      <ul><li>Member account &amp; reference</li><li>Virtual card</li><li>Member transfers</li><li>Support tickets</li></ul>
+      <button class="btn ghost" style="width:100%;justify-content:center" onclick="openModal('signup')">Choose Basic</button>
+    </div>
+    <div class="acc pop">
+      <span class="tag">POPULAR</span>
+      <h3>Fluxx Plus</h3><p style="color:var(--mut);font-size:.9rem">More features.</p>
+      <div class="price">€4.99<small>/month</small></div>
+      <ul><li>Everything in Basic</li><li>Multiple virtual cards</li><li>Savings goals</li><li>Priority support</li></ul>
+      <button class="btn gold" style="width:100%;justify-content:center" onclick="openModal('signup')">Choose Plus</button>
+    </div>
+    <div class="acc">
+      <h3>Fluxx Metal</h3><p style="color:var(--mut);font-size:.9rem">Premium banking.</p>
+      <div class="price">€12.99<small>/month</small></div>
+      <ul><li>Everything in Plus</li><li>Metal card</li><li>Everything unlocked</li><li>Priority support</li></ul>
+      <button class="btn ghost" style="width:100%;justify-content:center" onclick="openModal('signup')">Choose Metal</button>
+    </div>
+  </div>
+</section>
+
+<div class="band">
+  <div class="band-grid">
+    <div><b>€0</b><span>Monthly account fees</span></div>
+    <div><b>RLS-guarded</b><span>Row Level Security ensures one customer can never see another's records.</span></div>
+    <div><b>Audited</b><span>Every financial action runs server-side and is written to a security event log.</span></div>
+    <div><b>Zero secrets</b><span>Only public publishable keys ship to the browser — no privileged credentials.</span></div>
   </div>
 </div>
 
-<!-- LOGIN MODAL -->
+<section id="open">
+  <div class="sec-head"><h2>Open your account in minutes</h2><p>Register, verify your details, and start banking.</p></div>
+  <div class="steps">
+    <div class="step"><h3>Register</h3><p>Create your account with an email and password. Your profile starts as <i>Pending</i> — nothing is active yet.</p></div>
+    <div class="step"><h3>Get activated</h3><p>An admin reviews your application and issues a one-time 6-digit code. Enter it once — your account activates instantly.</p></div>
+    <div class="step"><h3>Start Fluxxing</h3><p>Explore the dashboard, send transfers, manage cards and open support tickets.</p></div>
+  </div>
+  <div style="text-align:center;margin-top:50px"><button class="btn gold" style="padding:16px 36px;font-size:1.05rem" onclick="openModal('signup')">Open my account →</button></div>
+</section>
+
+<section id="faq">
+  <div class="sec-head"><h2>Questions? Answers.</h2><p>Everything people usually ask before making the switch to Fluxxbank.</p></div>
+  <div class="faq">
+    <div class="qa"><button onclick="toggleQa(this)">Is Fluxxbank a real bank?<span class="chev">▾</span></button>
+      <div class="ans"><div>Fluxxbank provides digital banking services with instant transfers, multi-currency accounts and card controls.</div></div></div>
+    <div class="qa"><button onclick="toggleQa(this)">Can I move real money?<span class="chev">▾</span></button>
+      <div class="ans"><div>Transfers between Fluxxbank members are instant and free. External payments are processed according to the selected rail.</div></div></div>
+    <div class="qa"><button onclick="toggleQa(this)">How does activation work?<span class="chev">▾</span></button>
+      <div class="ans"><div>New accounts start as <i>Pending</i>. An administrator reviews the application and generates a one-time 6-digit code (valid 15 minutes, usable once). You enter it after signing in — the code is verified server-side and never shown in the app or sent by email.</div></div></div>
+    <div class="qa"><button onclick="toggleQa(this)">Who can see my data?<span class="chev">▾</span></button>
+      <div class="ans"><div>Only you — and authorised administrators. Every table is protected by Row Level Security keyed to your account ID, so one customer can never read or modify another customer's profile, balance, transactions, cards, documents or tickets.</div></div></div>
+    <div class="qa"><button onclick="toggleQa(this)">What powers the app?<span class="chev">▾</span></button>
+      <div class="ans"><div>A static frontend (HTML/CSS/JS) backed by Supabase: Postgres with RLS for storage, Auth for sessions, Storage for support attachments, and SECURITY DEFINER database functions for all financial operations.</div></div></div>
+  </div>
+</section>
+
+<div class="cta">
+  <h2>Banking in motion — <span style="background:linear-gradient(90deg,var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent">stay in motion</span></h2>
+  <p>Product updates and new features. No spam, ever.</p>
+  <form class="news" onsubmit="return subscribe(event)">
+    <input type="email" id="newsEmail" placeholder="you@example.com" required>
+    <button class="btn" type="submit">Subscribe</button>
+  </form>
+  <div class="news-msg" id="newsMsg"></div>
+</div>
+
+<footer>
+  <div class="foot-grid">
+    <div>
+      <a class="logo" href="#top" style="margin-bottom:14px">
+        <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+        Fluxxbank
+      </a>
+      <p style="max-width:340px;line-height:1.7">Banking in motion. Instant payments, fee-free accounts, and real-time insights.</p>
+    </div>
+    <div><h4>Explore</h4><a href="#features">Features</a><a href="#accounts">Plans</a><a href="#faq">FAQ</a><a href="#open">Open account</a></div>
+    <div><h4>Portal</h4><a href="app.html">Customer app</a><a href="admin.html">Admin console</a></div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Fluxxbank. All rights reserved.</span>
+    <span>Digital banking</span>
+  </div>
+</footer>
+
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <h3 id="authTitle">Welcome back ⚡</h3>
-    <p id="authSub">Log in to your Fluxxbank account.</p>
-    <input type="text" placeholder="Full name" id="authName" style="display:none; text-align:left; font-size:1rem; letter-spacing:normal;" autocomplete="off">
-    <input type="email" placeholder="Email address" id="loginEmail" style="text-align:left; font-size:1rem; letter-spacing:normal;">
-    <input type="password" placeholder="Password" id="loginPass" style="text-align:left; font-size:1rem; letter-spacing:normal;">
-    <div class="error" id="authErr"></div>
-    
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-       <a href="#" id="forgotPasswordLink" onclick="showForgotPassword(event)" style="color:var(--accent2); font-size:0.82rem; text-decoration:none;">Forgot password?</a>
-    </div>
-
+    <p class="m-sub" id="authSub">Log in to your Fluxxbank account.</p>
+    <input type="text" placeholder="Full name" id="authName" style="display:none" autocomplete="off" maxlength="80">
+    <input type="email" placeholder="Email address" id="loginEmail" autocomplete="email">
+    <input type="password" placeholder="Password (min. 6 characters)" id="loginPass" autocomplete="current-password">
+    <div id="authErr" style="color:var(--bad);font-size:.83rem;min-height:18px;margin-bottom:8px"></div>
     <button class="btn" id="authBtn" onclick="submitAuth()">Log in</button>
-    <p style="margin-top:16px;font-size:.82rem; text-align: center;">
-      <a href="#" id="authSwitch" style="color:var(--accent2)" onclick="switchAuthMode(event)">New here? Create a free account →</a>
-    </p>
+    <p style="margin-top:16px;font-size:.82rem"><a href="#" id="authSwitch" style="color:var(--accent2)" onclick="switchAuthMode(event)">New here? Create a free account →</a></p>
   </div>
 </div>
-
-<!-- FORGOT PASSWORD MODAL -->
-<div class="modal-bg" id="forgotPasswordModal" onclick="if(event.target===this)closeForgotPassword()">
-  <div class="modal">
-    <h3 style="text-align: center;">Reset Password 🔑</h3>
-    <p style="text-align: center;">Enter your email address and we'll send you a secure link to reset your password.</p>
-    <input type="email" id="forgotEmail" placeholder="Email address" style="text-align:left; font-size:1rem; letter-spacing:normal;">
-    <div class="error" id="forgotErr" style="text-align:center; margin-bottom:10px;"></div>
-    <button class="btn" id="sendResetBtn" onclick="sendResetLink()" style="margin-top: 10px;">Send Reset Link</button>
-    <button class="btn ghost" onclick="closeForgotPassword()" style="margin-top: 10px; width:100%; justify-content:center;">Back to Login</button>
-  </div>
-</div>
-
-<!-- CREATE NEW PASSWORD MODAL (AFTER CLICKING EMAIL LINK) -->
-<div class="modal-bg" id="newPasswordModal" onclick="if(event.target===this)return;">
-  <div class="modal">
-    <h3 style="text-align: center;">Create New Password 🔐</h3>
-    <p style="text-align: center;">Please enter a strong new password for your Fluxxbank account.</p>
-    <input type="password" id="newPasswordInput" placeholder="New Password (min. 6 chars)" style="text-align:left; font-size:1rem; letter-spacing:normal;">
-    <div class="error" id="resetErr" style="text-align:center; margin-bottom:10px;"></div>
-    <button class="btn" onclick="updatePassword()" style="margin-top: 10px;">Update Password</button>
-  </div>
-</div>
-
-<!-- TRANSFER OTP MODAL -->
-<div class="modal-bg" id="otpModal" onclick="if(event.target===this)closeOtpModal()">
-  <div class="modal">
-    <h3 style="text-align: center;">🔒 Transfer Authorization</h3>
-    <p style="text-align: center;">Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">€0.00</strong> to <strong id="transferToDisplay" style="color: var(--txt);">Recipient</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.</p>
-    <input type="text" id="transferOtpInput" placeholder="------" maxlength="6" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;">
-    <input type="hidden" id="currentTxId">
-    <div class="error" id="otpErr" style="margin-top: -5px;"></div>
-    <button class="btn" onclick="verifyTransferOTP()" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent));">Verify & Complete</button>
-    <button class="btn ghost" onclick="closeOtpModal()" style="margin-top: 10px; width: 100%; justify-content: center;">Cancel</button>
-  </div>
-</div>
-
-<!-- PROCESSING MODAL (7 SECOND DELAY) -->
-<div class="modal-bg" id="processingModal">
-  <div class="modal" style="background: transparent; border: none; box-shadow: none;">
-    <div class="spinner"></div>
-    <h3 style="text-align: center; font-size: 1.5rem;">Processing Transfer...</h3>
-    <p style="text-align: center; margin-top: 10px;">Securing your funds.<br>Please do not close this window.</p>
-  </div>
-</div>
-
-<!-- RECEIPT MODAL -->
-<div class="modal-bg" id="receiptModal">
-  <div class="receipt-paper" id="receiptPaper">
-    <div class="receipt-logo"><span class="bolt">⚡</span> FLUXXBANK</div>
-    <div class="r-sub">Official Transaction Receipt</div>
-    <hr class="r-rule">
-    <table class="r-table">
-      <tr><td>Date</td><td id="rDate">–</td></tr>
-      <tr><td>Time</td><td id="rTime">–</td></tr>
-      <tr><td>Reference</td><td id="rRef">–</td></tr>
-      <tr><td>From</td><td id="rFrom">–</td></tr>
-      <tr><td>To</td><td id="rTo">–</td></tr>
-      <tr><td>Note</td><td id="rNote">–</td></tr>
-      <tr><td>Status</td><td style="color:#059669; font-weight:bold;">✔ Completed</td></tr>
-    </table>
-    <hr class="r-rule">
-    <div class="r-total"><small>Amount Transferred</small><b id="rAmt">–</b></div>
-    <div class="r-bar"></div>
-    <div class="r-foot">Fluxxbank AG · fluxxbank.org.uk<br>Thank you for banking in motion ⚡</div>
-    <div class="r-actions">
-      <button class="r-print" onclick="window.print()">🖨️ Print / Save PDF</button>
-      <button class="r-close" onclick="closeReceipt()">Close</button>
-    </div>
-  </div>
-</div>
-
-<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // --- CORRECTED URL AND KEY ---
-  const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_yAZkAllUISEJCtm-yCvMZg_8OujNKmO";
-  let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  
-  let authMode = "login";
-  let isFirstLogin = true; 
-  let userTransactions = []; 
-  const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+"use strict";
+const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_JvS9Ga79l_ddco3i8GSjNQ_J6NFuW0L";
+const bg = document.getElementById("modalBg");
+let sb = null, authMode = "login";
+if (window.supabase) sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // --- LANDING PAGE SCRIPTS ---
-  const rates = [["EUR/USD","1.087","+0.12%"],["BTC","$98,420","+2.4%"],["ETH","$3,910","+1.1%"],["S&P 500","6,842","+0.6%"],["Gold","$2,915","−0.3%"],["NASDAQ","22,410","+0.9%"],["GBP/EUR","1.174","−0.08%"]];
-  document.getElementById("ticker").innerHTML = rates.map(r=>`
-    <div class="tick"><span style="color:var(--mut)">${r[0]}</span><b>${r[1]}</b>
-    <span class="${r[2].startsWith("+")?"up":"dn"}">${r[2]}</span></div>`).join("");
+function openModal(mode){
+  if(mode==="signup" && authMode!=="signup") switchAuthMode({preventDefault(){}});
+  bg.classList.add("show");
+}
+function closeModal(){ bg.classList.remove("show"); document.getElementById("authErr").textContent=""; }
+function switchAuthMode(e){
+  e.preventDefault();
+  authMode = authMode==="login" ? "signup" : "login";
+  const sign = authMode==="signup";
+  document.getElementById("authName").style.display = sign ? "block" : "none";
+  document.getElementById("authTitle").textContent = sign ? "Create your account ⚡" : "Welcome back ⚡";
+  document.getElementById("authSub").textContent = sign ? "Join Fluxxbank — activation takes minutes." : "Log in to your Fluxxbank account.";
+  document.getElementById("authBtn").textContent = sign ? "Create account" : "Log in";
+  document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in →" : "New here? Create a free account →";
+  document.getElementById("authErr").textContent = "";
+}
+document.addEventListener("keydown", e => { if(e.key==="Escape") closeModal(); });
 
-  function count(id, target, suffix, dur){
-    const el = document.getElementById(id), t0 = performance.now();
-    if(!el) return;
-    (function f(t){ const p = Math.min((t-t0)/dur,1), e = 1-Math.pow(1-p,3);
-      el.textContent = Math.round(target*e).toLocaleString()+suffix;
-      if(p<1) requestAnimationFrame(f); })(t0);
-  }
-  count("st1", 2400000, "+", 1800); count("st2", 190, "", 1800);
-
-  const reviews = [
-    {img:"review 1.png", name:"Amira Saleh", role:"Fluxx Plus member · Berlin", quote:"\u201CI opened my account on the train and was paying friends before my stop. I've never seen a bank move this fast.\u201D"},
-    {img:"review 2.png", name:"Daniel Kovač", role:"Small business owner · Prague", quote:"\u201CFluxxbank replaced three apps for my café — payments, savings and my metal card all live in one place. Game changer.\u201D"},
-    {img:"review 3.png", name:"Sofia Marchetti", role:"Digital nomad · Lisbon", quote:"\u201CI get paid in dollars, spend in euros, and save in vaults at 4.1%. Zero FX surprises. It just works, everywhere.\u201D"},
-    {img:"review 4.png", name:"Henrik Larsen", role:"Retired teacher · Aarhus", quote:"\u201CI was skeptical of online banks, but Fluxx support walked me through everything on the phone. My pension is in good hands.\u201D"},
-  ];
-  let cur = 0, revTimer;
-  const slides = document.querySelectorAll(".rev-slide");
-  const dotsEl = document.getElementById("revDots");
-  if(dotsEl) dotsEl.innerHTML = reviews.map((_,i)=>'<button onclick="goRev('+i+')" aria-label="review '+(i+1)+'"></button>').join("");
-  const dots = dotsEl ? dotsEl.querySelectorAll("button") : [];
-  function showRev(i){
-    cur = (i + reviews.length) % reviews.length;
-    slides.forEach((s,k)=>s.classList.toggle("active", k===cur));
-    dots.forEach((d,k)=>d.classList.toggle("on", k===cur));
-    const r = reviews[cur];
-    if(document.getElementById("revQuote")) document.getElementById("revQuote").textContent = r.quote;
-    if(document.getElementById("revName")) document.getElementById("revName").textContent = r.name;
-    if(document.getElementById("revRole")) document.getElementById("revRole").textContent = r.role;
-    if(document.getElementById("revAva")) document.getElementById("revAva").src = r.img;
-    if(document.getElementById("revCount")) document.getElementById("revCount").textContent = (cur+1) + " / " + reviews.length;
-  }
-  function goRev(i){ clearInterval(revTimer); showRev(i); revTimer = setInterval(()=>showRev(cur+1), 5200); }
-  if(slides.length > 0) { showRev(0); revTimer = setInterval(()=>showRev(cur+1), 5200); }
-
-  function toggleQa(btn){
-    const qa = btn.parentElement, wasOpen = qa.classList.contains("open");
-    document.querySelectorAll(".qa").forEach(q=>q.classList.remove("open"));
-    if(!wasOpen) qa.classList.add("open");
-  }
-  window.addEventListener("scroll", ()=>{
-    const btn = document.getElementById("toTop");
-    if(btn) btn.classList.toggle("show", window.scrollY > 600);
-  });
-
-  // --- MODAL LOGIC ---
-  const bg = document.getElementById("modalBg");
-  const forgotPwBg = document.getElementById("forgotPasswordModal");
-  const newPwBg = document.getElementById("newPasswordModal");
-  const otpBg = document.getElementById("otpModal");
-  const processingBg = document.getElementById("processingModal");
-  const receiptBg = document.getElementById("receiptModal");
-  
-  function openModal(){ bg.classList.add("show"); }
-  function closeModal(){ bg.classList.remove("show"); }
-  
-  function showForgotPassword(e) {
-    e.preventDefault();
-    closeModal();
-    forgotPwBg.classList.add("show");
-  }
-  function closeForgotPassword() {
-    forgotPwBg.classList.remove("show");
-    openModal(); 
-  }
-
-  function closeOtpModal(){ otpBg.classList.remove("show"); }
-  function closeReceipt(){ receiptBg.classList.remove("show"); }
-
-  function switchAuthMode(e){
-    e.preventDefault();
-    authMode = authMode === "login" ? "signup" : "login";
-    const sign = authMode === "signup";
-    document.getElementById("authName").style.display = sign ? "block" : "none";
-    document.getElementById("authTitle").textContent = sign ? "Create your account ⚡" : "Welcome back ⚡";
-    document.getElementById("authSub").textContent = sign ? "Join 2.4 million people banking in motion." : "Log in to your Fluxxbank account.";
-    document.getElementById("authBtn").textContent = sign ? "Create account" : "Log in";
-    document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in →" : "New here? Create a free account →";
-    document.getElementById("authErr").textContent = "";
-    
-    document.getElementById("forgotPasswordLink").style.display = sign ? "none" : "block";
-  }
-
-  // --- AUTHENTICATION ---
-  async function submitAuth(){
-    const em = document.getElementById("loginEmail").value.trim();
-    const pw = document.getElementById("loginPass").value;
-    const nm = document.getElementById("authName").value.trim();
-    const err = document.getElementById("authErr");
-    err.style.color = "var(--bad)";
-    
-    if(!em.includes("@")){ err.textContent = "Please enter a valid email address."; return; }
-    
-    try{
-      if(authMode === "signup"){
-        if(pw.length < 6){ err.textContent = "Password needs at least 6 characters."; return; }
-        const { data: su, error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm || "Customer" } } });
-        if(error) throw error;
-        
-        if(su.user){
-          const { error: insertErr } = await sb.from("profiles").insert({
-            id: su.user.id, 
-            name: nm || "Customer", 
-            email: em, 
-            balance: 0, 
-            status: "pending"
-          });
-          
-          if (insertErr) console.error("Profile insert error:", insertErr);
-        }
-        err.style.color = "var(--ok)";
-        err.textContent = "✅ Account created! Wait for admin activation.";
-      } else {
-        const { data: authData, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
-        if(error) throw error;
-        
-        const { data: profile, error: pError } = await sb.from("profiles").select("status, name, role").eq("id", authData.user.id).single();
-        if(pError) throw pError;
-        
-        if (profile.role && profile.role.startsWith("2FA-")) {
-          const correctCode = profile.role.replace("2FA-", "");
-          const enteredCode = prompt("🔐 Security Check: Please enter the 6-digit 2FA code provided by the Admin.");
-          
-          if (enteredCode !== correctCode) {
-            await sb.auth.signOut(); 
-            throw new Error("❌ Invalid 2FA Code. Please contact admin.");
-          }
-          
-          await sb.from("profiles").update({ role: "customer", status: "active" }).eq("id", authData.user.id);
-          profile.status = "active";
-        }
-        
-        if (profile.status !== "active") {
-          await sb.auth.signOut(); 
-          throw new Error("⏳ Account awaiting approval — an admin must activate it first.");
-        }
-        
-        closeModal();
-        isFirstLogin = true; 
-        await checkSession(); 
-      }
-    }catch(e){
-      err.textContent = e.message || "Something went wrong. Try again.";
-    }
-  }
-
-  // --- PASSWORD RESET LOGIC ---
-  async function sendResetLink() {
-    const em = document.getElementById("forgotEmail").value.trim();
-    const err = document.getElementById("forgotErr");
-    const btn = document.getElementById("sendResetBtn");
-    
-    if(!em.includes("@")){
-      err.style.color = "var(--bad)";
-      err.textContent = "Please enter a valid email address.";
-      return;
-    }
-    
-    err.textContent = "";
-    btn.disabled = true;
-    btn.textContent = "Sending link...";
-
-    setTimeout(async () => {
-      try {
-        const { error } = await sb.auth.resetPasswordForEmail(em, {
-          redirectTo: 'https://fluxxbank.org.uk/index.html' 
+async function submitAuth(){
+  const em = document.getElementById("loginEmail").value.trim();
+  const pw = document.getElementById("loginPass").value;
+  const nm = document.getElementById("authName").value.trim();
+  const err = document.getElementById("authErr");
+  err.style.color = "var(--bad)";
+  if(!em.includes("@")){ err.textContent = "Please enter a valid email address."; return; }
+  if(!sb){ err.textContent = "Backend unavailable — try again in a moment."; return; }
+  const btn = document.getElementById("authBtn"); btn.disabled = true;
+  try{
+    if(authMode === "signup"){
+      if(pw.length < 6){ err.textContent = "Password needs at least 6 characters."; btn.disabled=false; return; }
+      const { data: su, error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm || "Customer" } } });
+      if(error) throw error;
+      if(su.user){
+        const { error: pErr } = await sb.from("profiles").insert({
+          id: su.user.id,
+          name: (nm || "Customer").slice(0,80),
+          email: em,
+          balance: 0,
+          status: "Pending",
+          avatar_url: null
         });
-        
-        btn.disabled = false;
-        btn.textContent = "Send Reset Link";
-        
-        if(error) throw error;
-
-        forgotPwBg.classList.remove("show");
-        document.getElementById("resetSuccessScreen").classList.remove("hidden");
-
-      } catch(error) {
-        btn.disabled = false;
-        btn.textContent = "Send Reset Link";
-        err.style.color = "var(--bad)";
-        err.textContent = error.message || "Failed to send link. Try again.";
+        if(pErr && pErr.code !== "23505") console.warn("profile insert:", pErr.message);
       }
-    }, 4000); 
-  }
-
-  sb.auth.onAuthStateChange((event, session) => {
-    if (event === 'PASSWORD_RECOVERY') {
-      document.getElementById("resetSuccessScreen").classList.add("hidden");
-      newPwBg.classList.add("show");
-    }
-  });
-
-  async function updatePassword() {
-    const newPw = document.getElementById('newPasswordInput').value;
-    const err = document.getElementById('resetErr');
-    
-    if (newPw.length < 6) {
-      err.style.color = "var(--bad)";
-      err.textContent = "Password needs at least 6 characters.";
-      return;
-    }
-    
-    err.style.color = "var(--txt)";
-    err.textContent = "Updating...";
-
-    const { error } = await sb.auth.updateUser({ password: newPw });
-    
-    if (error) {
-      err.style.color = "var(--bad)";
-      err.textContent = error.message;
-    } else {
       err.style.color = "var(--ok)";
-      err.textContent = "✅ Password updated successfully! Redirecting to login...";
-      setTimeout(async () => {
-        await sb.auth.signOut();
-        window.location.reload();
-      }, 2000);
-    }
-  }
-
-  // --- AVATAR UPLOAD LOGIC ---
-  async function uploadAvatar(event) {
-    const file = event.target.files[0];
-    if(!file) return;
-
-    const { data: { session } } = await sb.auth.getSession();
-    if(!session) return;
-
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      const base64String = e.target.result;
-      
-      const { error } = await sb.from("profiles").update({ avatar_url: base64String }).eq("id", session.user.id);
-      if(error) return alert("Failed to upload photo: " + error.message);
-
-      const avatarHtml = `<img src="${base64String}" alt="User">`;
-      document.getElementById("desktopAvatar").innerHTML = avatarHtml;
-      document.getElementById("mobileAvatar").innerHTML = avatarHtml;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  // --- DASHBOARD LOADING LOGIC ---
-  async function loadDashboardData(session, profile) {
-    const firstName = profile.name.split(" ")[0];
-    document.getElementById("dashBal").textContent = eur(profile.balance);
-    document.getElementById("userNameDisplay").textContent = profile.name;
-    document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
-
-    const avatarHtml = profile.avatar_url ? `<img src="${profile.avatar_url}" alt="User">` : firstName.charAt(0).toUpperCase();
-    document.getElementById("desktopAvatar").innerHTML = avatarHtml;
-    document.getElementById("mobileAvatar").innerHTML = avatarHtml;
-
-    const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false }).limit(10);
-    
-    userTransactions = txData || []; 
-
-    const txList = document.getElementById("txlist");
-    if(userTransactions.length > 0) {
-      txList.innerHTML = userTransactions.map(t => {
-        const isPos = t.type === 'deposit';
-        return `
-        <div class="tx-item" onclick="viewReceipt('${t.id}')">
-          <div class="tx-left">
-            <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
-            <div class="tx-details">
-              <h4>${t.description}</h4>
-              <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})}</p>
-            </div>
-          </div>
-          <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
-            ${isPos ? '+' : '−'}${eur(Math.abs(t.amount))}
-          </span>
-        </div>
-        `;
-      }).join("");
+      err.textContent = "✅ Account created — status: Pending. Once an admin activates your account (or issues a one-time code), sign in below.";
     } else {
-      txList.innerHTML = '<p style="color: var(--mut); text-align: center; padding: 20px;">No recent activity.</p>';
+      const { error } = await sb.auth.signInWithPassword({ email: em, password: pw });
+      if(error) throw error;
+      location.href = "app.html";
     }
-  }
+  }catch(e){
+    err.textContent = e.message || "Something went wrong. Try again.";
+  }finally{ btn.disabled = false; }
+}
 
-  async function checkSession() {
-    const { data: { session } } = await sb.auth.getSession();
-    
-    if (session && session.user) {
-      document.getElementById("landingPage").classList.add("hidden");
-
-      const { data: p } = await sb.from("profiles").select("name, balance, avatar_url").eq("id", session.user.id).single();
-      
-      if (isFirstLogin) {
-        const firstName = p ? p.name.split(" ")[0] : "User";
-        document.getElementById("welcomeText").textContent = `Welcome, ${firstName}`;
-        document.getElementById("welcomeScreen").classList.remove("hidden");
-        document.getElementById("appDashboard").classList.add("hidden");
-
-        setTimeout(async () => {
-          document.getElementById("welcomeScreen").classList.add("hidden");
-          document.getElementById("appDashboard").classList.remove("hidden");
-          document.body.style.overflow = "auto";
-          isFirstLogin = false;
-          if (p) await loadDashboardData(session, p);
-        }, 8000);
-
-      } else {
-        document.getElementById("appDashboard").classList.remove("hidden");
-        if (p) await loadDashboardData(session, p);
-      }
-
-    } else {
-      document.getElementById("appDashboard").classList.add("hidden");
-      document.getElementById("landingPage").classList.remove("hidden");
-    }
-  }
-
-  async function doLogout(){
-    await sb.auth.signOut();
-    location.reload();
-  }
-
-  // --- SEND MONEY LOGIC ---
-  async function doPay(e){
-    e.preventDefault();
-    const who = document.getElementById("pWho").value;
-    const amt = parseFloat(document.getElementById("pAmt").value);
-    const note = document.getElementById("pNote").value || "FluxxPay";
-    const msg = document.getElementById("paymsg");
-    
-    msg.style.color = "white";
-    msg.textContent = "Requesting...";
-
-    const { data: { session } } = await sb.auth.getSession();
-    if(!session) return;
-
-    try {
-      const { data: p, error: pError } = await sb.from("profiles").select("balance").eq("id", session.user.id).single();
-      if(pError) throw pError;
-
-      if(Number(p.balance) < amt) {
-        msg.style.color = "var(--bad)";
-        msg.textContent = "Insufficient funds! Balance: " + eur(p.balance);
-        return false;
-      }
-
-      const expectedBalance = Number(p.balance) - amt;
-      const referenceCode = "FLX-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 100);
-
-      const { data: txData, error: txError } = await sb.from("transactions").insert({ 
-        user_id: session.user.id, 
-        type: 'transfer', 
-        amount: amt, 
-        description: `Sent to ${who} (${note})`,
-        status: 'pending',
-        reference: referenceCode,
-        balance_after: expectedBalance
-      }).select().single();
-
-      if(txError) throw new Error(txError.message);
-
-      document.getElementById("transferAmtDisplay").textContent = eur(amt);
-      document.getElementById("transferToDisplay").textContent = who;
-      document.getElementById("currentTxId").value = txData.id;
-      
-      msg.textContent = ""; 
-      document.getElementById("pAmt").value=""; 
-      document.getElementById("pNote").value="";
-      
-      otpBg.classList.add("show");
-
-    } catch (error) {
-      msg.style.color = "var(--bad)";
-      msg.textContent = "Error: " + error.message;
-    }
+function toggleQa(btn){
+  const qa = btn.parentElement, wasOpen = qa.classList.contains("open");
+  document.querySelectorAll(".qa").forEach(q => q.classList.remove("open"));
+  if(!wasOpen) qa.classList.add("open");
+}
+async function subscribe(e){
+  e.preventDefault();
+  const em = document.getElementById("newsEmail").value.trim();
+  const msg = document.getElementById("newsMsg");
+  if(!em.includes("@")){ msg.style.color="var(--bad)"; msg.textContent="Please enter a valid email address."; return false; }
+  if(sb){
+    const { error } = await sb.from("subscribers").insert({ email: em });
+    if(error && error.code === "23505"){ msg.style.color="var(--gold)"; msg.textContent="You're already on the list! ⚡"; }
+    else if(error){ msg.style.color="var(--bad)"; msg.textContent="Something went wrong — try again."; }
+    else { msg.style.color="var(--ok)"; msg.textContent="⚡ Welcome aboard! You're subscribed."; document.getElementById("newsEmail").value=""; }
     return false;
   }
-
-  // --- VERIFY OTP & 7-SECOND DELAY ---
-  async function verifyTransferOTP() {
-    const txId = document.getElementById("currentTxId").value;
-    const enteredOTP = document.getElementById("transferOtpInput").value.trim();
-    const errDisplay = document.getElementById("otpErr");
-
-    if(!enteredOTP) {
-      errDisplay.textContent = "Please enter the 6-digit code.";
-      return;
-    }
-
-    if (enteredOTP !== "241800") {
-      errDisplay.style.color = "var(--bad)";
-      errDisplay.textContent = "❌ Invalid OTP. Please check your code and try again.";
-      return;
-    }
-
-    closeOtpModal();
-    processingBg.classList.add("show");
-
-    setTimeout(async () => {
-      try {
-        const { data: { session } } = await sb.auth.getSession();
-        const { data: tx } = await sb.from("transactions").select("*").eq("id", txId).single();
-        const { data: profile } = await sb.from("profiles").select("balance, name").eq("id", session.user.id).single();
-        
-        const newBalance = Number(profile.balance) - Number(tx.amount);
-        await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
-        await sb.from("transactions").update({ status: "completed" }).eq("id", txId);
-
-        processingBg.classList.remove("show");
-        
-        populateAndShowReceipt(tx, profile.name);
-
-        await checkSession();
-      } catch (err) {
-        processingBg.classList.remove("show");
-        alert("Something went wrong completing the transaction.");
-      }
-    }, 7000);
+  msg.style.color="var(--ok)"; msg.textContent="⚡ Welcome aboard! Check " + em + " to confirm your subscription.";
+  document.getElementById("newsEmail").value = "";
+  return false;
+}
+(async ()=>{
+  if(!sb) return;
+  const { data:{session} } = await sb.auth.getSession();
+  if(session && session.user){
+    document.getElementById("authArea").innerHTML = '<a class="btn" href="app.html">Open your account →</a>';
   }
-
-  // --- REUSABLE RECEIPT VIEWER ---
-  function viewReceipt(txId) {
-    const tx = userTransactions.find(t => t.id === txId);
-    if(!tx) return;
-    const profileName = document.getElementById("userNameDisplay").textContent;
-    populateAndShowReceipt(tx, profileName);
-  }
-
-  function populateAndShowReceipt(tx, profileName) {
-    const dateObj = new Date(tx.created_at); 
-    document.getElementById("rDate").textContent = dateObj.toLocaleDateString("en-IE", {day:'2-digit', month:'long', year:'numeric'});
-    document.getElementById("rTime").textContent = dateObj.toLocaleTimeString("en-IE", {hour:'2-digit', minute:'2-digit'});
-    document.getElementById("rRef").textContent = tx.reference || "N/A";
-    document.getElementById("rFrom").textContent = profileName;
-    
-    let to = "Unknown";
-    let note = "None";
-    if (tx.type === 'deposit') {
-        to = "Admin Deposit";
-        note = tx.description;
-    } else {
-        const match = tx.description.match(/Sent to (.*?) \((.*?)\)/);
-        if (match) {
-            to = match[1];
-            note = match[2] || "None";
-        } else {
-            to = tx.description;
-        }
-    }
-
-    document.getElementById("rTo").textContent = to;
-    document.getElementById("rNote").textContent = note;
-    document.getElementById("rAmt").textContent = eur(tx.amount);
-
-    document.getElementById("receiptModal").classList.add("show");
-  }
-
-  window.addEventListener("DOMContentLoaded", () => {
-    checkSession();
-  });
+})();
 </script>
 </body>
 </html>
