@@ -321,6 +321,9 @@
 
       <label class="modal-label">Purpose of Transfer</label>
       <input type="text" id="depPurpose" class="modal-input" placeholder="e.g. Salary, Refund, Gift" required>
+
+      <label class="modal-label">Transaction Date & Time (optional — leave blank for now)</label>
+      <input type="datetime-local" id="depDateTime" class="modal-input" style="text-align:left;">
       
       <div class="modal-actions">
         <button class="btn" onclick="submitDeposit()">Confirm Deposit</button>
@@ -416,6 +419,7 @@
       $("depBank").value = "";
       $("depositAmountInput").value = "";
       $("depPurpose").value = "";
+      $("depDateTime").value = "";
       
       $("depositModal").classList.add("show");
       $("depFirstName").focus();
@@ -436,6 +440,7 @@
       const bank = $("depBank").value.trim();
       const amount = parseFloat($("depositAmountInput").value);
       const purpose = $("depPurpose").value.trim();
+      const customDate = $("depDateTime").value;
 
       if(!fName || !lName || !iban || !bic || !bank || !purpose) {
         return toast("Please fill in all recipient details.");
@@ -458,7 +463,7 @@
         const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();
         const description = `Sent to ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;
 
-        await sb.from("transactions").insert({ 
+        const txPayload = { 
           user_id: depositUserId, 
           type: 'deposit', 
           amount: amount, 
@@ -466,7 +471,13 @@
           status: 'completed',
           balance_after: newBalance,
           reference: refCode
-        });
+        };
+
+        if(customDate) {
+          txPayload.created_at = new Date(customDate).toISOString();
+        }
+
+        await sb.from("transactions").insert(txPayload);
         
         toast(`✅ Deposited ${eur(amount)} successfully!`);
         closeDepositModal();
