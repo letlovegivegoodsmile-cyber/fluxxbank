@@ -37,12 +37,20 @@
     .text-btn:hover { color: #ffd0a5; }
     #app { min-height: 100vh; }
     .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); min-height: 100vh; }
-    .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; }
+    .sidebar { background: #0b1425; border-right: 1px solid var(--border); padding: 25px 15px; display: flex; flex-direction: column; }
     .sidebar .brand { padding: 0 10px 27px; font-size: 22px; }
     .side-label { padding: 12px 10px; color: var(--muted); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
     .side-btn { display: block; width: 100%; margin: 5px 0; padding: 12px; text-align: left; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #b9c7dd; }
     .side-btn:hover, .side-btn.on { background: #172742; border-color: #293d5e; color: white; }
     .side-btn.on { box-shadow: inset 3px 0 var(--orange); }
+    
+    /* Perfect Center Profile Avatar */
+    .admin-profile-box { margin-top: auto; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; gap: 12px; }
+    .admin-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--orange), #3b5bdb); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; border: 2px solid transparent; }
+    .admin-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
+    .admin-info h4 { font-size: 0.85rem; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .admin-info p { font-size: 0.7rem; color: var(--muted); margin: 0; }
+
     main { min-width: 0; }
     .topbar { min-height: 82px; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border-bottom: 1px solid var(--border); background: #0c1526; }
     .topbar h1 { margin: 0; font-size: 21px; }
@@ -67,6 +75,16 @@
     .status.pending { background: #49341b; color: #ffd18c; }
     .empty { padding: 25px 10px; color: var(--muted); text-align: center; font-size: 13px; }
     #toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; max-width: calc(100vw - 40px); padding: 13px 17px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel2); color: white; box-shadow: 0 10px 30px #0006; overflow-wrap: anywhere; }
+    
+    /* MODAL STYLES */
+    .modal-bg { position: fixed; inset: 0; background: rgba(5, 7, 15, 0.75); backdrop-filter: blur(6px); display: none; place-items: center; z-index: 200; }
+    .modal-bg.show { display: grid; }
+    .modal { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 30px; width: min(400px, 92vw); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+    .modal h3 { margin-top: 0; margin-bottom: 8px; font-size: 1.25rem; color: #fff; }
+    .modal p { color: var(--muted); font-size: 0.88rem; margin-bottom: 20px; line-height: 1.5; }
+    .modal input { width: 100%; background: #091222; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; color: #fff; margin-bottom: 12px; outline: none; text-align: center; font-size: 1.2rem; letter-spacing: 4px; }
+    .modal .error { color: var(--red); font-size: 0.85rem; margin-bottom: 10px; text-align: center; min-height: 18px; }
+
     @media (max-width: 760px) {
       .layout { grid-template-columns: 1fr; }
       .sidebar { padding: 15px; border-right: 0; border-bottom: 1px solid var(--border); }
@@ -122,12 +140,21 @@
           <button class="side-btn" data-view="cust" type="button">Customers</button>
           <button class="side-btn" data-view="appr" type="button">Approvals</button>
           <button class="side-btn" data-view="transfers" type="button">Pending Transfers</button>
+          <button class="side-btn" data-view="settings" type="button">Settings</button>
         </nav>
+        
+        <div class="admin-profile-box">
+          <div class="admin-avatar" id="adminAvatarContainer">A</div>
+          <div class="admin-info">
+            <h4 id="adminIdentity">Administrator</h4>
+            <p>Super Admin</p>
+          </div>
+        </div>
       </aside>
 
       <main>
         <header class="topbar">
-          <div><h1 id="pageTitle">Overview</h1><small id="adminIdentity">Administrator</small></div>
+          <div><h1 id="pageTitle">Overview</h1><small>Manage banking configurations & records</small></div>
           <button class="btn secondary" id="logoutBtn" type="button">Sign out</button>
         </header>
 
@@ -179,19 +206,48 @@
               </div>
             </div>
           </section>
+
+          <!-- SETTINGS (HIDDEN UNTIL UNLOCKED WITH 1296 PIN) -->
+          <section id="view-settings" class="view">
+            <h2 class="section-title">Admin Settings & Configuration</h2>
+            <p class="section-desc">Secure system parameters and database endpoints.</p>
+            <div class="panel" style="max-width: 600px;">
+              <h2>Database Connection</h2>
+              <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 15px;">Connected to Supabase production environment.</p>
+              <div style="background: #091222; padding: 15px; border-radius: 8px; border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem; word-break: break-all; margin-bottom: 20px;">
+                URL: https://jthmxuecjbyvltvjfhyj.supabase.co<br>
+                Status: Active & Secure
+              </div>
+              <button class="btn" onclick="toast('Settings updated successfully!')">Save Configuration</button>
+            </div>
+          </section>
           
           <div id="pageErr" class="error" role="alert"></div>
         </div>
       </main>
     </div>
   </div>
+
+  <!-- PIN VERIFICATION MODAL FOR SETTINGS -->
+  <div class="modal-bg" id="pinModal" onclick="if(event.target===this)cancelPinModal()">
+    <div class="modal">
+      <h3 style="text-align: center;">🔒 Security PIN Required</h3>
+      <p style="text-align: center;">Enter the static 4-digit security PIN to access the confidential admin settings.</p>
+      <form onsubmit="event.preventDefault(); verifySettingsPin();">
+        <input type="password" id="pinInput" placeholder="----" maxlength="4" autocomplete="off">
+        <div class="error" id="pinErr"></div>
+        <button class="btn full" type="submit" style="background: var(--orange);">Unlock Settings</button>
+      </form>
+      <button class="btn secondary full" onclick="cancelPinModal()" style="margin-top: 10px;">Cancel</button>
+    </div>
+  </div>
+
   <div id="toast" class="hidden" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     "use strict";
     
-    // --- NEW CORRECTED URL AND KEY ---
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_WzE8F6fwrln4M3ExyLKKjQ_qzZSlPOe";
     const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
@@ -199,6 +255,7 @@
     let sb = null;
     let customers = [];
     let toastTimer = null;
+    let settingsUnlocked = false;
     const $ = id => document.getElementById(id);
 
     document.addEventListener("DOMContentLoaded", async () => {
@@ -216,14 +273,25 @@
       $("logoutBtn").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
 
       document.querySelectorAll(".side-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", (e) => {
+          const targetView = btn.dataset.view;
+
+          // If clicking settings and not unlocked yet, prompt for static pin 1296
+          if (targetView === "settings" && !settingsUnlocked) {
+            e.preventDefault();
+            $("pinInput").value = "";
+            $("pinErr").textContent = "";
+            $("pinModal").classList.add("show");
+            return;
+          }
+
           document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
           btn.classList.add("on");
           document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
-          $("view-" + btn.dataset.view).classList.add("on");
+          $("view-" + targetView).classList.add("on");
           $("pageTitle").textContent = btn.textContent;
 
-          if(btn.dataset.view === "transfers") loadPendingTransfers();
+          if(targetView === "transfers") loadPendingTransfers();
         });
       });
 
@@ -248,6 +316,32 @@
         }
       });
     });
+
+    function verifySettingsPin() {
+      const enteredPin = $("pinInput").value.trim();
+      const err = $("pinErr");
+
+      if (enteredPin === "1296") {
+        settingsUnlocked = true;
+        $("pinModal").classList.remove("show");
+        
+        // Switch view to settings
+        document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
+        const settingsBtn = document.querySelector('[data-view="settings"]');
+        if(settingsBtn) settingsBtn.classList.add("on");
+        
+        document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
+        $("view-settings").classList.add("on");
+        $("pageTitle").textContent = "Settings";
+        toast("🔓 Settings unlocked successfully!");
+      } else {
+        err.textContent = "❌ Invalid PIN. Please try again (Static PIN is 1296).";
+      }
+    }
+
+    function cancelPinModal() {
+      $("pinModal").classList.remove("show");
+    }
 
     function showLoginError(msg) { $("loginErr").textContent = msg || ""; }
     function showPageError(msg) { $("pageErr").textContent = msg || ""; }
@@ -295,11 +389,18 @@
       try {
         if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }
         if (!user) throw new Error("Please sign in.");
-        const { data: profile } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
+        const { data: profile } = await sb.from("profiles").select("id, name, email, role, status, avatar_url").eq("id", user.id).single();
         if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
           await sb.auth.signOut(); throw new Error("Not an active admin.");
         }
+        
         $("adminIdentity").textContent = profile.name || "Administrator";
+        if (profile.avatar_url) {
+          $("adminAvatarContainer").innerHTML = `<img src="${profile.avatar_url}" alt="Admin Avatar">`;
+        } else {
+          $("adminAvatarContainer").textContent = (profile.name || "A").charAt(0).toUpperCase();
+        }
+
         await loadAll();
         $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
         renderOverview(); renderCustomers(); renderApprovals();
@@ -438,7 +539,6 @@
       }
     }
 
-    // --- PENDING TRANSFERS LOGIC (STATIC OTP 241800) ---
     async function loadPendingTransfers() {
       const tbody = $("pendingTransfersBody");
       tbody.innerHTML = '<tr><td colspan="4">Loading transfers…</td></tr>';
