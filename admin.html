@@ -23,9 +23,7 @@
     button{font:inherit;cursor:pointer;border:none}
     .hidden{display:none !important}
 
-    /* =========================================
-       LOGIN SCREEN
-       ========================================= */
+    /* LOGIN SCREEN */
     #loginScreen {
       position: fixed; inset: 0; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%);
       display: grid; place-items: center; padding: 20px; z-index: 999;
@@ -56,9 +54,7 @@
     .login-links { display: flex; justify-content: flex-end; margin-top: 14px; }
     .text-btn { background: transparent; color: var(--accent2); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
 
-    /* =========================================
-       ADMIN APP LAYOUT
-       ========================================= */
+    /* ADMIN APP LAYOUT */
     #app { min-height: 100vh; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
     
     .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); width: 100%; min-height: 100vh; }
@@ -98,24 +94,25 @@
     
     .empty { padding: 30px; color: var(--mut); text-align: center; }
 
-    /* =========================================
-       MODAL STYLES (For Deposits)
-       ========================================= */
+    /* MODAL STYLES */
     .modal-bg { position: fixed; inset: 0; background: rgba(5,7,15,0.8); backdrop-filter: blur(8px); display: none; place-items: center; z-index: 1000; padding: 20px; }
     .modal-bg.show { display: grid; }
-    .modal-box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; width: 100%; max-width: 450px; padding: 34px; box-shadow: 0 30px 80px rgba(0,0,0,0.8); position: relative; }
+    .modal-box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 28px 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.8); position: relative; }
     .modal-box h3 { font-size: 1.4rem; margin-bottom: 8px; color: #fff; }
-    .modal-box p { color: var(--mut); font-size: 0.9rem; margin-bottom: 24px; }
+    .modal-box p { color: var(--mut); font-size: 0.9rem; margin-bottom: 20px; }
     
-    .customer-info-box { background: rgba(0,0,0,0.2); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px; }
+    .customer-info-box { background: rgba(0,0,0,0.2); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; }
     .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
     .info-row span { color: var(--mut); }
     .info-row strong { color: #fff; text-align: right; }
     
-    .modal-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 12px; padding: 14px; color: #fff; font-size: 1.1rem; margin-bottom: 20px; outline: none; transition: 0.2s; text-align: center;}
+    .modal-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 12px; padding: 14px; color: #fff; font-size: 1rem; margin-bottom: 14px; outline: none; transition: 0.2s; }
     .modal-input:focus { border-color: var(--accent); }
+    .modal-input::placeholder { color: var(--mut); }
     
-    .modal-actions { display: flex; gap: 12px; }
+    .modal-label { display: block; color: var(--mut); font-size: 0.8rem; margin-bottom: 6px; }
+    
+    .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
     .modal-actions .btn { flex: 1; }
 
     /* TOAST */
@@ -286,7 +283,7 @@
     </div>
   </div>
 
-  <!-- DEPOSIT MODAL (NEW) -->
+  <!-- DEPOSIT MODAL -->
   <div class="modal-bg" id="depositModal" onclick="if(event.target===this) closeDepositModal()">
     <div class="modal-box">
       <h3>💰 Deposit Funds</h3>
@@ -299,7 +296,31 @@
         <div class="info-row"><span>Current Balance</span><strong id="depBalance" style="color:var(--ok); font-size:1.1rem;">-</strong></div>
       </div>
 
-      <input type="number" id="depositAmountInput" class="modal-input" placeholder="Enter amount (€)" min="1" step="0.01" required>
+      <label class="modal-label">Recipient First Name</label>
+      <input type="text" id="depFirstName" class="modal-input" placeholder="e.g. John" required>
+
+      <label class="modal-label">Recipient Last Name</label>
+      <input type="text" id="depLastName" class="modal-input" placeholder="e.g. Doe" required>
+
+      <label class="modal-label">IBAN / Account Number</label>
+      <input type="text" id="depIban" class="modal-input" placeholder="e.g. DE89 3704 0044 0532 0130 00" required>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <label class="modal-label">BIC / SWIFT Code</label>
+          <input type="text" id="depBic" class="modal-input" placeholder="e.g. COBADEFFXXX" required>
+        </div>
+        <div>
+          <label class="modal-label">Bank Name</label>
+          <input type="text" id="depBank" class="modal-input" placeholder="e.g. Commerzbank" required>
+        </div>
+      </div>
+
+      <label class="modal-label">Amount (€)</label>
+      <input type="number" id="depositAmountInput" class="modal-input" placeholder="Enter amount (€)" min="0.01" step="0.01" required>
+
+      <label class="modal-label">Purpose of Transfer</label>
+      <input type="text" id="depPurpose" class="modal-input" placeholder="e.g. Salary, Refund, Gift" required>
       
       <div class="modal-actions">
         <button class="btn" onclick="submitDeposit()">Confirm Deposit</button>
@@ -321,7 +342,7 @@
     let sb = null;
     let customers = [];
     let toastTimer = null;
-    let depositUserId = null; // Holds the selected customer ID for deposits
+    let depositUserId = null;
     const $ = id => document.getElementById(id);
     const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -386,10 +407,18 @@
       $("depEmail").textContent = c.email || "N/A";
       $("depStatus").innerHTML = statusBadge(c.status);
       $("depBalance").textContent = eur(c.balance || 0);
+
+      // Clear form fields
+      $("depFirstName").value = "";
+      $("depLastName").value = "";
+      $("depIban").value = "";
+      $("depBic").value = "";
+      $("depBank").value = "";
       $("depositAmountInput").value = "";
+      $("depPurpose").value = "";
       
       $("depositModal").classList.add("show");
-      $("depositAmountInput").focus();
+      $("depFirstName").focus();
     }
 
     function closeDepositModal() {
@@ -400,7 +429,17 @@
     async function submitDeposit() {
       if(!depositUserId) return;
       
+      const fName = $("depFirstName").value.trim();
+      const lName = $("depLastName").value.trim();
+      const iban = $("depIban").value.trim();
+      const bic = $("depBic").value.trim();
+      const bank = $("depBank").value.trim();
       const amount = parseFloat($("depositAmountInput").value);
+      const purpose = $("depPurpose").value.trim();
+
+      if(!fName || !lName || !iban || !bic || !bank || !purpose) {
+        return toast("Please fill in all recipient details.");
+      }
       if(isNaN(amount) || amount <= 0) {
         return toast("Please enter a valid amount.");
       }
@@ -417,11 +456,13 @@
         if (err1) throw err1;
 
         const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();
+        const description = `Sent to ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;
+
         await sb.from("transactions").insert({ 
           user_id: depositUserId, 
           type: 'deposit', 
           amount: amount, 
-          description: 'Admin manual deposit', 
+          description: description, 
           status: 'completed',
           balance_after: newBalance,
           reference: refCode
@@ -453,7 +494,7 @@
       toastTimer = setTimeout(() => { el.classList.remove("show"); setTimeout(()=>el.classList.add("hidden"), 300); }, 3500);
     }
     function escapeHtml(v) {
-      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
+      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" })[ch]);
     }
     function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
     function statusBadge(status) {
