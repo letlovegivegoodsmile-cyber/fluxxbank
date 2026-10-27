@@ -336,7 +336,7 @@
   <div class="modal-bg" id="detailsModal" onclick="if(event.target===this) closeDetailsModal()">
     <div class="modal-box" style="max-width: 480px;">
       <h3>👤 Customer Details</h3>
-      <p id="detailsSub">Personal information is hidden. Click the eye and enter PIN 2121 to reveal.</p>
+      <p id="detailsSub">Personal information is hidden. Click the eye and enter your 4 digit secret pin to reveal.</p>
       
       <div class="customer-info-box" id="detailsContent">
         <!-- filled by JS -->
@@ -352,7 +352,7 @@
   <div class="modal-bg" id="adminPinModal" onclick="if(event.target===this) closeAdminPin()">
     <div class="modal-box" style="max-width: 400px; text-align:center;">
       <h3>🔐 Security PIN Required</h3>
-      <p>Please input your 4 digit secret pin which is 2121</p>
+      <p>Please input your 4 digit secret pin</p>
       <input type="password" id="adminPinInput" class="modal-input" placeholder="----" maxlength="4" style="font-size:1.5rem; letter-spacing:8px; text-align:center;">
       <div id="adminPinErr" class="error" style="margin-bottom:10px;"></div>
       <div class="modal-actions">
