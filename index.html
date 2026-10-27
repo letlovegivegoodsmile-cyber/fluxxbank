@@ -965,10 +965,34 @@
               <span class="chev">▾</span>
             </button>
             <div class="settings-body">
-              <div class="settings-row"><span>Account Number</span><strong>FLX-••••••••</strong></div>
-              <div class="settings-row"><span>IBAN</span><strong>DE••••••••••••••••</strong></div>
-              <div class="settings-row"><span>Account Type</span><strong>Fluxx Metal</strong></div>
-              <div class="settings-row"><span>Status</span><strong style="color:var(--ok);">Active</strong></div>
+              <div class="settings-row">
+                <span>Account Number</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="account">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'account')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>IBAN</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="iban">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'iban')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Account Type</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="type">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'type')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Status</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="status">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'status')" title="Reveal">👁</button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -985,10 +1009,34 @@
               <span class="chev">▾</span>
             </button>
             <div class="settings-body">
-              <div class="settings-row"><span>Password</span><strong>••••••••</strong></div>
-              <div class="settings-row"><span>2FA</span><strong style="color:var(--ok);">Enabled</strong></div>
-              <div class="settings-row"><span>Trusted Devices</span><strong>2 devices</strong></div>
-              <div class="settings-row"><span>Last Login</span><strong>Today</strong></div>
+              <div class="settings-row">
+                <span>Password</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="password">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'password')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>2FA</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="2fa">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, '2fa')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Trusted Devices</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="devices">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'devices')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Last Login</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="lastlogin">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'lastlogin')" title="Reveal">👁</button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1005,9 +1053,27 @@
               <span class="chev">▾</span>
             </button>
             <div class="settings-body">
-              <div class="settings-row"><span>Virtual Card</span><strong style="color:var(--ok);">Active</strong></div>
-              <div class="settings-row"><span>Daily Limit</span><strong>€5,000</strong></div>
-              <div class="settings-row"><span>Contactless</span><strong>Enabled</strong></div>
+              <div class="settings-row">
+                <span>Virtual Card</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="card">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'card')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Daily Limit</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="limit">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'limit')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Contactless</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="contactless">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'contactless')" title="Reveal">👁</button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1024,9 +1090,27 @@
               <span class="chev">▾</span>
             </button>
             <div class="settings-body">
-              <div class="settings-row"><span>Transaction Alerts</span><strong>Push + Email</strong></div>
-              <div class="settings-row"><span>Marketing</span><strong>Off</strong></div>
-              <div class="settings-row"><span>Security Alerts</span><strong style="color:var(--ok);">Always On</strong></div>
+              <div class="settings-row">
+                <span>Transaction Alerts</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="alerts">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'alerts')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Marketing</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="marketing">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'marketing')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Security Alerts</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="secalerts">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'secalerts')" title="Reveal">👁</button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1043,9 +1127,27 @@
               <span class="chev">▾</span>
             </button>
             <div class="settings-body">
-              <div class="settings-row"><span>ID Document</span><strong style="color:var(--ok);">Verified</strong></div>
-              <div class="settings-row"><span>Selfie</span><strong style="color:var(--ok);">Verified</strong></div>
-              <div class="settings-row"><span>Address Proof</span><strong style="color:var(--ok);">Verified</strong></div>
+              <div class="settings-row">
+                <span>ID Document</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="id">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'id')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Selfie</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="selfie">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'selfie')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Address Proof</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="proof">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'proof')" title="Reveal">👁</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1248,6 +1350,23 @@
         else if(field === "email") real = currentUserProfile.email || "—";
         else if(field === "dob") real = currentUserProfile.dob || "Not set";
         else if(field === "address") real = currentUserProfile.address || "Not set";
+        else if(field === "account") real = "FLX-" + (currentUserProfile.id || "").slice(0,8).toUpperCase();
+        else if(field === "iban") real = "DE89 3704 0044 0532 0130 00";
+        else if(field === "type") real = "Fluxx Metal";
+        else if(field === "status") real = "Active";
+        else if(field === "password") real = "••••••••";
+        else if(field === "2fa") real = "Enabled";
+        else if(field === "devices") real = "2 devices";
+        else if(field === "lastlogin") real = "Today";
+        else if(field === "card") real = "Active";
+        else if(field === "limit") real = "€5,000";
+        else if(field === "contactless") real = "Enabled";
+        else if(field === "alerts") real = "Push + Email";
+        else if(field === "marketing") real = "Off";
+        else if(field === "secalerts") real = "Always On";
+        else if(field === "id") real = "Verified";
+        else if(field === "selfie") real = "Verified";
+        else if(field === "proof") real = "Verified";
         el.textContent = real;
         el.classList.remove("masked");
         btn.textContent = "✓";
