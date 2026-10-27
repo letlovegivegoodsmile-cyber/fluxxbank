@@ -244,7 +244,7 @@
   .gal-nav:hover{background:rgba(79,124,255,.65)}
   .gal-prev{left:14px}.gal-next{right:14px}
   .gal-thumbs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
-  .gal-thumbs button{width:64px;height:44px;border-radius:9px;overflow:hidden;padding:0;border:2px solid transparent;
+  .gal-thumbs button{width:64px;height:44px;border-radius:99px;overflow:hidden;padding:0;border:2px solid transparent;
       opacity:.5;transition:all .25s;background:#0a0e1c}
   .gal-thumbs button img{width:100%;height:100%;object-fit:cover;display:block}
   .gal-thumbs button.on{border-color:var(--accent2);opacity:1;transform:translateY(-3px)}
@@ -278,12 +278,42 @@
   /* =========================================
      DASHBOARD APP STYLES
      ========================================= */
-  #appDashboard { min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
+  #appDashboard { min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); position: relative; }
+  .dashboard-blurred { filter: blur(10px); pointer-events: none; transition: filter 0.3s ease; }
+
+  /* OVERLAY LOADING TOGGLE FOR ANALYTICS TRANSITION */
+  #analyticsTransitionOverlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(11, 16, 32, 0.65); backdrop-filter: blur(8px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; transition: opacity 0.4s ease;
+  }
+  .analytics-loader-title { font-size: 1.25rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+  .analytics-loader-sub { font-size: 0.88rem; color: var(--mut); margin-top: -12px; }
+
+  .analytics-toggle-track {
+    width: 280px; height: 16px; background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--line); border-radius: 999px;
+    position: relative; overflow: hidden; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+  }
+  .analytics-toggle-thumb {
+    width: 60px; height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    border-radius: 999px; position: absolute; top: 0; left: 0;
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.8), 0 0 30px rgba(79, 124, 255, 0.6);
+    animation: sideToggleSmooth 1s ease-in-out infinite alternate;
+  }
+
+  @keyframes sideToggleSmooth {
+    0% { left: 0%; transform: translateX(0%); }
+    100% { left: 100%; transform: translateX(-100%); }
+  }
+
   .sidebar { width: 260px; background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10; }
   .sidebar .logo { margin-bottom: 40px; padding-left: 10px; }
   .side-menu { list-style: none; flex: 1; }
   .side-menu li { margin-bottom: 8px; }
-  .side-menu a { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; transition: all 0.2s; }
+  .side-menu a { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; transition: all 0.2s; cursor: pointer; }
   .side-menu a:hover, .side-menu a.active { background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
   .side-menu a.active { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
   .user-profile { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); margin-top: auto; }
@@ -440,7 +470,7 @@
     .main-content { margin-left: 0; padding: 20px; padding-bottom: 80px; }
     .top-header h1 { font-size: 1.5rem; }
     .mobile-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11, 16, 32, 0.95); border-top: 1px solid var(--line); padding: 15px; justify-content: space-around; z-index: 50; backdrop-filter: blur(20px); }
-    .mobile-bottom-bar a { color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; }
+    .mobile-bottom-bar a { color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; cursor: pointer; }
     .mobile-bottom-bar a.active { color: var(--accent2); }
     .mobile-bottom-bar span { font-size: 1.2rem; }
   }
@@ -643,6 +673,15 @@
 
 <!-- DASHBOARD APP -->
 <div id="appDashboard" class="hidden">
+  <!-- ANALYTICS TRANSITION OVERLAY -->
+  <div id="analyticsTransitionOverlay" class="hidden">
+    <div class="analytics-loader-title">Loading Analytics Data</div>
+    <div class="analytics-loader-sub">Preparing logarithmic distribution...</div>
+    <div class="analytics-toggle-track">
+      <div class="analytics-toggle-thumb"></div>
+    </div>
+  </div>
+
   <div class="mobile-nav">
     <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a>
     <div class="user-avatar" id="mobileAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
@@ -651,9 +690,9 @@
   <aside class="sidebar">
     <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a>
     <ul class="side-menu">
-      <li><a href="#" class="active"><span>🏠</span> Dashboard</a></li>
+      <li><a href="#" id="sideNavHome" class="active" onclick="switchDashboardTab('home', event)"><span>🏠</span> Dashboard</a></li>
       <li><a href="#" onclick="scrollToSendSection(event)"><span>💸</span> Transfers</a></li>
-      <li><a href="#"><span>📊</span> Analytics</a></li>
+      <li><a href="#" id="sideNavAnalytics" onclick="switchDashboardTab('analytics', event)"><span>📊</span> Analytics</a></li>
       <li><a href="#"><span>⚙️</span> Settings</a></li>
     </ul>
     <div class="user-profile">
@@ -666,84 +705,114 @@
     </div>
   </aside>
 
-  <main class="main-content">
-    <header class="top-header">
-      <div>
-        <h1 id="welcomeMessage">Good day 👋</h1>
-        <p>Here is what's happening with your money today.</p>
-      </div>
-    </header>
+  <main class="main-content" id="dashboardMainArea">
+    <!-- ================= TAB 1: HOME / DASHBOARD ================= -->
+    <div id="tabHome">
+      <header class="top-header">
+        <div>
+          <h1 id="welcomeMessage">Good day 👋</h1>
+          <p>Here is what's happening with your money today.</p>
+        </div>
+      </header>
 
-    <div class="dashboard-grid">
-      <div style="display: flex; flex-direction: column; gap: 24px;">
-        <!-- FULLY ADAPTIVE BALANCE CARD -->
-        <div class="dash-card balance-card">
-          <span class="balance-label">Total Available Balance</span>
-          <div class="balance-row">
-            <div class="balance-amount" id="dashBal">€0.00</div>
-            <button type="button" class="balance-toggle-btn" id="toggleBalanceBtn" onclick="toggleBalanceVisibility()" title="Toggle balance visibility">
-              <svg id="balanceToggleIcon" viewBox="0 0 24 24">
-                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-              </svg>
-            </button>
+      <div class="dashboard-grid">
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- FULLY ADAPTIVE BALANCE CARD -->
+          <div class="dash-card balance-card">
+            <span class="balance-label">Total Available Balance</span>
+            <div class="balance-row">
+              <div class="balance-amount" id="dashBal">€0.00</div>
+              <button type="button" class="balance-toggle-btn" id="toggleBalanceBtn" onclick="toggleBalanceVisibility()" title="Toggle balance visibility">
+                <svg id="balanceToggleIcon" viewBox="0 0 24 24">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="quick-actions">
+              <button class="action-btn" onclick="scrollToSendSection(event)"><span class="icon">⇄</span> Send</button>
+              <button class="action-btn" onclick="alert('Top up feature coming soon!')"><span class="icon">＋</span> Top Up</button>
+              <button class="action-btn" onclick="switchDashboardTab('analytics', event)"><span class="icon">◔</span> Stats</button>
+            </div>
           </div>
-          <div class="quick-actions">
-            <button class="action-btn" onclick="scrollToSendSection(event)"><span class="icon">⇄</span> Send</button>
-            <button class="action-btn" onclick="alert('Top up feature coming soon!')"><span class="icon">＋</span> Top Up</button>
-            <button class="action-btn" onclick="alert('Stats feature coming soon!')"><span class="icon">◔</span> Stats</button>
+
+          <div class="dash-card">
+            <h3 style="margin-bottom: 5px;">Recent Activity</h3>
+            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Your latest completed transactions (Click to view receipt)</p>
+            <div class="tx-list" id="txlist">
+              <p style="color: var(--mut); text-align: center; padding: 20px;">Loading transactions...</p>
+            </div>
           </div>
         </div>
 
-        <div class="dash-card">
-          <h3 style="margin-bottom: 5px;">Recent Activity</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Your latest completed transactions (Click to view receipt)</p>
-          <div class="tx-list" id="txlist">
-            <p style="color: var(--mut); text-align: center; padding: 20px;">Loading transactions...</p>
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- SEND MONEY CARD WITH ID FOR SCROLLING -->
+          <div class="dash-card" id="send-money-section">
+            <h3 style="margin-bottom: 5px;">Send Money</h3>
+            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer</p>
+            
+            <form class="send-form" onsubmit="return doPay(event)">
+              <div class="input-group">
+                <label>Recipient</label>
+                <select id="pWho" required>
+                  <option value="" disabled selected>Choose recipient</option>
+                  <option>Maya Chen</option><option>Jonas Weber</option><option>Luna Ortiz</option><option>Fluxx Vault</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Amount (€)</label>
+                <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+              </div>
+              <div class="input-group">
+                <label>Note (Optional)</label>
+                <input id="pNote" type="text" placeholder="What's it for?">
+              </div>
+              <button class="send-btn" type="submit">⚡ Request Transfer</button>
+              <div class="error" id="paymsg" style="text-align: center; margin-top: 10px;"></div>
+            </form>
+          </div>
+
+          <div class="dash-card" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(22, 31, 61, 0.7)); border-color: rgba(34, 211, 238, 0.2);">
+            <h3 style="margin-bottom: 5px;">Savings Vault</h3>
+            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Earn 4.1% APY</p>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent2); margin-bottom: 20px;">€8,120.00</div>
+            <button class="btn ghost" style="width: 100%; justify-content: center;" onclick="alert('Vault management coming soon!')">Manage Vault</button>
           </div>
         </div>
       </div>
+    </div>
 
-      <div style="display: flex; flex-direction: column; gap: 24px;">
-        <!-- SEND MONEY CARD WITH ID FOR SCROLLING -->
-        <div class="dash-card" id="send-money-section">
-          <h3 style="margin-bottom: 5px;">Send Money</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer</p>
+    <!-- ================= TAB 2: ANALYTICS (LOGARITHMIC PIE CHART VIEW) ================= -->
+    <div id="tabAnalytics" class="hidden">
+      <header class="top-header">
+        <div>
+          <h1>Portfolio Analytics 📊</h1>
+          <p>Logarithmic asset distribution and growth metrics.</p>
+        </div>
+      </header>
+
+      <div style="display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 800px; margin: 0 auto;">
+        <div class="dash-card" style="text-align: center; padding: 40px;">
+          <h3 style="margin-bottom: 10px; font-size: 1.5rem;">Logarithmic Asset Allocation</h3>
+          <p style="color: var(--mut); font-size: 0.95rem; margin-bottom: 30px;">Visualized using logarithmic base scaling for balanced risk representation.</p>
           
-          <form class="send-form" onsubmit="return doPay(event)">
-            <div class="input-group">
-              <label>Recipient</label>
-              <select id="pWho" required>
-                <option value="" disabled selected>Choose recipient</option>
-                <option>Maya Chen</option><option>Jonas Weber</option><option>Luna Ortiz</option><option>Fluxx Vault</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <label>Amount (€)</label>
-              <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="0.00" required>
-            </div>
-            <div class="input-group">
-              <label>Note (Optional)</label>
-              <input id="pNote" type="text" placeholder="What's it for?">
-            </div>
-            <button class="send-btn" type="submit">⚡ Request Transfer</button>
-            <div class="error" id="paymsg" style="text-align: center; margin-top: 10px;"></div>
-          </form>
-        </div>
+          <div style="position: relative; max-width: 420px; margin: 0 auto;">
+            <canvas id="logarithmicPieChart"></canvas>
+          </div>
 
-        <div class="dash-card" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(22, 31, 61, 0.7)); border-color: rgba(34, 211, 238, 0.2);">
-          <h3 style="margin-bottom: 5px;">Savings Vault</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Earn 4.1% APY</p>
-          <div style="font-size: 2rem; font-weight: 800; color: var(--accent2); margin-bottom: 20px;">€8,120.00</div>
-          <button class="btn ghost" style="width: 100%; justify-content: center;" onclick="alert('Vault management coming soon!')">Manage Vault</button>
+          <div style="display: flex; justify-content: center; gap: 30px; margin-top: 30px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #4f7cff; display: inline-block;"></span><span style="font-size: 0.9rem; color: var(--mut);">Liquid Balance (45%)</span></div>
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #22d3ee; display: inline-block;"></span><span style="font-size: 0.9rem; color: var(--mut);">Savings Vault (35%)</span></div>
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #a855f7; display: inline-block;"></span><span style="font-size: 0.9rem; color: var(--mut);">Crypto & Assets (20%)</span></div>
+          </div>
         </div>
       </div>
     </div>
   </main>
 
   <div class="mobile-bottom-bar">
-    <a href="#" class="active"><span>🏠</span> Home</a>
+    <a href="#" id="mobNavHome" class="active" onclick="switchDashboardTab('home', event)"><span>🏠</span> Home</a>
     <a href="#" onclick="scrollToSendSection(event)"><span>💸</span> Send</a>
-    <a href="#"><span>📊</span> Stats</a>
+    <a href="#" id="mobNavAnalytics" onclick="switchDashboardTab('analytics', event)"><span>📊</span> Stats</a>
     <a href="#" onclick="doLogout()"><span>⏻</span> Logout</a>
   </div>
 </div>
@@ -853,6 +922,7 @@
 <button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
   const SUPABASE_KEY = "sb_publishable_WzE8F6fwrln4M3ExyLKKjQ_qzZSlPOe";
@@ -862,18 +932,103 @@
   let isFirstLogin = true; 
   let userTransactions = []; 
   let currentActualBalance = 0; 
+  let logarithmicChartInstance = null;
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // --- TAB SWITCHING (HOME <-> ANALYTICS WITH 4-SECOND TOGGLE TRANSITION) ---
+  function switchDashboardTab(tabName, e) {
+    if(e) e.preventDefault();
+    const tabHome = document.getElementById("tabHome");
+    const tabAnalytics = document.getElementById("tabAnalytics");
+    const sideHome = document.getElementById("sideNavHome");
+    const sideAnalytics = document.getElementById("sideNavAnalytics");
+    const mobHome = document.getElementById("mobNavHome");
+    const mobAnalytics = document.getElementById("mobNavAnalytics");
+    const dashboardMainArea = document.getElementById("dashboardMainArea");
+    const transitionOverlay = document.getElementById("analyticsTransitionOverlay");
+
+    if(tabName === 'home') {
+      tabHome.classList.remove("hidden");
+      tabAnalytics.classList.add("hidden");
+      if(sideHome) sideHome.classList.add("active");
+      if(sideAnalytics) sideAnalytics.classList.remove("active");
+      if(mobHome) mobHome.classList.add("active");
+      if(mobAnalytics) mobAnalytics.classList.remove("active");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if(tabName === 'analytics') {
+      // 1. Apply blur to main content area and display overlay toggle
+      dashboardMainArea.classList.add("dashboard-blurred");
+      transitionOverlay.classList.remove("hidden");
+
+      // 2. Wait 4 seconds for glowing left-right toggle animation
+      setTimeout(() => {
+        dashboardMainArea.classList.remove("dashboard-blurred");
+        transitionOverlay.classList.add("hidden");
+
+        tabHome.classList.add("hidden");
+        tabAnalytics.classList.remove("hidden");
+        if(sideHome) sideHome.classList.remove("active");
+        if(sideAnalytics) sideAnalytics.classList.add("active");
+        if(mobHome) mobHome.classList.remove("active");
+        if(mobAnalytics) mobAnalytics.classList.add("active");
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        renderLogarithmicPieChart();
+      }, 4000);
+    }
+  }
+
+  // --- RENDER LOGARITHMIC PIE CHART ---
+  function renderLogarithmicPieChart() {
+    const ctx = document.getElementById('logarithmicPieChart');
+    if(!ctx) return;
+
+    if(logarithmicChartInstance) {
+      logarithmicChartInstance.destroy();
+    }
+
+    logarithmicChartInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Liquid Balance', 'Savings Vault', 'Crypto & Assets'],
+        datasets: [{
+          data: [45, 35, 20],
+          backgroundColor: ['#4f7cff', '#22d3ee', '#a855f7'],
+          borderWidth: 0,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                let label = context.label || '';
+                let val = context.raw;
+                return ` ${label}: Log scale index ${val}%`;
+              }
+            }
+          }
+        },
+        cutout: '68%'
+      }
+    });
+  }
 
   // --- SCROLL TO SEND SECTION HELPER ---
   function scrollToSendSection(e) {
     if(e) e.preventDefault();
-    const section = document.getElementById("send-money-section");
-    if(section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-      // Optionally focus the recipient selector or amount input
-      const recipientSelect = document.getElementById("pWho");
-      if(recipientSelect) recipientSelect.focus();
-    }
+    switchDashboardTab('home');
+    setTimeout(() => {
+      const section = document.getElementById("send-money-section");
+      if(section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+        const recipientSelect = document.getElementById("pWho");
+        if(recipientSelect) recipientSelect.focus();
+      }
+    }, 100);
   }
 
   // --- BALANCE HIDE / SHOW TOGGLE LOGIC ---
