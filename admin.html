@@ -332,6 +332,36 @@
     </div>
   </div>
 
+  <!-- CUSTOMER DETAILS MODAL (PIN 2121 protected fields) -->
+  <div class="modal-bg" id="detailsModal" onclick="if(event.target===this) closeDetailsModal()">
+    <div class="modal-box" style="max-width: 480px;">
+      <h3>👤 Customer Details</h3>
+      <p id="detailsSub">Personal information is hidden. Click the eye and enter PIN 2121 to reveal.</p>
+      
+      <div class="customer-info-box" id="detailsContent">
+        <!-- filled by JS -->
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn ghost" onclick="closeDetailsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN MODAL FOR REVEALING DETAILS -->
+  <div class="modal-bg" id="adminPinModal" onclick="if(event.target===this) closeAdminPin()">
+    <div class="modal-box" style="max-width: 400px; text-align:center;">
+      <h3>🔐 Security PIN Required</h3>
+      <p>Please input your 4 digit secret pin which is 2121</p>
+      <input type="password" id="adminPinInput" class="modal-input" placeholder="----" maxlength="4" style="font-size:1.5rem; letter-spacing:8px; text-align:center;">
+      <div id="adminPinErr" class="error" style="margin-bottom:10px;"></div>
+      <div class="modal-actions">
+        <button class="btn" onclick="verifyAdminPin()">Unlock</button>
+        <button class="btn ghost" onclick="closeAdminPin()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="hidden"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -398,6 +428,67 @@
         }
       });
     });
+
+    // --- CUSTOMER DETAILS + PIN 2121 ---
+    let detailsUserId = null;
+    let pendingDetailField = null;
+
+    function openCustomerDetails(userId) {
+      const c = customers.find(x => x.id === userId);
+      if(!c) return;
+      detailsUserId = userId;
+
+      const content = document.getElementById("detailsContent");
+      content.innerHTML = `
+        <div class="info-row"><span>Name</span><strong class="detail-masked" data-field="name">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('name')">👁</button></div>
+        <div class="info-row"><span>Email</span><strong class="detail-masked" data-field="email">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('email')">👁</button></div>
+        <div class="info-row"><span>Status</span><strong>${statusBadge(c.status)}</strong></div>
+        <div class="info-row"><span>Balance</span><strong style="color:var(--ok);">${eur(c.balance||0)}</strong></div>
+        <div class="info-row"><span>Role</span><strong>${escapeHtml(c.role||"customer")}</strong></div>
+        <div class="info-row"><span>Joined</span><strong>${c.created_at ? new Date(c.created_at).toLocaleString("en-GB") : "—"}</strong></div>
+      `;
+
+      document.getElementById("detailsModal").classList.add("show");
+    }
+
+    function closeDetailsModal() {
+      document.getElementById("detailsModal").classList.remove("show");
+      detailsUserId = null;
+    }
+
+    function requestReveal(field) {
+      pendingDetailField = field;
+      document.getElementById("adminPinInput").value = "";
+      document.getElementById("adminPinErr").textContent = "";
+      document.getElementById("adminPinModal").classList.add("show");
+    }
+
+    function closeAdminPin() {
+      document.getElementById("adminPinModal").classList.remove("show");
+      pendingDetailField = null;
+    }
+
+    function verifyAdminPin() {
+      const pin = document.getElementById("adminPinInput").value.trim();
+      const err = document.getElementById("adminPinErr");
+      if(pin !== "2121") {
+        err.textContent = "Incorrect password";
+        return;
+      }
+      err.textContent = "";
+      document.getElementById("adminPinModal").classList.remove("show");
+
+      if(pendingDetailField && detailsUserId) {
+        const c = customers.find(x => x.id === detailsUserId);
+        const el = document.querySelector(`.detail-masked[data-field="${pendingDetailField}"]`);
+        if(el && c) {
+          if(pendingDetailField === "name") el.textContent = c.name || "—";
+          else if(pendingDetailField === "email") el.textContent = c.email || "—";
+          el.classList.remove("detail-masked");
+        }
+      }
+      pendingDetailField = null;
+    }
 
     // --- MODAL LOGIC ---
     function openDepositModal(userId) {
@@ -602,6 +693,7 @@
           <td>
             ${isPending(c.status) ? `<button class="btn ghost approve-btn small" type="button" data-index="${i}">Approve</button>` : ""}
             <button class="btn small" style="background:var(--accent); color:#fff;" onclick="openDepositModal('${c.id}')">+ Deposit</button>
+            <button class="btn ghost small" onclick="openCustomerDetails('${c.id}')">View</button>
             <button class="btn ghost small" onclick="sendPasswordReset('${c.email}')">Reset PW</button>
           </td>
         </tr>`).join("") || '<tr><td colspan="5" class="empty">No profiles.</td></tr>';
