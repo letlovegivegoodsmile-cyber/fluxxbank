@@ -245,6 +245,7 @@
     let customers = [];
     let toastTimer = null;
     const $ = id => document.getElementById(id);
+    const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
     document.addEventListener("DOMContentLoaded", async () => {
       if (!window.supabase) return alert("Supabase failed to load.");
@@ -401,7 +402,7 @@
           <td>${escapeHtml(c.role)}</td>
           <td style="font-weight:bold; color:var(--ok);">${eur(c.balance || 0)}</td>
           <td>
-            ${isPending(c.status) ? `<button class="btn ghost" style="padding:6px 12px; font-size:0.8rem; display:inline-block; width:auto;" type="button" data-index="${i}" class="approve-btn">Approve</button>` : ""}
+            ${isPending(c.status) ? `<button class="btn ghost approve-btn" style="padding:6px 12px; font-size:0.8rem; display:inline-block; width:auto;" type="button" data-index="${i}">Approve</button>` : ""}
             <button class="btn ghost" style="padding:6px 12px; font-size:0.8rem; display:inline-block; width:auto; margin-left:5px; background:var(--accent); color:#fff;" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button>
             <button class="btn ghost" style="padding:6px 12px; font-size:0.8rem; display:inline-block; width:auto; margin-left:5px;" onclick="sendPasswordReset('${c.email}')">Reset PW</button>
           </td>
@@ -422,7 +423,7 @@
             ${codeDisplay}
           </div>
           <div style="display:flex; gap:8px;">
-            <button class="btn ghost" style="padding:8px 16px; font-size:0.85rem; width:auto;" type="button" data-index="${index}" class="approve-btn">Approve</button>
+            <button class="btn ghost approve-btn" style="padding:8px 16px; font-size:0.85rem; width:auto;" type="button" data-index="${index}">Approve</button>
             <button class="btn ghost" style="padding:8px 16px; font-size:0.85rem; width:auto;" onclick="generate2FA('${customer.id}', '${customer.name}')">Generate 2FA</button>
           </div>
         </div>`;
@@ -510,8 +511,6 @@
       if (profilesData) {
         profilesData.forEach(p => profileMap[p.id] = p);
       }
-
-      const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
       tbody.innerHTML = txData.map(tx => {
         const profile = profileMap[tx.user_id] || {};
