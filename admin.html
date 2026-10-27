@@ -366,6 +366,11 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // Clean URL if it has a trailing ? or query string from redirects
+    if (window.location.search || window.location.href.endsWith("?")) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     "use strict";
     
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
