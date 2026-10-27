@@ -244,7 +244,7 @@
   .gal-nav:hover{background:rgba(79,124,255,.65)}
   .gal-prev{left:14px}.gal-next{right:14px}
   .gal-thumbs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
-  .gal-thumbs button{width:64px;height:44px;border-radius:99px;overflow:hidden;padding:0;border:2px solid transparent;
+  .gal-thumbs button{width:64px;height:44px;border-radius:9px;overflow:hidden;padding:0;border:2px solid transparent;
       opacity:.5;transition:all .25s;background:#0a0e1c}
   .gal-thumbs button img{width:100%;height:100%;object-fit:cover;display:block}
   .gal-thumbs button.on{border-color:var(--accent2);opacity:1;transform:translateY(-3px)}
@@ -281,22 +281,22 @@
   #appDashboard { min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); position: relative; }
   .dashboard-blurred { filter: blur(10px); pointer-events: none; transition: filter 0.3s ease; }
 
-  /* OVERLAY LOADING TOGGLE FOR ANALYTICS TRANSITION */
-  #analyticsTransitionOverlay {
+  /* OVERLAY LOADING TOGGLE FOR TRANSITIONS */
+  #transitionOverlay {
     position: fixed; inset: 0; z-index: 1000;
     background: rgba(11, 16, 32, 0.65); backdrop-filter: blur(8px);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 20px; transition: opacity 0.4s ease;
   }
-  .analytics-loader-title { font-size: 1.25rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
-  .analytics-loader-sub { font-size: 0.88rem; color: var(--mut); margin-top: -12px; }
+  .transition-loader-title { font-size: 1.25rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+  .transition-loader-sub { font-size: 0.88rem; color: var(--mut); margin-top: -12px; }
 
-  .analytics-toggle-track {
+  .transition-toggle-track {
     width: 280px; height: 16px; background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--line); border-radius: 999px;
     position: relative; overflow: hidden; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
   }
-  .analytics-toggle-thumb {
+  .transition-toggle-thumb {
     width: 60px; height: 100%;
     background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
     border-radius: 999px; position: absolute; top: 0; left: 0;
@@ -339,7 +339,6 @@
   .balance-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%); pointer-events: none; }
   .balance-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
   
-  /* UNIVERSALLY ADAPTIVE BALANCE ROW FOR ANY VIEW SCREEN */
   .balance-row { 
     display: flex; 
     align-items: center; 
@@ -403,6 +402,14 @@
   .tx-amount { font-weight: 700; font-size: 1.1rem; }
   .tx-amount.pos { color: var(--ok); }
   .tx-amount.neg { color: var(--txt); }
+
+  /* SHOW MORE BUTTON */
+  .show-more-btn {
+    width: 100%; margin-top: 20px; padding: 14px; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--line); border-radius: 12px; color: var(--txt); font-weight: 600;
+    text-align: center; cursor: pointer; transition: 0.2s;
+  }
+  .show-more-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); }
 
   /* MODALS */
   .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200}
@@ -673,12 +680,12 @@
 
 <!-- DASHBOARD APP -->
 <div id="appDashboard" class="hidden">
-  <!-- ANALYTICS TRANSITION OVERLAY -->
-  <div id="analyticsTransitionOverlay" class="hidden">
-    <div class="analytics-loader-title">Loading Analytics Data</div>
-    <div class="analytics-loader-sub">Preparing logarithmic distribution...</div>
-    <div class="analytics-toggle-track">
-      <div class="analytics-toggle-thumb"></div>
+  <!-- TRANSITION OVERLAY FOR TOGGLE EFFECT -->
+  <div id="transitionOverlay" class="hidden">
+    <div class="transition-loader-title" id="transitionTitle">Loading Analytics Data</div>
+    <div class="transition-loader-sub" id="transitionSub">Preparing logarithmic distribution...</div>
+    <div class="transition-toggle-track">
+      <div class="transition-toggle-thumb"></div>
     </div>
   </div>
 
@@ -691,7 +698,7 @@
     <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a>
     <ul class="side-menu">
       <li><a href="#" id="sideNavHome" class="active" onclick="switchDashboardTab('home', event)"><span>🏠</span> Dashboard</a></li>
-      <li><a href="#" onclick="scrollToSendSection(event)"><span>💸</span> Transfers</a></li>
+      <li><a href="#" id="sideNavTransfers" onclick="switchDashboardTab('transfers', event)"><span>💸</span> Transfers</a></li>
       <li><a href="#" id="sideNavAnalytics" onclick="switchDashboardTab('analytics', event)"><span>📊</span> Analytics</a></li>
       <li><a href="#"><span>⚙️</span> Settings</a></li>
     </ul>
@@ -729,7 +736,7 @@
               </button>
             </div>
             <div class="quick-actions">
-              <button class="action-btn" onclick="scrollToSendSection(event)"><span class="icon">⇄</span> Send</button>
+              <button class="action-btn" onclick="switchDashboardTab('transfers', event)"><span class="icon">⇄</span> Send</button>
               <button class="action-btn" onclick="alert('Top up feature coming soon!')"><span class="icon">＋</span> Top Up</button>
               <button class="action-btn" onclick="switchDashboardTab('analytics', event)"><span class="icon">◔</span> Stats</button>
             </div>
@@ -745,30 +752,15 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 24px;">
-          <!-- SEND MONEY CARD WITH ID FOR SCROLLING -->
+          <!-- SEND MONEY CARD (Redirects to Transfers view) -->
           <div class="dash-card" id="send-money-section">
             <h3 style="margin-bottom: 5px;">Send Money</h3>
             <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer</p>
             
-            <form class="send-form" onsubmit="return doPay(event)">
-              <div class="input-group">
-                <label>Recipient</label>
-                <select id="pWho" required>
-                  <option value="" disabled selected>Choose recipient</option>
-                  <option>Maya Chen</option><option>Jonas Weber</option><option>Luna Ortiz</option><option>Fluxx Vault</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <label>Amount (€)</label>
-                <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="0.00" required>
-              </div>
-              <div class="input-group">
-                <label>Note (Optional)</label>
-                <input id="pNote" type="text" placeholder="What's it for?">
-              </div>
-              <button class="send-btn" type="submit">⚡ Request Transfer</button>
-              <div class="error" id="paymsg" style="text-align: center; margin-top: 10px;"></div>
-            </form>
+            <div style="text-align: center; padding: 20px 0;">
+              <p style="color: var(--mut); font-size: 0.95rem; margin-bottom: 20px;">Access full transfer details, custom recipient info, and complete transaction histories.</p>
+              <button class="send-btn" onclick="switchDashboardTab('transfers', event)" style="width: 100%;">⇄ Go to Transfers Page</button>
+            </div>
           </div>
 
           <div class="dash-card" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(22, 31, 61, 0.7)); border-color: rgba(34, 211, 238, 0.2);">
@@ -781,7 +773,65 @@
       </div>
     </div>
 
-    <!-- ================= TAB 2: ANALYTICS (LOGARITHMIC PIE CHART VIEW) ================= -->
+    <!-- ================= TAB 2: TRANSFERS & FULL HISTORY ================= -->
+    <div id="tabTransfers" class="hidden">
+      <header class="top-header">
+        <div>
+          <h1>Transfers & History 💸</h1>
+          <p>Send secure funds and view your complete account history.</p>
+        </div>
+      </header>
+
+      <div style="display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 800px; margin: 0 auto;">
+        
+        <!-- SEND MONEY FORM -->
+        <div class="dash-card">
+          <h3 style="margin-bottom: 5px;">Send Money</h3>
+          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer with custom recipient details</p>
+          
+          <form class="send-form" onsubmit="return doPay(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div class="input-group">
+                <label>Recipient First Name</label>
+                <input id="pFirstName" type="text" placeholder="e.g. John" required>
+              </div>
+              <div class="input-group">
+                <label>Recipient Last Name</label>
+                <input id="pLastName" type="text" placeholder="e.g. Doe" required>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Amount (€)</label>
+              <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="0.00" required>
+            </div>
+
+            <div class="input-group">
+              <label>Purpose of Transfer</label>
+              <input id="pPurpose" type="text" placeholder="e.g. Rent, Invoice payment, Gift" required>
+            </div>
+
+            <button class="send-btn" type="submit">⚡ Transfer</button>
+            <div class="error" id="paymsg" style="text-align: center; margin-top: 10px;"></div>
+          </form>
+        </div>
+
+        <!-- FULL HISTORY CARD -->
+        <div class="dash-card">
+          <h3 style="margin-bottom: 5px;">Complete Transaction History</h3>
+          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">All past inflows and outflows</p>
+          
+          <div class="tx-list" id="fullTxList">
+            <p style="color: var(--mut); text-align: center; padding: 20px;">Loading history...</p>
+          </div>
+
+          <button class="show-more-btn" id="showMoreTxBtn" onclick="loadMoreTransactions()">Show More ↓</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= TAB 3: ANALYTICS (LOGARITHMIC PIE CHART VIEW) ================= -->
     <div id="tabAnalytics" class="hidden">
       <header class="top-header">
         <div>
@@ -811,7 +861,7 @@
 
   <div class="mobile-bottom-bar">
     <a href="#" id="mobNavHome" class="active" onclick="switchDashboardTab('home', event)"><span>🏠</span> Home</a>
-    <a href="#" onclick="scrollToSendSection(event)"><span>💸</span> Send</a>
+    <a href="#" id="mobNavTransfers" onclick="switchDashboardTab('transfers', event)"><span>💸</span> Transfers</a>
     <a href="#" id="mobNavAnalytics" onclick="switchDashboardTab('analytics', event)"><span>📊</span> Stats</a>
     <a href="#" onclick="doLogout()"><span>⏻</span> Logout</a>
   </div>
@@ -933,49 +983,123 @@
   let userTransactions = []; 
   let currentActualBalance = 0; 
   let logarithmicChartInstance = null;
+  let txDisplayLimit = 5; // Initial limit for "Show More" history
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  // --- TAB SWITCHING (HOME <-> ANALYTICS WITH 4-SECOND TOGGLE TRANSITION) ---
+  // --- TAB SWITCHING (HOME <-> TRANSFERS <-> ANALYTICS WITH 4-SECOND TOGGLE TRANSITION) ---
   function switchDashboardTab(tabName, e) {
     if(e) e.preventDefault();
     const tabHome = document.getElementById("tabHome");
+    const tabTransfers = document.getElementById("tabTransfers");
     const tabAnalytics = document.getElementById("tabAnalytics");
+    
     const sideHome = document.getElementById("sideNavHome");
+    const sideTransfers = document.getElementById("sideNavTransfers");
     const sideAnalytics = document.getElementById("sideNavAnalytics");
+    
     const mobHome = document.getElementById("mobNavHome");
+    const mobTransfers = document.getElementById("mobNavTransfers");
     const mobAnalytics = document.getElementById("mobNavAnalytics");
+    
     const dashboardMainArea = document.getElementById("dashboardMainArea");
-    const transitionOverlay = document.getElementById("analyticsTransitionOverlay");
+    const transitionOverlay = document.getElementById("transitionOverlay");
+    const transitionTitle = document.getElementById("transitionTitle");
+    const transitionSub = document.getElementById("transitionSub");
 
     if(tabName === 'home') {
       tabHome.classList.remove("hidden");
+      tabTransfers.classList.add("hidden");
       tabAnalytics.classList.add("hidden");
+
       if(sideHome) sideHome.classList.add("active");
+      if(sideTransfers) sideTransfers.classList.remove("active");
       if(sideAnalytics) sideAnalytics.classList.remove("active");
+
       if(mobHome) mobHome.classList.add("active");
+      if(mobTransfers) mobTransfers.classList.remove("active");
       if(mobAnalytics) mobAnalytics.classList.remove("active");
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if(tabName === 'analytics') {
-      // 1. Apply blur to main content area and display overlay toggle
+    } else {
+      // Configure overlay text based on view
+      if(tabName === 'transfers') {
+        transitionTitle.textContent = "Loading Transfers & History";
+        transitionSub.textContent = "Fetching secure transaction records...";
+      } else {
+        transitionTitle.textContent = "Loading Analytics Data";
+        transitionSub.textContent = "Preparing logarithmic distribution...";
+      }
+
+      // 1. Apply blur and show toggle overlay
       dashboardMainArea.classList.add("dashboard-blurred");
       transitionOverlay.classList.remove("hidden");
 
-      // 2. Wait 4 seconds for glowing left-right toggle animation
+      // 2. Wait 4 seconds for glowing toggle animation
       setTimeout(() => {
         dashboardMainArea.classList.remove("dashboard-blurred");
         transitionOverlay.classList.add("hidden");
 
         tabHome.classList.add("hidden");
-        tabAnalytics.classList.remove("hidden");
-        if(sideHome) sideHome.classList.remove("active");
-        if(sideAnalytics) sideAnalytics.classList.add("active");
-        if(mobHome) mobHome.classList.remove("active");
-        if(mobAnalytics) mobAnalytics.classList.add("active");
+        tabTransfers.classList.toggle("hidden", tabName !== 'transfers');
+        tabAnalytics.classList.toggle("hidden", tabName !== 'analytics');
+
+        if(sideHome) sideHome.classList.toggle("active", tabName === 'home');
+        if(sideTransfers) sideTransfers.classList.toggle("active", tabName === 'transfers');
+        if(sideAnalytics) sideAnalytics.classList.toggle("active", tabName === 'analytics');
+
+        if(mobHome) mobHome.classList.toggle("active", tabName === 'home');
+        if(mobTransfers) mobTransfers.classList.toggle("active", tabName === 'transfers');
+        if(mobAnalytics) mobAnalytics.classList.toggle("active", tabName === 'analytics');
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        renderLogarithmicPieChart();
+        
+        if(tabName === 'analytics') {
+          renderLogarithmicPieChart();
+        } else if(tabName === 'transfers') {
+          renderFullHistory();
+        }
       }, 4000);
     }
+  }
+
+  // --- RENDER FULL HISTORY WITH "SHOW MORE" ---
+  function renderFullHistory() {
+    const fullTxList = document.getElementById("fullTxList");
+    const showMoreBtn = document.getElementById("showMoreTxBtn");
+    if(!fullTxList) return;
+
+    if(userTransactions.length > 0) {
+      const visibleTx = userTransactions.slice(0, txDisplayLimit);
+      fullTxList.innerHTML = visibleTx.map(t => {
+        const isPos = t.type === 'deposit';
+        return `
+        <div class="tx-item" onclick="viewReceipt('${t.id}')">
+          <div class="tx-left">
+            <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
+            <div class="tx-details">
+              <h4>${t.description}</h4>
+              <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})}</p>
+            </div>
+          </div>
+          <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
+            ${isPos ? '+' : '−'}${eur(Math.abs(t.amount))}
+          </span>
+        </div>
+        `;
+      }).join("");
+
+      if(showMoreBtn) {
+        showMoreBtn.style.display = txDisplayLimit >= userTransactions.length ? "none" : "block";
+      }
+    } else {
+      fullTxList.innerHTML = '<p style="color: var(--mut); text-align: center; padding: 20px;">No transaction history found.</p>';
+      if(showMoreBtn) showMoreBtn.style.display = "none";
+    }
+  }
+
+  function loadMoreTransactions() {
+    txDisplayLimit += 5;
+    renderFullHistory();
   }
 
   // --- RENDER LOGARITHMIC PIE CHART ---
@@ -1015,20 +1139,6 @@
         cutout: '68%'
       }
     });
-  }
-
-  // --- SCROLL TO SEND SECTION HELPER ---
-  function scrollToSendSection(e) {
-    if(e) e.preventDefault();
-    switchDashboardTab('home');
-    setTimeout(() => {
-      const section = document.getElementById("send-money-section");
-      if(section) {
-        section.scrollIntoView({ behavior: 'smooth' });
-        const recipientSelect = document.getElementById("pWho");
-        if(recipientSelect) recipientSelect.focus();
-      }
-    }, 100);
   }
 
   // --- BALANCE HIDE / SHOW TOGGLE LOGIC ---
@@ -1351,13 +1461,15 @@
     document.getElementById("desktopAvatar").innerHTML = avatarHtml;
     document.getElementById("mobileAvatar").innerHTML = avatarHtml;
 
-    const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false }).limit(10);
+    const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false });
     
     userTransactions = txData || []; 
 
+    // Render Home Recent Activity (top 5)
     const txList = document.getElementById("txlist");
     if(userTransactions.length > 0) {
-      txList.innerHTML = userTransactions.map(t => {
+      const recentTx = userTransactions.slice(0, 5);
+      txList.innerHTML = recentTx.map(t => {
         const isPos = t.type === 'deposit';
         return `
         <div class="tx-item" onclick="viewReceipt('${t.id}')">
@@ -1377,6 +1489,8 @@
     } else {
       txList.innerHTML = '<p style="color: var(--mut); text-align: center; padding: 20px;">No recent activity.</p>';
     }
+
+    renderFullHistory();
   }
 
   async function checkSession() {
@@ -1420,13 +1534,14 @@
   // --- SEND MONEY LOGIC ---
   async function doPay(e){
     e.preventDefault();
-    const who = document.getElementById("pWho").value;
+    const fName = document.getElementById("pFirstName").value.trim();
+    const lName = document.getElementById("pLastName").value.trim();
     const amt = parseFloat(document.getElementById("pAmt").value);
-    const note = document.getElementById("pNote").value || "FluxxPay";
+    const purpose = document.getElementById("pPurpose").value.trim();
     const msg = document.getElementById("paymsg");
     
     msg.style.color = "white";
-    msg.textContent = "Requesting...";
+    msg.textContent = "Processing transfer...";
 
     const { data: { session } } = await sb.auth.getSession();
     if(!session) return;
@@ -1448,7 +1563,7 @@
         user_id: session.user.id, 
         type: 'transfer', 
         amount: amt, 
-        description: `Sent to ${who} (${note})`,
+        description: `Sent to ${fName} ${lName} (${purpose})`,
         status: 'pending',
         reference: referenceCode,
         balance_after: expectedBalance
@@ -1457,12 +1572,14 @@
       if(txError) throw new Error(txError.message);
 
       document.getElementById("transferAmtDisplay").textContent = eur(amt);
-      document.getElementById("transferToDisplay").textContent = who;
+      document.getElementById("transferToDisplay").textContent = `${fName} ${lName}`;
       document.getElementById("currentTxId").value = txData.id;
       
       msg.textContent = ""; 
+      document.getElementById("pFirstName").value="";
+      document.getElementById("pLastName").value="";
       document.getElementById("pAmt").value=""; 
-      document.getElementById("pNote").value="";
+      document.getElementById("pPurpose").value="";
       
       otpBg.classList.add("show");
 
