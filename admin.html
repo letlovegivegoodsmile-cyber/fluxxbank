@@ -1,106 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Expires" content="0" />
-<title>Fluxxbank — Admin Console</title>
-<style>
-  :root{
-    --ink:#0b1020; --ink2:#131a33; --card:#161f3d;
-    --accent:#4f7cff; --accent2:#22d3ee; --accent3:#a855f7;
-    --gold:#f5c451;
-    --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08);
-    --ok:#34d399; --bad:#f87171;
-    --r:16px;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}
-  body{background:var(--ink);color:var(--txt);min-height:100vh;overflow-x:hidden}
-  a{color:inherit;text-decoration:none}
-  button{font:inherit;cursor:pointer;border:none}
-  .hidden{display:none !important}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Fluxxbank — Admin Console</title>
+  <style>
+    :root{
+      --ink:#0b1020; --ink2:#131a33; --card:#161f3d;
+      --accent:#4f7cff; --accent2:#22d3ee; --accent3:#a855f7;
+      --gold:#f5c451;
+      --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08);
+      --ok:#34d399; --bad:#f87171;
+      --r:16px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}
+    body{background:var(--ink);color:var(--txt);min-height:100vh;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+    button{font:inherit;cursor:pointer;border:none}
+    .hidden{display:none !important}
 
-  /* LOGIN SCREEN */
-  #loginScreen {
-    position: fixed; inset: 0; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%);
-    display: grid; place-items: center; padding: 20px; z-index: 999;
-  }
-  .login-box {
-    width: 100%; max-width: 440px; padding: 40px; background: rgba(22, 31, 61, 0.7);
-    border: 1px solid var(--line); border-radius: 24px; backdrop-filter: blur(20px);
-    box-shadow: 0 30px 80px rgba(0,0,0,.6);
-  }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.5rem; margin-bottom: 8px; }
-  .brand .mark { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 0 22px rgba(79,124,255,.55); }
-  .brand .mark svg { width: 20px; height: 20px; }
-  .subtitle { color: var(--mut); font-size: 0.9rem; line-height: 1.6; margin-bottom: 28px; }
-  
-  .input-group { margin-bottom: 18px; }
-  .input-group label { display: block; color: var(--mut); font-size: 0.85rem; margin-bottom: 6px; }
-  .input-group input { width: 100%; padding: 14px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--line); color: white; font-size: 1rem; outline: none; transition: 0.2s; }
-  .input-group input:focus { border-color: var(--accent); }
+    /* =========================================
+       LOGIN SCREEN
+       ========================================= */
+    #loginScreen {
+      position: fixed; inset: 0; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%);
+      display: grid; place-items: center; padding: 20px; z-index: 999;
+    }
+    .login-box {
+      width: 100%; max-width: 440px; padding: 40px; background: rgba(22, 31, 61, 0.7);
+      border: 1px solid var(--line); border-radius: 24px; backdrop-filter: blur(20px);
+      box-shadow: 0 30px 80px rgba(0,0,0,.6);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.5rem; margin-bottom: 8px; }
+    .brand .mark { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 0 22px rgba(79,124,255,.55); }
+    .brand .mark svg { width: 20px; height: 20px; }
+    .subtitle { color: var(--mut); font-size: 0.9rem; line-height: 1.6; margin-bottom: 28px; }
+    
+    .input-group { margin-bottom: 18px; }
+    .input-group label { display: block; color: var(--mut); font-size: 0.85rem; margin-bottom: 6px; }
+    .input-group input { width: 100%; padding: 14px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--line); color: white; font-size: 1rem; outline: none; transition: 0.2s; }
+    .input-group input:focus { border-color: var(--accent); }
 
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 22px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; background: linear-gradient(135deg, var(--accent), #3b5bdb); color: #fff; box-shadow: 0 6px 22px rgba(79,124,255,.35); transition: transform .15s, box-shadow .15s; width: 100%; }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(79,124,255,.5); }
-  .btn.ghost { background: transparent; border: 1px solid var(--line); box-shadow: none; color: var(--txt); }
-  .btn:disabled { opacity: .6; cursor: wait; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 22px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; background: linear-gradient(135deg, var(--accent), #3b5bdb); color: #fff; box-shadow: 0 6px 22px rgba(79,124,255,.35); transition: transform .15s, box-shadow .15s; width: 100%; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(79,124,255,.5); }
+    .btn.ghost { background: transparent; border: 1px solid var(--line); box-shadow: none; color: var(--txt); }
+    .btn:disabled { opacity: .6; cursor: wait; }
 
-  .error { color: var(--bad); font-size: 0.85rem; line-height: 1.5; margin-top: 10px; text-align: center; }
-  .success { color: var(--ok); font-size: 0.85rem; text-align: center; }
-  .login-links { display: flex; justify-content: flex-end; margin-top: 14px; }
-  .text-btn { background: transparent; color: var(--accent2); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
+    .error { color: var(--bad); font-size: 0.85rem; line-height: 1.5; margin-top: 10px; text-align: center; }
+    .success { color: var(--ok); font-size: 0.85rem; text-align: center; }
+    .login-links { display: flex; justify-content: flex-end; margin-top: 14px; }
+    .text-btn { background: transparent; color: var(--accent2); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
 
-  /* ADMIN APP DASHBOARD LAYOUT */
-  #app { min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
-  .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); width: 100%; min-height: 100vh; }
-  
-  .sidebar { width: 260px; background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10; }
-  .sidebar .brand { margin-bottom: 30px; }
-  .side-label { padding: 10px 16px; color: var(--mut); font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; }
-  .side-nav { list-style: none; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-  .side-btn { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; background: transparent; text-align: left; transition: all 0.2s; }
-  .side-btn:hover, .side-btn.on { background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
-  .side-btn.on { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
+    /* =========================================
+       ADMIN APP LAYOUT
+       ========================================= */
+    #app { min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
+    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); width: 100%; min-height: 100vh; }
+    
+    .sidebar { width: 260px; background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10; }
+    .sidebar .brand { margin-bottom: 30px; }
+    .side-label { padding: 10px 16px; color: var(--mut); font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; }
+    .side-nav { list-style: none; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .side-btn { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; background: transparent; text-align: left; transition: all 0.2s; }
+    .side-btn:hover, .side-btn.on { background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
+    .side-btn.on { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
 
-  main { flex: 1; margin-left: 260px; padding: 40px; width: calc(100% - 260px); }
-  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-  .topbar h1 { font-size: 2rem; font-weight: 700; }
-  .topbar small { display: block; color: var(--mut); margin-top: 5px; }
+    main { flex: 1; margin-left: 260px; padding: 40px; width: calc(100% - 260px); }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    .topbar h1 { font-size: 2rem; font-weight: 700; }
+    .topbar small { display: block; color: var(--mut); margin-top: 5px; }
 
-  .content { display: flex; flex-direction: column; gap: 24px; width: 100%; }
-  .view { display: none; }
-  .view.on { display: block; }
-  
-  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 24px; width: 100%; }
-  .stat, .panel { background: rgba(22, 31, 61, 0.7); border: 1px solid var(--line); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); width: 100%; }
-  .stat-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-  .stat-value { margin-top: 10px; font-size: 2.5rem; font-weight: 800; }
+    .content { display: flex; flex-direction: column; gap: 24px; width: 100%; }
+    .view { display: none; }
+    .view.on { display: block; }
+    
+    .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 24px; width: 100%; }
+    .stat, .panel { background: rgba(22, 31, 61, 0.7); border: 1px solid var(--line); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); width: 100%; }
+    .stat-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-value { margin-top: 10px; font-size: 2.5rem; font-weight: 800; }
 
-  .panel h2 { margin-bottom: 20px; font-size: 1.3rem; }
-  .table-wrap { width: 100%; overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-  th, td { padding: 16px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
-  th { color: var(--mut); font-weight: 600; white-space: nowrap; }
-  td small { display: block; margin-top: 4px; color: var(--mut); }
-  
-  .status { display: inline-block; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.05); font-size: 0.75rem; font-weight: 600; }
-  .status.active { background: rgba(52, 211, 153, 0.15); color: var(--ok); border: 1px solid rgba(52, 211, 153, 0.3); }
-  .status.pending { background: rgba(245, 196, 81, 0.15); color: var(--gold); border: 1px solid rgba(245, 196, 81, 0.3); }
-  
-  .empty { padding: 30px; color: var(--mut); text-align: center; }
+    .panel h2 { margin-bottom: 20px; font-size: 1.3rem; }
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    th, td { padding: 16px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    th { color: var(--mut); font-weight: 600; white-space: nowrap; }
+    td small { display: block; margin-top: 4px; color: var(--mut); }
+    
+    .status { display: inline-block; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.05); font-size: 0.75rem; font-weight: 600; }
+    .status.active { background: rgba(52, 211, 153, 0.15); color: var(--ok); border: 1px solid rgba(52, 211, 153, 0.3); }
+    .status.pending { background: rgba(245, 196, 81, 0.15); color: var(--gold); border: 1px solid rgba(245, 196, 81, 0.3); }
+    
+    .empty { padding: 30px; color: var(--mut); text-align: center; }
 
-  #toast { position: fixed; right: 24px; bottom: 24px; z-index: 1000; padding: 14px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink2); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.6); backdrop-filter: blur(10px); }
+    /* FLOATING ACTION BUTTONS */
+    .btn.small { padding: 8px 12px; font-size: 0.8rem; width: auto; display: inline-block; margin-right: 5px; }
 
-  @media (max-width: 768px) {
-    .layout { grid-template-columns: 1fr; }
-    .sidebar { display: none; }
-    main { margin-left: 0; padding: 20px; width: 100%; }
-    .stats { grid-template-columns: 1fr; }
-  }
-</style>
+    /* TOAST */
+    #toast { position: fixed; right: 24px; bottom: 24px; z-index: 1000; padding: 14px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink2); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.6); backdrop-filter: blur(10px); transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.hidden { display: none; }
+
+    /* MOBILE NAV */
+    .mobile-nav { display: none; justify-content: space-between; align-items: center; padding: 20px; background: rgba(11, 16, 32, 0.95); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); }
+    .mobile-nav .side-menu-btn { background: transparent; color: var(--txt); font-size: 1.5rem; }
+
+    @media (max-width: 768px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; position: fixed; top: 0; left: 0; width: 260px; height: 100vh; z-index: 1001; background: var(--ink2); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
+      .sidebar.open { display: flex; }
+      main { margin-left: 0; padding: 20px; width: 100%; }
+      .stats { grid-template-columns: 1fr; }
+      .mobile-nav { display: flex; }
+      .topbar h1 { font-size: 1.5rem; }
+    }
+  </style>
 </head>
 <body>
 
@@ -149,8 +166,18 @@
 
   <!-- ADMIN DASHBOARD -->
   <div id="app" class="hidden">
+    
+    <!-- MOBILE NAV -->
+    <div class="mobile-nav">
+      <div class="brand" style="margin-bottom: 0; font-size: 1.2rem;">
+        <span class="mark" style="width: 28px; height: 28px;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+        Fluxxbank
+      </div>
+      <button class="side-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    </div>
+
     <div class="layout">
-      <aside class="sidebar">
+      <aside class="sidebar" id="sidebar">
         <div class="brand">
           <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
           Fluxxbank
@@ -215,7 +242,7 @@
           <section id="view-appr" class="view">
             <div class="panel">
               <h2>Pending applications</h2>
-              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Review and approve pending new customer registrations.</p>
+              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Review and approve pending new customer registrations. Generate 2FA codes for login.</p>
               <div id="apprList"><div class="empty">Loading applications…</div></div>
             </div>
           </section>
@@ -224,7 +251,7 @@
           <section id="view-transfers" class="view">
             <div class="panel">
               <h2>Pending Customer Transfers</h2>
-              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Monitor customer transfers waiting for OTP verification.</p>
+              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Monitor customer transfers waiting for OTP verification (Static OTP: 241800).</p>
               <div class="table-wrap">
                 <table>
                   <thead><tr><th>Customer</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
@@ -246,6 +273,7 @@
   <script>
     "use strict";
     
+    // --- CORRECT URL AND KEY ---
     const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
     const SUPABASE_KEY = "sb_publishable_WzE8F6fwrln4M3ExyLKKjQ_qzZSlPOe";
     const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
@@ -277,6 +305,9 @@
           document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
           $("view-" + btn.dataset.view).classList.add("on");
           $("pageTitle").textContent = btn.textContent.replace(/[^a-zA-Z ]/g, "").trim();
+          
+          // Close mobile sidebar when a link is clicked
+          document.querySelector('.sidebar').classList.remove('open');
 
           if(btn.dataset.view === "transfers") loadPendingTransfers();
         });
@@ -312,8 +343,9 @@
     }
     function toast(msg) {
       const el = $("toast"); el.textContent = msg; el.classList.remove("hidden");
+      el.classList.add("show");
       if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.classList.add("hidden"), 3500);
+      toastTimer = setTimeout(() => { el.classList.remove("show"); setTimeout(()=>el.classList.add("hidden"), 300); }, 3500);
     }
     function escapeHtml(v) {
       return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
@@ -411,9 +443,9 @@
           <td>${escapeHtml(c.role)}</td>
           <td style="font-weight:bold; color:var(--ok);">${eur(c.balance || 0)}</td>
           <td>
-            ${isPending(c.status) ? `<button class="btn ghost approve-btn" style="padding:6px 12px; font-size:0.8rem; display:inline-block; width:auto;" type="button" data-index="${i}">Approve</button>` : ""}
-            <button class="btn ghost" style="padding:6px 12px; font-size:0.8rem; display:inline-block; width:auto; margin-left:5px; background:var(--accent); color:#fff;" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button>
-            <button class="btn ghost" style="padding:6px 12px; font-size:0.8rem; display:inline-block; width:auto; margin-left:5px;" onclick="sendPasswordReset('${c.email}')">Reset PW</button>
+            ${isPending(c.status) ? `<button class="btn ghost approve-btn small" type="button" data-index="${i}">Approve</button>` : ""}
+            <button class="btn small" style="background:var(--accent); color:#fff;" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button>
+            <button class="btn ghost small" onclick="sendPasswordReset('${c.email}')">Reset PW</button>
           </td>
         </tr>`).join("") || '<tr><td colspan="5" class="empty">No profiles.</td></tr>';
     }
@@ -422,7 +454,14 @@
       const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
       $("apprList").innerHTML = pending.map(({ customer, index }) => {
         const has2FA = customer.role && customer.role.startsWith("2FA-");
-        const codeDisplay = has2FA ? `<div style="color:var(--accent2); font-size:12px; margin-top:5px;">Login 2FA Code: <b>${customer.role.replace("2FA-", "")}</b></div>` : '';
+        const codeVal = has2FA ? customer.role.replace("2FA-", "") : "";
+        
+        const codeDisplay = has2FA 
+          ? `<div style="color:var(--gold); font-size:14px; margin-top:8px; display:flex; align-items:center; gap:10px;">
+               <span>2FA Code: <b>${codeVal}</b></span>
+               <button class="btn small" style="background:rgba(255,255,255,0.1); color:#fff; padding:4px 10px; font-size:0.75rem;" onclick="navigator.clipboard.writeText('${codeVal}'); toast('2FA Code copied!')">Copy</button>
+             </div>` 
+          : '';
 
         return `
         <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)">
@@ -432,8 +471,8 @@
             ${codeDisplay}
           </div>
           <div style="display:flex; gap:8px;">
-            <button class="btn ghost approve-btn" style="padding:8px 16px; font-size:0.85rem; width:auto;" type="button" data-index="${index}">Approve</button>
-            <button class="btn ghost" style="padding:8px 16px; font-size:0.85rem; width:auto;" onclick="generate2FA('${customer.id}', '${customer.name}')">Generate 2FA</button>
+            <button class="btn ghost approve-btn small" type="button" data-index="${index}">Approve</button>
+            <button class="btn small" style="background:var(--accent2); color:#111827;" onclick="generate2FA('${customer.id}', '${customer.name}')">Generate 2FA</button>
           </div>
         </div>`;
       }).join("") || '<div class="empty">No pending applications.</div>';
@@ -527,7 +566,7 @@
           <tr>
             <td>${profile.name || "Unknown"}<br><small>${profile.email || ""}</small></td>
             <td>${escapeHtml(tx.description)}</td>
-            <td>${eur(tx.amount)}</td>
+            <td style="font-weight:bold;">${eur(tx.amount)}</td>
             <td><span style="color:var(--gold); font-weight:bold;">Waiting for customer OTP (241800)...</span></td>
           </tr>
         `;
