@@ -409,7 +409,18 @@
     border: 1px solid var(--line); border-radius: 12px; color: var(--txt); font-weight: 600;
     text-align: center; cursor: pointer; transition: 0.2s;
   }
-  .show-more-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); }
+  .settings-section { border-bottom: 1px solid var(--line); }
+  .settings-section:last-child { border-bottom: none; }
+  .settings-header { width: 100%; background: none; border: none; color: var(--txt); padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
+  .settings-header:hover { background: rgba(255,255,255,0.03); }
+  .settings-header .chev { transition: transform 0.3s; color: var(--accent2); font-size: 1.1rem; }
+  .settings-section.open .chev { transform: rotate(180deg); }
+  .settings-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; background: rgba(0,0,0,0.15); }
+  .settings-section.open .settings-body { max-height: 400px; }
+  .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 22px; border-top: 1px solid var(--line); font-size: 0.92rem; }
+  .settings-row span { color: var(--mut); }
+  .eye-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--line); border-radius: 8px; width: 32px; height: 32px; display: grid; place-items: center; cursor: pointer; color: var(--txt); font-size: 0.95rem; transition: 0.2s; }
+  .eye-btn:hover { background: rgba(79,124,255,0.25); border-color: var(--accent); }
 
   /* MODALS */
   .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200}
@@ -874,36 +885,168 @@
       </div>
     </div>
 
-    <!-- ================= TAB 4: SETTINGS (PROTECTED BY PIN 1296) ================= -->
+    <!-- ================= TAB 4: SETTINGS ================= -->
     <div id="tabSettings" class="hidden">
       <header class="top-header">
         <div>
           <h1>Account Settings ⚙️</h1>
-          <p>Manage confidential customer profile data and security preferences.</p>
+          <p>Manage your profile, security and preferences.</p>
         </div>
       </header>
 
-      <div style="display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 800px; margin: 0 auto;">
-        <div class="dash-card" style="padding: 40px;">
-          <h3 style="margin-bottom: 10px; font-size: 1.5rem;">Confidential Customer Details</h3>
-          <p style="color: var(--mut); font-size: 0.95rem; margin-bottom: 30px;">All personal attributes and banking configurations unlocked successfully.</p>
-          
-          <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div style="display: flex; justify-content: space-between; padding: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); border-radius: 12px;">
-              <span style="color: var(--mut);">Registered Name</span>
-              <strong id="settingsNameVal" style="color: var(--txt);">Loading...</strong>
+      <div style="max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+
+        <!-- PROFILE PHOTO + CUSTOMER SINCE -->
+        <div class="dash-card" style="padding: 32px; text-align: center;">
+          <div id="settingsAvatarWrap" style="width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 16px; overflow: hidden; border: 4px solid var(--accent); box-shadow: 0 8px 30px rgba(79,124,255,0.35); background: linear-gradient(135deg, var(--accent), var(--accent3)); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; font-weight: 800; color: #fff; cursor: pointer;" onclick="document.getElementById('avatarUpload').click()">
+            <span id="settingsAvatarInitial">U</span>
+          </div>
+          <h3 style="margin-bottom: 6px;" id="settingsProfileName">Customer</h3>
+          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 18px;" id="customerSinceText">This user has been a customer since —</p>
+          <button class="btn" style="width: auto; padding: 12px 28px;" onclick="document.getElementById('avatarUpload').click()">Upload new photo</button>
+          <p style="color: var(--mut); font-size: 0.8rem; margin-top: 10px;">Click the photo or button to upload. You can zoom, fit or fill before saving.</p>
+        </div>
+
+        <!-- SETTINGS SECTIONS (ACCORDION) -->
+        <div class="dash-card" style="padding: 0; overflow: hidden;">
+          <!-- Personal details -->
+          <div class="settings-section">
+            <button class="settings-header" onclick="toggleSettingsSection(this)">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">👤</div>
+                <div style="text-align:left;">
+                  <strong>Personal details</strong>
+                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Name, date of birth, address and contact details</div>
+                </div>
+              </div>
+              <span class="chev">▾</span>
+            </button>
+            <div class="settings-body">
+              <div class="settings-row">
+                <span>Full Name</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="name">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'name')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Date of Birth</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="dob">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'dob')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Address</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="address">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'address')" title="Reveal">👁</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <span>Email</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="email">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'email')" title="Reveal">👁</button>
+                </div>
+              </div>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); border-radius: 12px;">
-              <span style="color: var(--mut);">Account Email</span>
-              <strong id="settingsEmailVal" style="color: var(--txt);">Loading...</strong>
+          </div>
+
+          <!-- Accounts -->
+          <div class="settings-section">
+            <button class="settings-header" onclick="toggleSettingsSection(this)">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">🏦</div>
+                <div style="text-align:left;">
+                  <strong>Accounts</strong>
+                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Account number, IBAN, account type and status</div>
+                </div>
+              </div>
+              <span class="chev">▾</span>
+            </button>
+            <div class="settings-body">
+              <div class="settings-row"><span>Account Number</span><strong>FLX-••••••••</strong></div>
+              <div class="settings-row"><span>IBAN</span><strong>DE••••••••••••••••</strong></div>
+              <div class="settings-row"><span>Account Type</span><strong>Fluxx Metal</strong></div>
+              <div class="settings-row"><span>Status</span><strong style="color:var(--ok);">Active</strong></div>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); border-radius: 12px;">
-              <span style="color: var(--mut);">Security Verification PIN</span>
-              <strong style="color: var(--ok);">1296 (Verified)</strong>
+          </div>
+
+          <!-- Security -->
+          <div class="settings-section">
+            <button class="settings-header" onclick="toggleSettingsSection(this)">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">🛡️</div>
+                <div style="text-align:left;">
+                  <strong>Security</strong>
+                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Password, 2FA, devices and login history</div>
+                </div>
+              </div>
+              <span class="chev">▾</span>
+            </button>
+            <div class="settings-body">
+              <div class="settings-row"><span>Password</span><strong>••••••••</strong></div>
+              <div class="settings-row"><span>2FA</span><strong style="color:var(--ok);">Enabled</strong></div>
+              <div class="settings-row"><span>Trusted Devices</span><strong>2 devices</strong></div>
+              <div class="settings-row"><span>Last Login</span><strong>Today</strong></div>
             </div>
-            <div style="display: flex; justify-content: space-between; padding: 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--line); border-radius: 12px;">
-              <span style="color: var(--mut);">Account Tier</span>
-              <strong style="color: var(--accent2);">Fluxx Metal Member</strong>
+          </div>
+
+          <!-- Cards -->
+          <div class="settings-section">
+            <button class="settings-header" onclick="toggleSettingsSection(this)">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">💳</div>
+                <div style="text-align:left;">
+                  <strong>Cards</strong>
+                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Card controls, limits and payment preferences</div>
+                </div>
+              </div>
+              <span class="chev">▾</span>
+            </button>
+            <div class="settings-body">
+              <div class="settings-row"><span>Virtual Card</span><strong style="color:var(--ok);">Active</strong></div>
+              <div class="settings-row"><span>Daily Limit</span><strong>€5,000</strong></div>
+              <div class="settings-row"><span>Contactless</span><strong>Enabled</strong></div>
+            </div>
+          </div>
+
+          <!-- Notifications -->
+          <div class="settings-section">
+            <button class="settings-header" onclick="toggleSettingsSection(this)">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">🔔</div>
+                <div style="text-align:left;">
+                  <strong>Notifications</strong>
+                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Transaction alerts and communication preferences</div>
+                </div>
+              </div>
+              <span class="chev">▾</span>
+            </button>
+            <div class="settings-body">
+              <div class="settings-row"><span>Transaction Alerts</span><strong>Push + Email</strong></div>
+              <div class="settings-row"><span>Marketing</span><strong>Off</strong></div>
+              <div class="settings-row"><span>Security Alerts</span><strong style="color:var(--ok);">Always On</strong></div>
+            </div>
+          </div>
+
+          <!-- Verification -->
+          <div class="settings-section">
+            <button class="settings-header" onclick="toggleSettingsSection(this)">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">✅</div>
+                <div style="text-align:left;">
+                  <strong>Verification</strong>
+                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Identity documents and verification status</div>
+                </div>
+              </div>
+              <span class="chev">▾</span>
+            </button>
+            <div class="settings-body">
+              <div class="settings-row"><span>ID Document</span><strong style="color:var(--ok);">Verified</strong></div>
+              <div class="settings-row"><span>Selfie</span><strong style="color:var(--ok);">Verified</strong></div>
+              <div class="settings-row"><span>Address Proof</span><strong style="color:var(--ok);">Verified</strong></div>
             </div>
           </div>
         </div>
@@ -920,15 +1063,36 @@
   </div>
 </div>
 
-<!-- PIN ENTRY MODAL FOR SETTINGS -->
+<!-- PHOTO CROP / ZOOM MODAL -->
+<div class="modal-bg" id="cropModal" onclick="if(event.target===this)closeCropModal()">
+  <div class="modal" style="width: min(420px, 94vw); text-align:center;">
+    <h3 style="margin-bottom:8px;">Adjust Profile Photo</h3>
+    <p style="color:var(--mut); font-size:0.88rem; margin-bottom:16px;">Zoom, fit or fill, then save.</p>
+    <canvas id="cropCanvas" style="width:280px; height:280px; border-radius:50%; border:3px solid var(--accent); background:#0a0e1c; margin:0 auto 16px; display:block;"></canvas>
+    <div style="margin-bottom:14px;">
+      <label style="color:var(--mut); font-size:0.82rem;">Zoom</label>
+      <input type="range" id="zoomSlider" min="0.5" max="3" step="0.05" value="1" oninput="onZoomChange(this.value)" style="width:100%; margin-top:6px;">
+    </div>
+    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:16px;">
+      <button class="btn ghost" style="width:auto; padding:10px 18px;" onclick="setCropMode('fit')">Fit</button>
+      <button class="btn ghost" style="width:auto; padding:10px 18px;" onclick="setCropMode('fill')">Fill</button>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button class="btn" onclick="saveCroppedAvatar()">Save Photo</button>
+      <button class="btn ghost" onclick="closeCropModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN ENTRY MODAL FOR REVEALING PERSONAL DETAILS -->
 <div class="modal-bg" id="settingsPinModal" onclick="if(event.target===this)cancelSettingsPin()">
   <div class="modal">
     <h3 style="text-align: center;">🔐 Security PIN Required</h3>
-    <p style="text-align: center;">Please enter your static 4-digit PIN (1296) to unlock settings and reveal confidential details.</p>
+    <p style="text-align: center;">Please input your 4 digit secret pin which is 2121</p>
     <form onsubmit="event.preventDefault(); verifySettingsPin();">
       <input type="password" id="settingsPinInput" placeholder="----" maxlength="4" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;" required>
       <div class="error" id="settingsPinErr" style="margin-top: -5px;"></div>
-      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent)); justify-content: center;">Unlock Settings</button>
+      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent)); justify-content: center;">Unlock</button>
     </form>
     <button class="btn ghost" onclick="cancelSettingsPin()" style="margin-top: 10px; width: 100%; justify-content: center;">Cancel</button>
   </div>
@@ -1057,34 +1221,63 @@
   // --- TAB SWITCHING (HOME <-> TRANSFERS <-> ANALYTICS <-> SETTINGS WITH 4-SECOND TOGGLE TRANSITION) ---
   function switchDashboardTab(tabName, e) {
     if(e) e.preventDefault();
-
-    // Intercept Settings to prompt PIN first
-    if(tabName === 'settings') {
-      document.getElementById("settingsPinInput.value") = "";
-      document.getElementById("settingsPinErr").textContent = "";
-      document.getElementById("settingsPinModal").classList.add("show");
-      return;
-    }
-
     executeTabSwitch(tabName);
   }
+
+  let pendingRevealField = null;
+  let pendingRevealBtn = null;
 
   function verifySettingsPin() {
     const pinVal = document.getElementById("settingsPinInput").value.trim();
     const errEl = document.getElementById("settingsPinErr");
 
-    if(pinVal !== "1296") {
-      errEl.textContent = "❌ Incorrect PIN. Please enter static PIN 1296.";
+    if(pinVal !== "2121") {
+      errEl.textContent = "Incorrect password";
       return;
     }
 
     errEl.textContent = "";
     document.getElementById("settingsPinModal").classList.remove("show");
-    executeTabSwitch('settings');
+
+    if(pendingRevealField && pendingRevealBtn) {
+      const field = pendingRevealField;
+      const btn = pendingRevealBtn;
+      const el = document.querySelector(`.masked[data-field="${field}"]`);
+      if(el && currentUserProfile) {
+        let real = "—";
+        if(field === "name") real = currentUserProfile.name || "—";
+        else if(field === "email") real = currentUserProfile.email || "—";
+        else if(field === "dob") real = currentUserProfile.dob || "Not set";
+        else if(field === "address") real = currentUserProfile.address || "Not set";
+        el.textContent = real;
+        el.classList.remove("masked");
+        btn.textContent = "✓";
+        btn.onclick = null;
+      }
+      pendingRevealField = null;
+      pendingRevealBtn = null;
+    }
   }
 
   function cancelSettingsPin() {
     document.getElementById("settingsPinModal").classList.remove("show");
+    pendingRevealField = null;
+    pendingRevealBtn = null;
+  }
+
+  function toggleSettingsSection(btn) {
+    const section = btn.parentElement;
+    const wasOpen = section.classList.contains("open");
+    document.querySelectorAll(".settings-section").forEach(s => s.classList.remove("open"));
+    if(!wasOpen) section.classList.add("open");
+  }
+
+  function revealField(btn, field) {
+    pendingRevealField = field;
+    pendingRevealBtn = btn;
+    document.getElementById("settingsPinInput").value = "";
+    document.getElementById("settingsPinErr").textContent = "";
+    document.getElementById("settingsPinModal").classList.add("show");
   }
 
   function executeTabSwitch(tabName) {
@@ -1535,27 +1728,103 @@
     }
   }
 
-  // --- AVATAR UPLOAD LOGIC ---
+  // --- AVATAR UPLOAD WITH CROP / ZOOM ---
+  let cropImage = null;
+  let cropScale = 1;
+  let cropOffsetX = 0;
+  let cropOffsetY = 0;
+  let cropMode = "fit";
+
   async function uploadAvatar(event) {
     const file = event.target.files[0];
     if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      cropImage = new Image();
+      cropImage.onload = () => openCropModal();
+      cropImage.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    event.target.value = "";
+  }
+
+  function openCropModal() {
+    const modal = document.getElementById("cropModal");
+    if(!modal) return;
+    modal.classList.add("show");
+    cropScale = 1;
+    cropOffsetX = 0;
+    cropOffsetY = 0;
+    document.getElementById("zoomSlider").value = 1;
+    drawCropCanvas();
+  }
+
+  function closeCropModal() {
+    document.getElementById("cropModal").classList.remove("show");
+    cropImage = null;
+  }
+
+  function drawCropCanvas() {
+    const canvas = document.getElementById("cropCanvas");
+    if(!canvas || !cropImage) return;
+    const ctx = canvas.getContext("2d");
+    const size = 280;
+    canvas.width = size;
+    canvas.height = size;
+    ctx.clearRect(0, 0, size, size);
+
+    const imgRatio = cropImage.width / cropImage.height;
+    let drawW, drawH;
+    if(cropMode === "fill") {
+      if(imgRatio > 1) { drawH = size * cropScale; drawW = drawH * imgRatio; }
+      else { drawW = size * cropScale; drawH = drawW / imgRatio; }
+    } else {
+      if(imgRatio > 1) { drawW = size * cropScale; drawH = drawW / imgRatio; }
+      else { drawH = size * cropScale; drawW = drawH * imgRatio; }
+    }
+
+    const x = (size - drawW) / 2 + cropOffsetX;
+    const y = (size - drawH) / 2 + cropOffsetY;
+    ctx.drawImage(cropImage, x, y, drawW, drawH);
+
+    // Circle mask preview
+    ctx.globalCompositeOperation = "destination-in";
+    ctx.beginPath();
+    ctx.arc(size/2, size/2, size/2 - 4, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalCompositeOperation = "source-over";
+  }
+
+  function setCropMode(mode) {
+    cropMode = mode;
+    drawCropCanvas();
+  }
+
+  function onZoomChange(val) {
+    cropScale = parseFloat(val);
+    drawCropCanvas();
+  }
+
+  async function saveCroppedAvatar() {
+    const canvas = document.getElementById("cropCanvas");
+    if(!canvas) return;
+    const base64String = canvas.toDataURL("image/jpeg", 0.9);
 
     const { data: { session } } = await sb.auth.getSession();
     if(!session) return;
 
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-      const base64String = e.target.result;
-      
-      const { error } = await sb.from("profiles").update({ avatar_url: base64String }).eq("id", session.user.id);
-      if(error) return alert("Failed to upload photo: " + error.message);
+    const { error } = await sb.from("profiles").update({ avatar_url: base64String }).eq("id", session.user.id);
+    if(error) return alert("Failed to upload photo: " + error.message);
 
-      currentUserProfile.avatar_url = base64String;
-      const avatarHtml = `<img src="${base64String}" alt="User">`;
-      document.getElementById("desktopAvatar").innerHTML = avatarHtml;
-      document.getElementById("mobileAvatar").innerHTML = avatarHtml;
-    };
-    reader.readAsDataURL(file);
+    currentUserProfile.avatar_url = base64String;
+    const avatarHtml = `<img src="${base64String}" alt="User">`;
+    document.getElementById("desktopAvatar").innerHTML = avatarHtml;
+    document.getElementById("mobileAvatar").innerHTML = avatarHtml;
+    const settingsAvatar = document.getElementById("settingsAvatarWrap");
+    if(settingsAvatar) settingsAvatar.innerHTML = `<img src="${base64String}" alt="User" style="width:100%;height:100%;object-fit:cover;">`;
+
+    closeCropModal();
+    alert("Profile photo updated successfully.");
   }
 
   // --- DASHBOARD LOADING LOGIC ---
@@ -1573,6 +1842,25 @@
     const avatarHtml = profile.avatar_url ? `<img src="${profile.avatar_url}" alt="User">` : firstName.charAt(0).toUpperCase();
     document.getElementById("desktopAvatar").innerHTML = avatarHtml;
     document.getElementById("mobileAvatar").innerHTML = avatarHtml;
+
+    // Settings profile section
+    const settingsAvatar = document.getElementById("settingsAvatarWrap");
+    if(settingsAvatar) {
+      if(profile.avatar_url) {
+        settingsAvatar.innerHTML = `<img src="${profile.avatar_url}" alt="User" style="width:100%;height:100%;object-fit:cover;">`;
+      } else {
+        settingsAvatar.innerHTML = `<span id="settingsAvatarInitial">${firstName.charAt(0).toUpperCase()}</span>`;
+      }
+    }
+    const profileNameEl = document.getElementById("settingsProfileName");
+    if(profileNameEl) profileNameEl.textContent = profile.name || "Customer";
+
+    const sinceEl = document.getElementById("customerSinceText");
+    if(sinceEl && profile.created_at) {
+      const d = new Date(profile.created_at);
+      const formatted = d.toLocaleString("en-GB", { day:"numeric", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit" });
+      sinceEl.textContent = `This user has been a customer since ${formatted}`;
+    }
 
     const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false });
     
@@ -1612,7 +1900,7 @@
     if (session && session.user) {
       document.getElementById("landingPage").classList.add("hidden");
 
-      const { data: p } = await sb.from("profiles").select("name, email, balance, avatar_url").eq("id", session.user.id).single();
+      const { data: p } = await sb.from("profiles").select("name, email, balance, avatar_url, created_at").eq("id", session.user.id).single();
       
       if (isFirstLogin) {
         const firstName = p ? p.name.split(" ")[0] : "User";
