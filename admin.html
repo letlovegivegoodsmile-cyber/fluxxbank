@@ -57,29 +57,13 @@
     .text-btn { background: transparent; color: var(--accent2); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
 
     /* =========================================
-       ADMIN APP LAYOUT (FIXED)
+       ADMIN APP LAYOUT
        ========================================= */
     #app { min-height: 100vh; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
     
-    .layout { 
-      display: grid; 
-      grid-template-columns: 260px minmax(0, 1fr); 
-      width: 100%; 
-      min-height: 100vh; 
-    }
+    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); width: 100%; min-height: 100vh; }
     
-    .sidebar { 
-      background: rgba(11, 16, 32, 0.6); 
-      backdrop-filter: blur(20px); 
-      border-right: 1px solid var(--line); 
-      padding: 30px 20px; 
-      display: flex; 
-      flex-direction: column; 
-      height: 100vh;
-      position: sticky; 
-      top: 0;
-      z-index: 10; 
-    }
+    .sidebar { background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; z-index: 10; }
     .sidebar .brand { margin-bottom: 30px; }
     .side-label { padding: 10px 16px; color: var(--mut); font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; }
     .side-nav { list-style: none; flex: 1; display: flex; flex-direction: column; gap: 8px; }
@@ -87,12 +71,7 @@
     .side-btn:hover, .side-btn.on { background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
     .side-btn.on { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
 
-    main { 
-      padding: 40px; 
-      min-width: 0; /* Prevents grid blowout */
-      width: 100%;
-    }
-    
+    main { padding: 40px; min-width: 0; width: 100%; }
     .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
     .topbar h1 { font-size: 2rem; font-weight: 700; }
     .topbar small { display: block; color: var(--mut); margin-top: 5px; }
@@ -119,8 +98,28 @@
     
     .empty { padding: 30px; color: var(--mut); text-align: center; }
 
+    /* =========================================
+       MODAL STYLES (For Deposits)
+       ========================================= */
+    .modal-bg { position: fixed; inset: 0; background: rgba(5,7,15,0.8); backdrop-filter: blur(8px); display: none; place-items: center; z-index: 1000; padding: 20px; }
+    .modal-bg.show { display: grid; }
+    .modal-box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; width: 100%; max-width: 450px; padding: 34px; box-shadow: 0 30px 80px rgba(0,0,0,0.8); position: relative; }
+    .modal-box h3 { font-size: 1.4rem; margin-bottom: 8px; color: #fff; }
+    .modal-box p { color: var(--mut); font-size: 0.9rem; margin-bottom: 24px; }
+    
+    .customer-info-box { background: rgba(0,0,0,0.2); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
+    .info-row span { color: var(--mut); }
+    .info-row strong { color: #fff; text-align: right; }
+    
+    .modal-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 12px; padding: 14px; color: #fff; font-size: 1.1rem; margin-bottom: 20px; outline: none; transition: 0.2s; text-align: center;}
+    .modal-input:focus { border-color: var(--accent); }
+    
+    .modal-actions { display: flex; gap: 12px; }
+    .modal-actions .btn { flex: 1; }
+
     /* TOAST */
-    #toast { position: fixed; right: 24px; bottom: 24px; z-index: 1000; padding: 14px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink2); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.6); backdrop-filter: blur(10px); transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+    #toast { position: fixed; right: 24px; bottom: 24px; z-index: 1001; padding: 14px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink2); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.6); backdrop-filter: blur(10px); transform: translateY(100px); opacity: 0; transition: all 0.3s; }
     #toast.show { transform: translateY(0); opacity: 1; }
     #toast.hidden { display: none; }
 
@@ -287,6 +286,28 @@
     </div>
   </div>
 
+  <!-- DEPOSIT MODAL (NEW) -->
+  <div class="modal-bg" id="depositModal" onclick="if(event.target===this) closeDepositModal()">
+    <div class="modal-box">
+      <h3>💰 Deposit Funds</h3>
+      <p>Add money to customer's account securely.</p>
+      
+      <div class="customer-info-box">
+        <div class="info-row"><span>Customer Name</span><strong id="depName">-</strong></div>
+        <div class="info-row"><span>Email Address</span><strong id="depEmail">-</strong></div>
+        <div class="info-row"><span>Account Status</span><span id="depStatus">-</span></div>
+        <div class="info-row"><span>Current Balance</span><strong id="depBalance" style="color:var(--ok); font-size:1.1rem;">-</strong></div>
+      </div>
+
+      <input type="number" id="depositAmountInput" class="modal-input" placeholder="Enter amount (€)" min="1" step="0.01" required>
+      
+      <div class="modal-actions">
+        <button class="btn" onclick="submitDeposit()">Confirm Deposit</button>
+        <button class="btn ghost" onclick="closeDepositModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="hidden"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -300,6 +321,7 @@
     let sb = null;
     let customers = [];
     let toastTimer = null;
+    let depositUserId = null; // Holds the selected customer ID for deposits
     const $ = id => document.getElementById(id);
     const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
@@ -353,6 +375,71 @@
       });
     });
 
+    // --- MODAL LOGIC ---
+    function openDepositModal(userId) {
+      const c = customers.find(x => x.id === userId);
+      if(!c) return;
+
+      depositUserId = userId;
+      
+      $("depName").textContent = c.name || "Unknown";
+      $("depEmail").textContent = c.email || "N/A";
+      $("depStatus").innerHTML = statusBadge(c.status);
+      $("depBalance").textContent = eur(c.balance || 0);
+      $("depositAmountInput").value = "";
+      
+      $("depositModal").classList.add("show");
+      $("depositAmountInput").focus();
+    }
+
+    function closeDepositModal() {
+      $("depositModal").classList.remove("show");
+      depositUserId = null;
+    }
+
+    async function submitDeposit() {
+      if(!depositUserId) return;
+      
+      const amount = parseFloat($("depositAmountInput").value);
+      if(isNaN(amount) || amount <= 0) {
+        return toast("Please enter a valid amount.");
+      }
+
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = "Processing...";
+
+      try {
+        const { data: profile } = await sb.from("profiles").select("balance").eq("id", depositUserId).single();
+        const newBalance = Number(profile.balance || 0) + amount;
+
+        const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", depositUserId);
+        if (err1) throw err1;
+
+        const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();
+        await sb.from("transactions").insert({ 
+          user_id: depositUserId, 
+          type: 'deposit', 
+          amount: amount, 
+          description: 'Admin manual deposit', 
+          status: 'completed',
+          balance_after: newBalance,
+          reference: refCode
+        });
+        
+        toast(`✅ Deposited ${eur(amount)} successfully!`);
+        closeDepositModal();
+        await loadAll(); 
+        renderCustomers();
+      } catch (error) {
+        toast("Error: " + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Confirm Deposit";
+      }
+    }
+
+    // --- AUTH & DATA LOGIC ---
     function showLoginError(msg) { $("loginErr").textContent = msg || ""; }
     function showPageError(msg) { $("pageErr").textContent = msg || ""; }
     function showLoginMessage(msg, success = false) {
@@ -462,7 +549,7 @@
           <td style="font-weight:bold; color:var(--ok);">${eur(c.balance || 0)}</td>
           <td>
             ${isPending(c.status) ? `<button class="btn ghost approve-btn small" type="button" data-index="${i}">Approve</button>` : ""}
-            <button class="btn small" style="background:var(--accent); color:#fff;" onclick="depositMoney('${c.id}', '${c.name}')">+ Deposit</button>
+            <button class="btn small" style="background:var(--accent); color:#fff;" onclick="openDepositModal('${c.id}')">+ Deposit</button>
             <button class="btn ghost small" onclick="sendPasswordReset('${c.email}')">Reset PW</button>
           </td>
         </tr>`).join("") || '<tr><td colspan="5" class="empty">No profiles.</td></tr>';
@@ -507,33 +594,6 @@
         await loadAll();
         renderApprovals();
       }
-    }
-
-    async function depositMoney(userId, userName) {
-      const amountStr = prompt(`How much to deposit for ${userName}? (e.g. 500)`);
-      if (!amountStr) return;
-      const amount = parseFloat(amountStr);
-      if (isNaN(amount) || amount <= 0) return alert("Invalid amount");
-
-      const { data: profile } = await sb.from("profiles").select("balance").eq("id", userId).single();
-      const newBalance = Number(profile.balance || 0) + amount;
-
-      const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", userId);
-      if (err1) return toast("Error: " + err1.message);
-
-      const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();
-      await sb.from("transactions").insert({ 
-        user_id: userId, 
-        type: 'deposit', 
-        amount: amount, 
-        description: 'Admin manual deposit', 
-        status: 'completed',
-        balance_after: newBalance,
-        reference: refCode
-      });
-      
-      toast(`✅ Deposited €${amount} to ${userName}`);
-      await loadAll(); renderCustomers();
     }
 
     async function sendPasswordReset(email) {
