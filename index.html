@@ -1,3 +1,7 @@
+Here is your complete code with the balance hide/show toggle feature seamlessly integrated into your dashboard right next to the balance amount!
+I added:
+ * A neat 👁️/🙈 toggle icon button right beside your balance display (dashBal).
+ * A lightweight function that instantly masks your balance as •••••••• or reveals the exact amount, while saving the user's preference in localStorage so it stays hidden or shown across page reloads.
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -308,7 +312,13 @@
   .balance-card { background: linear-gradient(135deg, rgba(79, 124, 255, 0.2), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(79, 124, 255, 0.3); }
   .balance-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%); pointer-events: none; }
   .balance-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
-  .balance-amount { font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 20px; }
+  
+  /* BALANCE WRAPPER & TOGGLE BUTTON STYLING */
+  .balance-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .balance-amount { font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; }
+  .balance-toggle-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--line); border-radius: 50%; width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer; transition: 0.2s; font-size: 1.1rem; }
+  .balance-toggle-btn:hover { background: rgba(255, 255, 255, 0.15); transform: scale(1.05); }
+
   .quick-actions { display: flex; gap: 15px; margin-top: 20px; }
   .action-btn { flex: 1; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--txt); font-weight: 600; transition: 0.2s; }
   .action-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
@@ -397,7 +407,7 @@
     .mobile-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(11, 16, 32, 0.9); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); }
     .main-content { margin-left: 0; padding: 20px; padding-bottom: 80px; }
     .top-header h1 { font-size: 1.5rem; }
-    .balance-amount { font-size: 2.5rem; }
+    .balance-amount { font-size: 2.2rem; }
     .mobile-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11, 16, 32, 0.95); border-top: 1px solid var(--line); padding: 15px; justify-content: space-around; z-index: 50; backdrop-filter: blur(20px); }
     .mobile-bottom-bar a { color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; }
     .mobile-bottom-bar a.active { color: var(--accent2); }
@@ -635,9 +645,15 @@
 
     <div class="dashboard-grid">
       <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- UPDATED BALANCE CARD WITH TOGGLE BUTTON -->
         <div class="dash-card balance-card">
           <span class="balance-label">Total Available Balance</span>
-          <div class="balance-amount" id="dashBal">€0.00</div>
+          <div class="balance-row">
+            <div class="balance-amount" id="dashBal">€0.00</div>
+            <button type="button" class="balance-toggle-btn" id="toggleBalanceBtn" onclick="toggleBalanceVisibility()" title="Toggle balance visibility">
+              <span id="balanceToggleIcon">👁️</span>
+            </button>
+          </div>
           <div class="quick-actions">
             <button class="action-btn" onclick="document.getElementById('pAmt').focus()"><span class="icon">⇄</span> Send</button>
             <button class="action-btn" onclick="alert('Top up feature coming soon!')"><span class="icon">＋</span> Top Up</button>
@@ -704,7 +720,6 @@
     <h3 id="authTitle">Welcome back ⚡</h3>
     <p id="authSub">Log in to your Fluxxbank account.</p>
     
-    <!-- FIXED: Wrapped inputs in a <form> to stop the DOM warnings -->
     <form onsubmit="event.preventDefault(); submitAuth();">
       <input type="text" placeholder="Full name" id="authName" style="display:none; text-align:left; font-size:1rem; letter-spacing:normal;" autocomplete="off">
       <input type="email" placeholder="Email address" id="loginEmail" style="text-align:left; font-size:1rem; letter-spacing:normal;">
@@ -805,7 +820,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // --- NEW CORRECTED URL AND KEY ---
   const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
   const SUPABASE_KEY = "sb_publishable_WzE8F6fwrln4M3ExyLKKjQ_qzZSlPOe";
   let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -813,7 +827,30 @@
   let authMode = "login";
   let isFirstLogin = true; 
   let userTransactions = []; 
+  let currentActualBalance = 0; // Tracks raw balance value
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  // --- BALANCE HIDE / SHOW TOGGLE LOGIC ---
+  function toggleBalanceVisibility() {
+    let isHidden = localStorage.getItem('hideBalance') === 'true';
+    isHidden = !isHidden;
+    localStorage.setItem('hideBalance', isHidden);
+    applyBalanceVisibility(isHidden);
+  }
+
+  function applyBalanceVisibility(isHidden) {
+    const balEl = document.getElementById("dashBal");
+    const iconEl = document.getElementById("balanceToggleIcon");
+    if (!balEl || !iconEl) return;
+
+    if (isHidden) {
+      balEl.textContent = "••••••••";
+      iconEl.textContent = "🙈";
+    } else {
+      balEl.textContent = eur(currentActualBalance);
+      iconEl.textContent = "👁️";
+    }
+  }
 
   // --- LANDING PAGE SCRIPTS ---
   const rates = [["EUR/USD","1.087","+0.12%"],["BTC","$98,420","+2.4%"],["ETH","$3,910","+1.1%"],["S&P 500","6,842","+0.6%"],["Gold","$2,915","−0.3%"],["NASDAQ","22,410","+0.9%"],["GBP/EUR","1.174","−0.08%"]];
@@ -1098,7 +1135,12 @@
   // --- DASHBOARD LOADING LOGIC ---
   async function loadDashboardData(session, profile) {
     const firstName = profile.name.split(" ")[0];
-    document.getElementById("dashBal").textContent = eur(profile.balance);
+    
+    // Store raw balance value and render according to hidden preference
+    currentActualBalance = Number(profile.balance || 0);
+    const isHidden = localStorage.getItem('hideBalance') === 'true';
+    applyBalanceVisibility(isHidden);
+
     document.getElementById("userNameDisplay").textContent = profile.name;
     document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
 
@@ -1313,3 +1355,4 @@
 </script>
 </body>
 </html>
+
