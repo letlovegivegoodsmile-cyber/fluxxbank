@@ -923,19 +923,31 @@
             <div class="settings-body">
               <div class="settings-row">
                 <span>Full Name</span>
-                <strong id="settingsNameVal">—</strong>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="name">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'name')" title="Reveal">👁</button>
+                </div>
               </div>
               <div class="settings-row">
                 <span>Date of Birth</span>
-                <strong>Not set</strong>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="dob">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'dob')" title="Reveal">👁</button>
+                </div>
               </div>
               <div class="settings-row">
                 <span>Address</span>
-                <strong>Not set</strong>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="address">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'address')" title="Reveal">👁</button>
+                </div>
               </div>
               <div class="settings-row">
                 <span>Email</span>
-                <strong id="settingsEmailVal">—</strong>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <strong class="masked" data-field="email">••••••••</strong>
+                  <button class="eye-btn" onclick="revealField(this, 'email')" title="Reveal">👁</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1071,6 +1083,20 @@
   </div>
 </div>
 
+<!-- PIN ENTRY MODAL FOR REVEALING PERSONAL DETAILS -->
+<div class="modal-bg" id="settingsPinModal" onclick="if(event.target===this)cancelSettingsPin()">
+  <div class="modal">
+    <h3 style="text-align: center;">🔐 Security PIN Required</h3>
+    <p style="text-align: center;">Please input your 4 digit secret pin</p>
+    <form onsubmit="event.preventDefault(); verifySettingsPin();">
+      <input type="password" id="settingsPinInput" placeholder="----" maxlength="4" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;" required>
+      <div class="error" id="settingsPinErr" style="margin-top: -5px;"></div>
+      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent)); justify-content: center;">Unlock</button>
+    </form>
+    <button class="btn ghost" onclick="cancelSettingsPin()" style="margin-top: 10px; width: 100%; justify-content: center;">Cancel</button>
+  </div>
+</div>
+
 <!-- LOGIN MODAL -->
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -1197,11 +1223,60 @@
     executeTabSwitch(tabName);
   }
 
+  let pendingRevealField = null;
+  let pendingRevealBtn = null;
+
+  function verifySettingsPin() {
+    const pinVal = document.getElementById("settingsPinInput").value.trim();
+    const errEl = document.getElementById("settingsPinErr");
+
+    if(pinVal !== "2121") {
+      errEl.textContent = "Incorrect password";
+      return;
+    }
+
+    errEl.textContent = "";
+    document.getElementById("settingsPinModal").classList.remove("show");
+
+    if(pendingRevealField && pendingRevealBtn) {
+      const field = pendingRevealField;
+      const btn = pendingRevealBtn;
+      const el = document.querySelector(`.masked[data-field="${field}"]`);
+      if(el && currentUserProfile) {
+        let real = "—";
+        if(field === "name") real = currentUserProfile.name || "—";
+        else if(field === "email") real = currentUserProfile.email || "—";
+        else if(field === "dob") real = currentUserProfile.dob || "Not set";
+        else if(field === "address") real = currentUserProfile.address || "Not set";
+        el.textContent = real;
+        el.classList.remove("masked");
+        btn.textContent = "✓";
+        btn.onclick = null;
+      }
+      pendingRevealField = null;
+      pendingRevealBtn = null;
+    }
+  }
+
+  function cancelSettingsPin() {
+    document.getElementById("settingsPinModal").classList.remove("show");
+    pendingRevealField = null;
+    pendingRevealBtn = null;
+  }
+
   function toggleSettingsSection(btn) {
     const section = btn.parentElement;
     const wasOpen = section.classList.contains("open");
     document.querySelectorAll(".settings-section").forEach(s => s.classList.remove("open"));
     if(!wasOpen) section.classList.add("open");
+  }
+
+  function revealField(btn, field) {
+    pendingRevealField = field;
+    pendingRevealBtn = btn;
+    document.getElementById("settingsPinInput").value = "";
+    document.getElementById("settingsPinErr").textContent = "";
+    document.getElementById("settingsPinModal").classList.add("show");
   }
 
   function executeTabSwitch(tabName) {
@@ -1282,9 +1357,6 @@
           renderLogarithmicPieChart();
         } else if(tabName === 'transfers') {
           renderFullHistory();
-        } else if(tabName === 'settings' && currentUserProfile) {
-          document.getElementById("settingsNameVal").textContent = currentUserProfile.name || "N/A";
-          document.getElementById("settingsEmailVal").textContent = currentUserProfile.email || "N/A";
         }
       }, 4000);
     }
