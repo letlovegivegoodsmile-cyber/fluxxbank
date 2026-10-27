@@ -802,6 +802,22 @@
             </div>
 
             <div class="input-group">
+              <label>IBAN / Account Number</label>
+              <input id="pIban" type="text" placeholder="e.g. DE89 3704 0044 0532 0130 00" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div class="input-group">
+                <label>BIC / SWIFT Code</label>
+                <input id="pBic" type="text" placeholder="e.g. COBADEFFXXX" required>
+              </div>
+              <div class="input-group">
+                <label>Bank Name</label>
+                <input id="pBank" type="text" placeholder="e.g. Commerzbank" required>
+              </div>
+            </div>
+
+            <div class="input-group">
               <label>Amount (€)</label>
               <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="0.00" required>
             </div>
@@ -1633,6 +1649,9 @@
     e.preventDefault();
     const fName = document.getElementById("pFirstName").value.trim();
     const lName = document.getElementById("pLastName").value.trim();
+    const iban = document.getElementById("pIban").value.trim();
+    const bic = document.getElementById("pBic").value.trim();
+    const bank = document.getElementById("pBank").value.trim();
     const amt = parseFloat(document.getElementById("pAmt").value);
     const purpose = document.getElementById("pPurpose").value.trim();
     const msg = document.getElementById("paymsg");
@@ -1656,11 +1675,13 @@
       const expectedBalance = Number(p.balance) - amt;
       const referenceCode = "FLX-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 100);
 
+      const description = `Sent to ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;
+
       const { data: txData, error: txError } = await sb.from("transactions").insert({ 
         user_id: session.user.id, 
         type: 'transfer', 
         amount: amt, 
-        description: `Sent to ${fName} ${lName} (${purpose})`,
+        description: description,
         status: 'pending',
         reference: referenceCode,
         balance_after: expectedBalance
@@ -1675,6 +1696,9 @@
       msg.textContent = ""; 
       document.getElementById("pFirstName").value="";
       document.getElementById("pLastName").value="";
+      document.getElementById("pIban").value="";
+      document.getElementById("pBic").value="";
+      document.getElementById("pBank").value="";
       document.getElementById("pAmt").value=""; 
       document.getElementById("pPurpose").value="";
       
@@ -1746,17 +1770,20 @@
     
     let to = "Unknown";
     let note = "None";
-    if (tx.type === 'deposit') {
-        to = "Admin Deposit";
-        note = tx.description;
+    
+    // Unified parsing for both customer transfers and admin deposits
+    const match = tx.description.match(/Sent to (.*?) \((.*?)\)/);
+    if (match) {
+      to = match[1];
+      note = match[2] || "None";
+      // Append bank details if present
+      const details = tx.description.split("|").slice(1).map(s => s.trim()).join(" | ");
+      if (details) note += " | " + details;
+    } else if (tx.type === 'deposit') {
+      to = "External Deposit";
+      note = tx.description;
     } else {
-        const match = tx.description.match(/Sent to (.*?) \((.*?)\)/);
-        if (match) {
-            to = match[1];
-            note = match[2] || "None";
-        } else {
-            to = tx.description;
-        }
+      to = tx.description;
     }
 
     document.getElementById("rTo").textContent = to;
