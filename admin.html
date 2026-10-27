@@ -65,17 +65,17 @@
   .side-btn:hover, .side-btn.on { background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
   .side-btn.on { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
 
-  main { flex: 1; margin-left: 260px; padding: 40px; max-width: 1400px; }
+  main { flex: 1; margin-left: 260px; padding: 40px; width: calc(100% - 260px); }
   .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
   .topbar h1 { font-size: 2rem; font-weight: 700; }
   .topbar small { display: block; color: var(--mut); margin-top: 5px; }
 
-  .content { display: flex; flex-direction: column; gap: 24px; }
+  .content { display: flex; flex-direction: column; gap: 24px; width: 100%; }
   .view { display: none; }
   .view.on { display: block; }
   
-  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 24px; }
-  .stat, .panel { background: rgba(22, 31, 61, 0.7); border: 1px solid var(--line); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); }
+  .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 24px; width: 100%; }
+  .stat, .panel { background: rgba(22, 31, 61, 0.7); border: 1px solid var(--line); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); width: 100%; }
   .stat-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
   .stat-value { margin-top: 10px; font-size: 2.5rem; font-weight: 800; }
 
@@ -97,7 +97,7 @@
   @media (max-width: 768px) {
     .layout { grid-template-columns: 1fr; }
     .sidebar { display: none; }
-    main { margin-left: 0; padding: 20px; }
+    main { margin-left: 0; padding: 20px; width: 100%; }
     .stats { grid-template-columns: 1fr; }
   }
 </style>
