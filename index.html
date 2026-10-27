@@ -901,8 +901,7 @@
           <div id="settingsAvatarWrap" style="width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 16px; overflow: hidden; border: 4px solid var(--accent); box-shadow: 0 8px 30px rgba(79,124,255,0.35); background: linear-gradient(135deg, var(--accent), var(--accent3)); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; font-weight: 800; color: #fff; cursor: pointer;" onclick="document.getElementById('avatarUpload').click()">
             <span id="settingsAvatarInitial">U</span>
           </div>
-          <h3 style="margin-bottom: 6px;" id="settingsProfileName">Customer</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 18px;" id="customerSinceText">This user has been a customer since —</p>
+          <h3 style="margin-bottom: 18px;" id="settingsProfileName">Customer</h3>
           <button class="btn" style="width: auto; padding: 12px 28px;" onclick="document.getElementById('avatarUpload').click()">Upload new photo</button>
           <p style="color: var(--mut); font-size: 0.8rem; margin-top: 10px;">Click the photo or button to upload. You can zoom, fit or fill before saving.</p>
         </div>
@@ -1779,13 +1778,6 @@
     }
     const profileNameEl = document.getElementById("settingsProfileName");
     if(profileNameEl) profileNameEl.textContent = profile.name || "Customer";
-
-    const sinceEl = document.getElementById("customerSinceText");
-    if(sinceEl && profile.created_at) {
-      const d = new Date(profile.created_at);
-      const formatted = d.toLocaleString("en-GB", { day:"numeric", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit" });
-      sinceEl.textContent = `This user has been a customer since ${formatted}`;
-    }
 
     const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false });
     
