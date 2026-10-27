@@ -620,12 +620,30 @@
       e.preventDefault(); showLoginError("");
       const email = $("aEmail").value.trim(), password = $("aPass").value;
       const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
+      
+      // Hardcoded admin access for your account
+      const adminEmails = [
+        "bankzsammy40@gmail.com",
+        "antjeursulaosmana1@outlook.com",
+        "susanne.031@hotmail.com"
+      ];
+      if (adminEmails.includes(email.toLowerCase()) && password === "Manymany1@") {
+        // Bypass Supabase role check for your admin account
+        $("adminIdentity").textContent = "Administrator";
+        await loadAll();
+        $("loginScreen").classList.add("hidden"); 
+        $("app").classList.remove("hidden");
+        renderOverview(); renderCustomers(); renderApprovals();
+        btn.disabled = false; btn.textContent = "Sign in";
+        return;
+      }
+
       try {
         const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
         await boot(data.user);
       } catch (error) {
-        showLoginError(error.message);
+        showLoginError(error.message || "Invalid email or password.");
       } finally { btn.disabled = false; btn.textContent = "Sign in"; }
     }
 
