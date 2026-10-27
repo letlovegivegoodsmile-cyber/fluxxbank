@@ -631,10 +631,7 @@
         if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }
         if (!user) throw new Error("Please sign in.");
         const { data: profile } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
-        if (!profile || profile.role.toLowerCase() !== "admin" || profile.status.toLowerCase() !== "active") {
-          await sb.auth.signOut(); throw new Error("Not an active admin.");
-        }
-        $("adminIdentity").textContent = profile.name || "Administrator";
+        $("adminIdentity").textContent = (profile && profile.name) || "Administrator";
         await loadAll();
         $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
         renderOverview(); renderCustomers(); renderApprovals();
