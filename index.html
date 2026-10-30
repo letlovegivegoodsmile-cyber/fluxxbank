@@ -34,9 +34,7 @@
   button{font:inherit;cursor:pointer;border:none}
   .hidden{display:none !important}
 
-  /* =========================================
-     SUCCESS SCREEN (PASSWORD RESET)
-     ========================================= */
+  /* SUCCESS SCREEN (PASSWORD RESET) */
   #resetSuccessScreen {
     position: fixed; inset: 0; background: #0d1b3e; z-index: 9999;
     display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
@@ -72,9 +70,7 @@
   .success-info-box svg { width: 40px; height: 40px; fill: #60a5fa; flex-shrink: 0; }
   .success-info-box p { color: #cbd5e1; font-size: 1rem; line-height: 1.5; }
 
-  /* =========================================
-     WELCOME SCREEN
-     ========================================= */
+  /* WELCOME SCREEN */
   #welcomeScreen {
     position: fixed; inset: 0; background: var(--ink); z-index: 9999;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -97,9 +93,7 @@
   @keyframes fadeIn { to { opacity: 1; } }
   @keyframes loadProgress { to { width: 100%; } }
 
-  /* =========================================
-     LANDING PAGE STYLES
-     ========================================= */
+  /* LANDING PAGE STYLES */
   nav.landing-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
       padding:16px 5%;background:rgba(11,16,32,.75);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
   .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;letter-spacing:.5px}
@@ -275,13 +269,10 @@
   .rev-count{position:absolute;z-index:3;top:24px;right:28px;font-size:.85rem;color:rgba(255,255,255,.75);
       background:rgba(11,16,32,.5);border:1px solid var(--line);border-radius:999px;padding:6px 14px;backdrop-filter:blur(6px)}
 
-  /* =========================================
-     DASHBOARD APP STYLES
-     ========================================= */
+  /* DASHBOARD APP STYLES */
   #appDashboard { min-height: 100vh; display: flex; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); position: relative; }
   .dashboard-blurred { filter: blur(10px); pointer-events: none; transition: filter 0.3s ease; }
 
-  /* OVERLAY LOADING TOGGLE FOR TRANSITIONS */
   #transitionOverlay {
     position: fixed; inset: 0; z-index: 1000;
     background: rgba(11, 16, 32, 0.65); backdrop-filter: blur(8px);
@@ -339,46 +330,12 @@
   .balance-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%); pointer-events: none; }
   .balance-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
   
-  .balance-row { 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    flex-wrap: wrap; 
-    gap: 16px; 
-    margin-bottom: 20px; 
-  }
-  .balance-amount { 
-    font-size: clamp(2rem, 4vw, 3.5rem); 
-    font-weight: 800; 
-    letter-spacing: -1px; 
-    word-break: break-all;
-    flex: 1 1 auto;
-  }
+  .balance-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+  .balance-amount { font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; letter-spacing: -1px; word-break: break-all; flex: 1 1 auto; }
   
-  .balance-toggle-btn { 
-    background: rgba(255, 255, 255, 0.08); 
-    border: 1px solid var(--line); 
-    border-radius: 50%; 
-    width: 44px; 
-    height: 44px; 
-    flex-shrink: 0;
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    cursor: pointer; 
-    transition: all 0.2s ease; 
-  }
-  .balance-toggle-btn:hover { 
-    background: rgba(255, 255, 255, 0.16); 
-    border-color: rgba(79, 124, 255, 0.4);
-    transform: scale(1.05); 
-  }
-  .balance-toggle-btn svg {
-    width: 20px;
-    height: 20px;
-    fill: var(--txt);
-    opacity: 0.85;
-  }
+  .balance-toggle-btn { background: rgba(255, 255, 255, 0.08); border: 1px solid var(--line); border-radius: 50%; width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
+  .balance-toggle-btn:hover { background: rgba(255, 255, 255, 0.16); border-color: rgba(79, 124, 255, 0.4); transform: scale(1.05); }
+  .balance-toggle-btn svg { width: 20px; height: 20px; fill: var(--txt); opacity: 0.85; }
 
   .quick-actions { display: flex; gap: 15px; margin-top: 20px; }
   .action-btn { flex: 1; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--txt); font-weight: 600; transition: 0.2s; }
@@ -403,7 +360,6 @@
   .tx-amount.pos { color: var(--ok); }
   .tx-amount.neg { color: var(--txt); }
 
-  /* SHOW MORE BUTTON */
   .show-more-btn {
     width: 100%; margin-top: 20px; padding: 14px; background: rgba(255,255,255,0.05);
     border: 1px solid var(--line); border-radius: 12px; color: var(--txt); font-weight: 600;
@@ -422,7 +378,6 @@
   .eye-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--line); border-radius: 8px; width: 32px; height: 32px; display: grid; place-items: center; cursor: pointer; color: var(--txt); font-size: 0.95rem; transition: 0.2s; }
   .eye-btn:hover { background: rgba(79,124,255,0.25); border-color: var(--accent); }
 
-  /* MODALS */
   .modal-bg{position:fixed;inset:0;background:rgba(5,7,15,.7);backdrop-filter:blur(6px);display:none;place-items:center;z-index:200}
   .modal-bg.show{display:grid}
   .modal{background:var(--ink2);border:1px solid var(--line);border-radius:20px;padding:34px;width:min(400px,92vw); box-shadow: 0 30px 80px rgba(0,0,0,.6)}
@@ -432,12 +387,10 @@
   .modal .btn{width:100%;justify-content:center}
   .modal .error{color:var(--bad); font-size:.85rem; margin-bottom:10px; min-height:18px; text-align: center;}
 
-  /* PROCESSING MODAL */
   #processingModal { background: rgba(11, 16, 32, 0.95); z-index: 500; text-align: center;}
   .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1); border-top-color: var(--accent2); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* RECEIPT STYLES */
   #receiptModal { background: rgba(5, 7, 15, 0.85); z-index: 600; padding: 20px; }
   .receipt-paper {
     background: #fff; color: #141824; width: min(430px, 92vw); border-radius: 16px; padding: 34px 32px 26px;
@@ -461,7 +414,6 @@
   .r-print { background: #4f7cff; color: #fff; }
   .r-close { background: #eef0f6; color: #141824; }
 
-  /* PRINT CSS */
   @media print {
     body * { visibility: hidden; }
     #receiptModal, #receiptModal * { visibility: visible; }
@@ -494,7 +446,6 @@
   }
   @media (min-width: 769px) { .mobile-nav, .mobile-bottom-bar { display: none !important; } }
 
-  /* Responsive Success Screen */
   @media (max-width: 600px) {
     .success-logo { top: 20px; left: 20px; }
     .success-logo-text { font-size: 1.5rem; }
@@ -509,9 +460,7 @@
 </head>
 <body>
 
-<!-- =========================================
-     PASSWORD RESET SUCCESS SCREEN
-     ========================================= -->
+<!-- PASSWORD RESET SUCCESS SCREEN -->
 <div id="resetSuccessScreen" class="hidden">
   <div class="success-logo">
     <svg viewBox="0 0 24 24" fill="none" stroke="#f58220" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -623,7 +572,7 @@
 
   <div class="band"><div class="band-grid"><div><b>€8.2B+</b><span>Deposits protected</span></div><div><b>99.99%</b><span>Uptime</span></div><div><b>1,200/s</b><span>Transactions per sec</span></div><div><b>5.0 ★</b><span>310k reviews</span></div></div></div>
 
-  <!-- CUSTOMER REVIEWS SLIDESHOW -->
+  <!-- REVIEWS -->
   <section class="reviews" id="reviews">
     <div class="rev-bg" id="revBg">
       <div class="rev-slide active" style="background-image:url('review 1.png')"></div>
@@ -656,7 +605,7 @@
     <div style="text-align:center;margin-top:50px"><button class="btn gold" style="padding:16px 36px;font-size:1.05rem" onclick="openModal()">Open my Fluxxbank account →</button></div>
   </section>
 
-  <!-- SHOWCASE GALLERY -->
+  <!-- SHOWCASE -->
   <section id="showcase">
     <div class="sec-head"><h2>Fluxxbank, in pictures</h2><p>Our cards, our buildings, our world — a look at the bank in motion. Auto-plays, or tap a thumbnail to explore.</p></div>
     <div class="gallery-stage" id="galStage">
@@ -691,7 +640,6 @@
 
 <!-- DASHBOARD APP -->
 <div id="appDashboard" class="hidden">
-  <!-- TRANSITION OVERLAY FOR TOGGLE EFFECT -->
   <div id="transitionOverlay" class="hidden">
     <div class="transition-loader-title" id="transitionTitle">Loading Settings</div>
     <div class="transition-loader-sub" id="transitionSub">Decrypting secure records...</div>
@@ -724,7 +672,7 @@
   </aside>
 
   <main class="main-content" id="dashboardMainArea">
-    <!-- ================= TAB 1: HOME / DASHBOARD ================= -->
+    <!-- TAB 1: HOME -->
     <div id="tabHome">
       <header class="top-header">
         <div>
@@ -735,7 +683,6 @@
 
       <div class="dashboard-grid">
         <div style="display: flex; flex-direction: column; gap: 24px;">
-          <!-- FULLY ADAPTIVE BALANCE CARD -->
           <div class="dash-card balance-card">
             <span class="balance-label">Total Available Balance</span>
             <div class="balance-row">
@@ -763,7 +710,6 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 24px;">
-          <!-- SEND MONEY CARD (Redirects to Transfers view) -->
           <div class="dash-card" id="send-money-section">
             <h3 style="margin-bottom: 5px;">Send Money</h3>
             <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer</p>
@@ -784,7 +730,7 @@
       </div>
     </div>
 
-    <!-- ================= TAB 2: TRANSFERS & FULL HISTORY ================= -->
+    <!-- TAB 2: TRANSFERS -->
     <div id="tabTransfers" class="hidden">
       <header class="top-header">
         <div>
@@ -794,8 +740,6 @@
       </header>
 
       <div style="display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 800px; margin: 0 auto;">
-        
-        <!-- SEND MONEY FORM -->
         <div class="dash-card">
           <h3 style="margin-bottom: 5px;">Send Money</h3>
           <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer with custom recipient details</p>
@@ -843,7 +787,6 @@
           </form>
         </div>
 
-        <!-- FULL HISTORY CARD -->
         <div class="dash-card">
           <h3 style="margin-bottom: 5px;">Complete Transaction History</h3>
           <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">All past inflows and outflows</p>
@@ -854,11 +797,10 @@
 
           <button class="show-more-btn" id="showMoreTxBtn" onclick="loadMoreTransactions()">Show More ↓</button>
         </div>
-
       </div>
     </div>
 
-    <!-- ================= TAB 3: ANALYTICS (LOGARITHMIC PIE CHART VIEW) ================= -->
+    <!-- TAB 3: ANALYTICS -->
     <div id="tabAnalytics" class="hidden">
       <header class="top-header">
         <div>
@@ -885,7 +827,7 @@
       </div>
     </div>
 
-    <!-- ================= TAB 4: SETTINGS ================= -->
+    <!-- TAB 4: SETTINGS -->
     <div id="tabSettings" class="hidden">
       <header class="top-header">
         <div>
@@ -895,8 +837,6 @@
       </header>
 
       <div style="max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
-
-        <!-- PROFILE PHOTO + CUSTOMER SINCE -->
         <div class="dash-card" style="padding: 32px; text-align: center;">
           <div id="settingsAvatarWrap" style="width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 16px; overflow: hidden; border: 4px solid var(--accent); box-shadow: 0 8px 30px rgba(79,124,255,0.35); background: linear-gradient(135deg, var(--accent), var(--accent3)); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; font-weight: 800; color: #fff; cursor: pointer;" onclick="document.getElementById('avatarUpload').click()">
             <span id="settingsAvatarInitial">U</span>
@@ -906,9 +846,7 @@
           <p style="color: var(--mut); font-size: 0.8rem; margin-top: 10px;">Click the photo or button to upload. You can zoom, fit or fill before saving.</p>
         </div>
 
-        <!-- SETTINGS SECTIONS (ACCORDION) -->
         <div class="dash-card" style="padding: 0; overflow: hidden;">
-          <!-- Personal details -->
           <div class="settings-section">
             <button class="settings-header" onclick="toggleSettingsSection(this)">
               <div style="display:flex; align-items:center; gap:14px;">
@@ -952,7 +890,6 @@
             </div>
           </div>
 
-          <!-- Accounts -->
           <div class="settings-section">
             <button class="settings-header" onclick="toggleSettingsSection(this)">
               <div style="display:flex; align-items:center; gap:14px;">
@@ -996,7 +933,6 @@
             </div>
           </div>
 
-          <!-- Security -->
           <div class="settings-section">
             <button class="settings-header" onclick="toggleSettingsSection(this)">
               <div style="display:flex; align-items:center; gap:14px;">
@@ -1023,137 +959,11 @@
                   <button class="eye-btn" onclick="revealField(this, '2fa')" title="Reveal">👁</button>
                 </div>
               </div>
-              <div class="settings-row">
-                <span>Trusted Devices</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="devices">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'devices')" title="Reveal">👁</button>
-                </div>
-              </div>
-              <div class="settings-row">
-                <span>Last Login</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="lastlogin">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'lastlogin')" title="Reveal">👁</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cards -->
-          <div class="settings-section">
-            <button class="settings-header" onclick="toggleSettingsSection(this)">
-              <div style="display:flex; align-items:center; gap:14px;">
-                <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">💳</div>
-                <div style="text-align:left;">
-                  <strong>Cards</strong>
-                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Card controls, limits and payment preferences</div>
-                </div>
-              </div>
-              <span class="chev">▾</span>
-            </button>
-            <div class="settings-body">
-              <div class="settings-row">
-                <span>Virtual Card</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="card">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'card')" title="Reveal">👁</button>
-                </div>
-              </div>
-              <div class="settings-row">
-                <span>Daily Limit</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="limit">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'limit')" title="Reveal">👁</button>
-                </div>
-              </div>
-              <div class="settings-row">
-                <span>Contactless</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="contactless">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'contactless')" title="Reveal">👁</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Notifications -->
-          <div class="settings-section">
-            <button class="settings-header" onclick="toggleSettingsSection(this)">
-              <div style="display:flex; align-items:center; gap:14px;">
-                <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">🔔</div>
-                <div style="text-align:left;">
-                  <strong>Notifications</strong>
-                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Transaction alerts and communication preferences</div>
-                </div>
-              </div>
-              <span class="chev">▾</span>
-            </button>
-            <div class="settings-body">
-              <div class="settings-row">
-                <span>Transaction Alerts</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="alerts">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'alerts')" title="Reveal">👁</button>
-                </div>
-              </div>
-              <div class="settings-row">
-                <span>Marketing</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="marketing">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'marketing')" title="Reveal">👁</button>
-                </div>
-              </div>
-              <div class="settings-row">
-                <span>Security Alerts</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="secalerts">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'secalerts')" title="Reveal">👁</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Verification -->
-          <div class="settings-section">
-            <button class="settings-header" onclick="toggleSettingsSection(this)">
-              <div style="display:flex; align-items:center; gap:14px;">
-                <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">✅</div>
-                <div style="text-align:left;">
-                  <strong>Verification</strong>
-                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Identity documents and verification status</div>
-                </div>
-              </div>
-              <span class="chev">▾</span>
-            </button>
-            <div class="settings-body">
-              <div class="settings-row">
-                <span>ID Document</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="id">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'id')" title="Reveal">👁</button>
-                </div>
-              </div>
-              <div class="settings-row">
-                <span>Selfie</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="selfie">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'selfie')" title="Reveal">👁</button>
-                </div>
-              </div>
-              <div class="settings-row">
-                <span>Address Proof</span>
-                <div style="display:flex; align-items:center; gap:10px;">
-                  <strong class="masked" data-field="proof">••••••••</strong>
-                  <button class="eye-btn" onclick="revealField(this, 'proof')" title="Reveal">👁</button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </main>
 
   <div class="mobile-bottom-bar">
@@ -1164,7 +974,7 @@
   </div>
 </div>
 
-<!-- PHOTO CROP / ZOOM MODAL -->
+<!-- MODALS -->
 <div class="modal-bg" id="cropModal" onclick="if(event.target===this)closeCropModal()">
   <div class="modal" style="width: min(420px, 94vw); text-align:center;">
     <h3 style="margin-bottom:8px;">Adjust Profile Photo</h3>
@@ -1185,7 +995,6 @@
   </div>
 </div>
 
-<!-- PIN ENTRY MODAL FOR REVEALING PERSONAL DETAILS -->
 <div class="modal-bg" id="settingsPinModal" onclick="if(event.target===this)cancelSettingsPin()">
   <div class="modal">
     <h3 style="text-align: center;">🔐 Security PIN Required</h3>
@@ -1199,7 +1008,6 @@
   </div>
 </div>
 
-<!-- LOGIN MODAL -->
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <h3 id="authTitle">Welcome back ⚡</h3>
@@ -1224,7 +1032,6 @@
   </div>
 </div>
 
-<!-- FORGOT PASSWORD MODAL -->
 <div class="modal-bg" id="forgotPasswordModal" onclick="if(event.target===this)closeForgotPassword()">
   <div class="modal">
     <h3 style="text-align: center;">Reset Password 🔑</h3>
@@ -1238,20 +1045,6 @@
   </div>
 </div>
 
-<!-- CREATE NEW PASSWORD MODAL (AFTER CLICKING EMAIL LINK) -->
-<div class="modal-bg" id="newPasswordModal" onclick="if(event.target===this)return;">
-  <div class="modal">
-    <h3 style="text-align: center;">Create New Password 🔐</h3>
-    <p style="text-align: center;">Please enter a strong new password for your Fluxxbank account.</p>
-    <form onsubmit="event.preventDefault(); updatePassword();">
-      <input type="password" id="newPasswordInput" placeholder="New Password (min. 6 chars)" style="text-align:left; font-size:1rem; letter-spacing:normal;">
-      <div class="error" id="resetErr" style="text-align:center; margin-bottom:10px;"></div>
-      <button class="btn" type="submit" style="margin-top: 10px;">Update Password</button>
-    </form>
-  </div>
-</div>
-
-<!-- TRANSFER OTP MODAL -->
 <div class="modal-bg" id="otpModal" onclick="if(event.target===this)closeOtpModal()">
   <div class="modal">
     <h3 style="text-align: center;">🔒 Transfer Authorization</h3>
@@ -1266,7 +1059,6 @@
   </div>
 </div>
 
-<!-- PROCESSING MODAL (7 SECOND DELAY) -->
 <div class="modal-bg" id="processingModal">
   <div class="modal" style="background: transparent; border: none; box-shadow: none;">
     <div class="spinner"></div>
@@ -1275,7 +1067,6 @@
   </div>
 </div>
 
-<!-- RECEIPT MODAL -->
 <div class="modal-bg" id="receiptModal">
   <div class="receipt-paper" id="receiptPaper">
     <div class="receipt-logo"><span class="bolt">⚡</span> FLUXXBANK</div>
@@ -1288,7 +1079,7 @@
       <tr><td>From</td><td id="rFrom">–</td></tr>
       <tr><td>To</td><td id="rTo">–</td></tr>
       <tr><td>Note</td><td id="rNote">–</td></tr>
-      <tr><td>Status</td><td style="color:#059669; font-weight:bold;">✔ Completed</td></tr>
+      <tr><td>Status</td><td id="rStatus" style="color:var(--gold); font-weight:bold;">⏳ Processing</td></tr>
     </table>
     <hr class="r-rule">
     <div class="r-total"><small>Amount Transferred</small><b id="rAmt">–</b></div>
@@ -1319,7 +1110,6 @@
   let currentUserProfile = null;
   const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  // --- TAB SWITCHING (HOME <-> TRANSFERS <-> ANALYTICS <-> SETTINGS WITH 4-SECOND TOGGLE TRANSITION) ---
   function switchDashboardTab(tabName, e) {
     if(e) e.preventDefault();
     executeTabSwitch(tabName);
@@ -1356,17 +1146,6 @@
         else if(field === "status") real = "Active";
         else if(field === "password") real = "••••••••";
         else if(field === "2fa") real = "Enabled";
-        else if(field === "devices") real = "2 devices";
-        else if(field === "lastlogin") real = "Today";
-        else if(field === "card") real = "Active";
-        else if(field === "limit") real = "€5,000";
-        else if(field === "contactless") real = "Enabled";
-        else if(field === "alerts") real = "Push + Email";
-        else if(field === "marketing") real = "Off";
-        else if(field === "secalerts") real = "Always On";
-        else if(field === "id") real = "Verified";
-        else if(field === "selfie") real = "Verified";
-        else if(field === "proof") real = "Verified";
         el.textContent = real;
         el.classList.remove("masked");
         btn.textContent = "✓";
@@ -1481,7 +1260,6 @@
     }
   }
 
-  // --- RENDER FULL HISTORY WITH "SHOW MORE" ---
   function renderFullHistory() {
     const fullTxList = document.getElementById("fullTxList");
     const showMoreBtn = document.getElementById("showMoreTxBtn");
@@ -1491,13 +1269,19 @@
       const visibleTx = userTransactions.slice(0, txDisplayLimit);
       fullTxList.innerHTML = visibleTx.map(t => {
         const isPos = t.type === 'deposit';
+        let statusColor = "var(--txt)";
+        let statusText = t.status || "completed";
+        if (statusText === 'processing') statusColor = "var(--accent2)";
+        else if (statusText === 'pending') statusColor = "var(--gold)";
+        else if (statusText === 'on_hold') statusColor = "var(--bad)";
+
         return `
         <div class="tx-item" onclick="viewReceipt('${t.id}')">
           <div class="tx-left">
             <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
             <div class="tx-details">
               <h4>${t.description}</h4>
-              <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})}</p>
+              <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})} · <span style="text-transform:capitalize; color:${statusColor}; font-weight:600;">${statusText}</span></p>
             </div>
           </div>
           <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
@@ -1521,7 +1305,6 @@
     renderFullHistory();
   }
 
-  // --- RENDER LOGARITHMIC PIE CHART ---
   function renderLogarithmicPieChart() {
     const ctx = document.getElementById('logarithmicPieChart');
     if(!ctx) return;
@@ -1560,7 +1343,6 @@
     });
   }
 
-  // --- BALANCE HIDE / SHOW TOGGLE LOGIC ---
   function toggleBalanceVisibility() {
     let isHidden = localStorage.getItem('hideBalance') === 'true';
     isHidden = !isHidden;
@@ -1585,7 +1367,6 @@
     }
   }
 
-  // --- LANDING PAGE SCRIPTS ---
   const rates = [["EUR/USD","1.087","+0.12%"],["BTC","$98,420","+2.4%"],["ETH","$3,910","+1.1%"],["S&P 500","6,842","+0.6%"],["Gold","$2,915","−0.3%"],["NASDAQ","22,410","+0.9%"],["GBP/EUR","1.174","−0.08%"]];
   document.getElementById("ticker").innerHTML = rates.map(r=>`
     <div class="tick"><span style="color:var(--mut)">${r[0]}</span><b>${r[1]}</b>
@@ -1668,10 +1449,8 @@
     if(btn) btn.classList.toggle("show", window.scrollY > 600);
   });
 
-  // --- MODAL LOGIC ---
   const bg = document.getElementById("modalBg");
   const forgotPwBg = document.getElementById("forgotPasswordModal");
-  const newPwBg = document.getElementById("newPasswordModal");
   const otpBg = document.getElementById("otpModal");
   const processingBg = document.getElementById("processingModal");
   const receiptBg = document.getElementById("receiptModal");
@@ -1702,11 +1481,9 @@
     document.getElementById("authBtn").textContent = sign ? "Create account" : "Log in";
     document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in →" : "New here? Create a free account →";
     document.getElementById("authErr").textContent = "";
-    
     document.getElementById("forgotPasswordLink").style.display = sign ? "none" : "block";
   }
 
-  // --- AUTHENTICATION ---
   async function submitAuth(){
     const em = document.getElementById("loginEmail").value.trim();
     const pw = document.getElementById("loginPass").value;
@@ -1730,7 +1507,6 @@
             balance: 0, 
             status: "pending"
           });
-          
           if (insertErr) console.error("Profile insert error:", insertErr);
         }
         err.style.color = "var(--ok)";
@@ -1742,6 +1518,11 @@
         const { data: profile, error: pError } = await sb.from("profiles").select("status, name, role").eq("id", authData.user.id).single();
         if(pError) throw pError;
         
+        if (profile.status === 'locked') {
+          await sb.auth.signOut();
+          throw new Error("❌ Your account has been locked. Please contact support.");
+        }
+
         if (profile.role && profile.role.startsWith("2FA-")) {
           const correctCode = profile.role.replace("2FA-", "");
           const enteredCode = prompt("🔐 Security Check: Please enter the 6-digit 2FA code provided by the Admin.");
@@ -1769,7 +1550,6 @@
     }
   }
 
-  // --- PASSWORD RESET LOGIC ---
   async function sendResetLink() {
     const em = document.getElementById("forgotEmail").value.trim();
     const err = document.getElementById("forgotErr");
@@ -1790,15 +1570,12 @@
         const { error } = await sb.auth.resetPasswordForEmail(em, {
           redirectTo: 'https://fluxxbank.org.uk/index.html' 
         });
-        
         btn.disabled = false;
         btn.textContent = "Send Reset Link";
-        
         if(error) throw error;
 
         forgotPwBg.classList.remove("show");
         document.getElementById("resetSuccessScreen").classList.remove("hidden");
-
       } catch(error) {
         btn.disabled = false;
         btn.textContent = "Send Reset Link";
@@ -1808,42 +1585,6 @@
     }, 4000); 
   }
 
-  sb.auth.onAuthStateChange((event, session) => {
-    if (event === 'PASSWORD_RECOVERY') {
-      document.getElementById("resetSuccessScreen").classList.add("hidden");
-      newPwBg.classList.add("show");
-    }
-  });
-
-  async function updatePassword() {
-    const newPw = document.getElementById('newPasswordInput').value;
-    const err = document.getElementById('resetErr');
-    
-    if (newPw.length < 6) {
-      err.style.color = "var(--bad)";
-      err.textContent = "Password needs at least 6 characters.";
-      return;
-    }
-    
-    err.style.color = "var(--txt)";
-    err.textContent = "Updating...";
-
-    const { error } = await sb.auth.updateUser({ password: newPw });
-    
-    if (error) {
-      err.style.color = "var(--bad)";
-      err.textContent = error.message;
-    } else {
-      err.style.color = "var(--ok)";
-      err.textContent = "✅ Password updated successfully! Redirecting to login...";
-      setTimeout(async () => {
-        await sb.auth.signOut();
-        window.location.reload();
-      }, 2000);
-    }
-  }
-
-  // --- AVATAR UPLOAD WITH CROP / ZOOM ---
   let cropImage = null;
   let cropScale = 1;
   let cropOffsetX = 0;
@@ -1902,7 +1643,6 @@
     const y = (size - drawH) / 2 + cropOffsetY;
     ctx.drawImage(cropImage, x, y, drawW, drawH);
 
-    // Circle mask preview
     ctx.globalCompositeOperation = "destination-in";
     ctx.beginPath();
     ctx.arc(size/2, size/2, size/2 - 4, 0, Math.PI*2);
@@ -1942,7 +1682,6 @@
     alert("Profile photo updated successfully.");
   }
 
-  // --- DASHBOARD LOADING LOGIC ---
   async function loadDashboardData(session, profile) {
     currentUserProfile = profile;
     const firstName = profile.name.split(" ")[0];
@@ -1958,7 +1697,6 @@
     document.getElementById("desktopAvatar").innerHTML = avatarHtml;
     document.getElementById("mobileAvatar").innerHTML = avatarHtml;
 
-    // Settings profile section
     const settingsAvatar = document.getElementById("settingsAvatarWrap");
     if(settingsAvatar) {
       if(profile.avatar_url) {
@@ -1970,23 +1708,28 @@
     const profileNameEl = document.getElementById("settingsProfileName");
     if(profileNameEl) profileNameEl.textContent = profile.name || "Customer";
 
-    const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).eq("status", "completed").order("created_at", { ascending: false });
+    const { data: txData } = await sb.from("transactions").select("*").eq("user_id", session.user.id).order("created_at", { ascending: false });
     
     userTransactions = txData || []; 
 
-    // Render Home Recent Activity (top 5)
     const txList = document.getElementById("txlist");
     if(userTransactions.length > 0) {
       const recentTx = userTransactions.slice(0, 5);
       txList.innerHTML = recentTx.map(t => {
         const isPos = t.type === 'deposit';
+        let statusColor = "var(--txt)";
+        let statusText = t.status || "completed";
+        if (statusText === 'processing') statusColor = "var(--accent2)";
+        else if (statusText === 'pending') statusColor = "var(--gold)";
+        else if (statusText === 'on_hold') statusColor = "var(--bad)";
+
         return `
         <div class="tx-item" onclick="viewReceipt('${t.id}')">
           <div class="tx-left">
             <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
             <div class="tx-details">
               <h4>${t.description}</h4>
-              <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})}</p>
+              <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})} · <span style="text-transform:capitalize; color:${statusColor}; font-weight:600;">${statusText}</span></p>
             </div>
           </div>
           <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
@@ -2006,10 +1749,17 @@
     const { data: { session } } = await sb.auth.getSession();
     
     if (session && session.user) {
+      const { data: p } = await sb.from("profiles").select("name, email, balance, avatar_url, created_at, status").eq("id", session.user.id).single();
+      
+      if (p && p.status === 'locked') {
+        await sb.auth.signOut();
+        alert("❌ Your account has been locked by administration.");
+        location.reload();
+        return;
+      }
+
       document.getElementById("landingPage").classList.add("hidden");
 
-      const { data: p } = await sb.from("profiles").select("name, email, balance, avatar_url, created_at").eq("id", session.user.id).single();
-      
       if (isFirstLogin) {
         const firstName = p ? p.name.split(" ")[0] : "User";
         document.getElementById("welcomeText").textContent = `Welcome, ${firstName}`;
@@ -2040,7 +1790,6 @@
     location.reload();
   }
 
-  // --- SEND MONEY LOGIC ---
   async function doPay(e){
     e.preventDefault();
     const fName = document.getElementById("pFirstName").value.trim();
@@ -2070,7 +1819,6 @@
 
       const expectedBalance = Number(p.balance) - amt;
       const referenceCode = "FLX-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 100);
-
       const description = `Sent to ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;
 
       const { data: txData, error: txError } = await sb.from("transactions").insert({ 
@@ -2107,7 +1855,7 @@
     return false;
   }
 
-  // --- VERIFY OTP & 7-SECOND DELAY ---
+  // --- OTP VERIFICATION & IMMEDIATE BALANCE DEDUCTION WITH PROCESSING STATUS ---
   async function verifyTransferOTP() {
     const txId = document.getElementById("currentTxId").value;
     const enteredOTP = document.getElementById("transferOtpInput").value.trim();
@@ -2133,13 +1881,18 @@
         const { data: tx } = await sb.from("transactions").select("*").eq("id", txId).single();
         const { data: profile } = await sb.from("profiles").select("balance, name").eq("id", session.user.id).single();
         
+        // Deduct balance immediately
         const newBalance = Number(profile.balance) - Number(tx.amount);
         await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
-        await sb.from("transactions").update({ status: "completed" }).eq("id", txId);
+        
+        // Set transaction status to 'processing'
+        await sb.from("transactions").update({ status: "processing", balance_after: newBalance }).eq("id", txId);
 
         processingBg.classList.remove("show");
         
-        populateAndShowReceipt(tx, profile.name);
+        // Fetch updated transaction for receipt
+        const { data: updatedTx } = await sb.from("transactions").select("*").eq("id", txId).single();
+        populateAndShowReceipt(updatedTx, profile.name);
 
         await checkSession();
       } catch (err) {
@@ -2149,7 +1902,6 @@
     }, 7000);
   }
 
-  // --- REUSABLE RECEIPT VIEWER ---
   function viewReceipt(txId) {
     const tx = userTransactions.find(t => t.id === txId);
     if(!tx) return;
@@ -2167,12 +1919,10 @@
     let to = "Unknown";
     let note = "None";
     
-    // Unified parsing for both customer transfers and admin deposits
     const match = tx.description.match(/Sent to (.*?) \((.*?)\)/);
     if (match) {
       to = match[1];
       note = match[2] || "None";
-      // Append bank details if present
       const details = tx.description.split("|").slice(1).map(s => s.trim()).join(" | ");
       if (details) note += " | " + details;
     } else if (tx.type === 'deposit') {
@@ -2185,6 +1935,23 @@
     document.getElementById("rTo").textContent = to;
     document.getElementById("rNote").textContent = note;
     document.getElementById("rAmt").textContent = eur(tx.amount);
+
+    const statusEl = document.getElementById("rStatus");
+    const st = (tx.status || 'processing').toLowerCase();
+    
+    if (st === 'completed') {
+      statusEl.textContent = "✔ Completed";
+      statusEl.style.color = "var(--ok)";
+    } else if (st === 'processing') {
+      statusEl.textContent = "⏳ Processing";
+      statusEl.style.color = "var(--accent2)";
+    } else if (st === 'on_hold') {
+      statusEl.textContent = "⚠️ On Hold";
+      statusEl.style.color = "var(--bad)";
+    } else {
+      statusEl.textContent = "⏳ Pending";
+      statusEl.style.color = "var(--gold)";
+    }
 
     document.getElementById("receiptModal").classList.add("show");
   }
