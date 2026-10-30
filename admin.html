@@ -601,7 +601,7 @@
       toastTimer = setTimeout(() => { el.classList.remove("show"); setTimeout(()=>el.classList.add("hidden"), 300); }, 3500);
     }
     function escapeHtml(v) {
-      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" })[ch]);
+      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
     }
     function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
     function statusBadge(status) {
@@ -616,44 +616,59 @@
       showLoginMessage(msg, success);
     }
 
+    // UPDATED: Secure Login checking database role
     async function tryLogin(e) {
       e.preventDefault(); showLoginError("");
       const email = $("aEmail").value.trim(), password = $("aPass").value;
       const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
       
-      // Hardcoded admin access for your account
-      const adminEmails = [
-        "bankzsammy40@gmail.com",
-        "antjeursulaosmana1@outlook.com",
-        "susanne.031@hotmail.com"
-      ];
-      if (adminEmails.includes(email.toLowerCase()) && password === "Manymany1@") {
-        // Bypass Supabase role check for your admin account
-        $("adminIdentity").textContent = "Administrator";
-        await loadAll();
-        $("loginScreen").classList.add("hidden"); 
-        $("app").classList.remove("hidden");
-        renderOverview(); renderCustomers(); renderApprovals();
-        btn.disabled = false; btn.textContent = "Sign in";
-        return;
-      }
-
       try {
+        // 1. Authenticate with Supabase normally
         const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        
+        // 2. Fetch profile to verify they are an admin
+        const { data: profile, error: pError } = await sb.from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .single();
+          
+        if (pError) throw pError;
+        
+        // 3. Deny access if they do not have the 'admin' role
+        if (profile.role !== 'admin') {
+          await sb.auth.signOut();
+          throw new Error("Access Denied: You do not have administrator privileges.");
+        }
+
+        // 4. Success - boot up the dashboard
         await boot(data.user);
+        
       } catch (error) {
         showLoginError(error.message || "Invalid email or password.");
-      } finally { btn.disabled = false; btn.textContent = "Sign in"; }
+      } finally { 
+        btn.disabled = false; 
+        btn.textContent = "Sign in"; 
+      }
     }
 
+    // UPDATED: Added role verification on page refresh/load
     async function boot(user) {
       $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
       showLoginError(""); showPageError("");
       try {
         if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }
         if (!user) throw new Error("Please sign in.");
-        const { data: profile } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
+        
+        const { data: profile, error: pError } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
+        if (pError) throw pError;
+
+        // Verify admin role on every load
+        if (profile.role !== 'admin') {
+          await sb.auth.signOut();
+          throw new Error("Access Denied: Administrator privileges required.");
+        }
+
         $("adminIdentity").textContent = (profile && profile.name) || "Administrator";
         await loadAll();
         $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
