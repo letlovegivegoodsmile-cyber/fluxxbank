@@ -91,6 +91,8 @@
     .status { display: inline-block; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.05); font-size: 0.75rem; font-weight: 600; }
     .status.active { background: rgba(52, 211, 153, 0.15); color: var(--ok); border: 1px solid rgba(52, 211, 153, 0.3); }
     .status.pending { background: rgba(245, 196, 81, 0.15); color: var(--gold); border: 1px solid rgba(245, 196, 81, 0.3); }
+    .status.locked { background: rgba(248, 113, 113, 0.15); color: var(--bad); border: 1px solid rgba(248, 113, 113, 0.3); }
+    .status.processing { background: rgba(34, 211, 238, 0.15); color: var(--accent2); border: 1px solid rgba(34, 211, 238, 0.3); }
     
     .empty { padding: 30px; color: var(--mut); text-align: center; }
 
@@ -203,7 +205,7 @@
           <button class="side-btn on" data-view="dash" type="button"><span>🏠</span> Overview</button>
           <button class="side-btn" data-view="cust" type="button"><span>👥</span> Customers</button>
           <button class="side-btn" data-view="appr" type="button"><span>🛡️</span> Approvals</button>
-          <button class="side-btn" data-view="transfers" type="button"><span>💸</span> Pending Transfers</button>
+          <button class="side-btn" data-view="transfers" type="button"><span>💸</span> Customer Transfers</button>
         </nav>
       </aside>
 
@@ -244,7 +246,7 @@
           <section id="view-cust" class="view">
             <div class="panel">
               <h2>Customer Management</h2>
-              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">View and manage customer profiles, balances, and account actions.</p>
+              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">View and manage customer profiles, balances, account actions, and locking.</p>
               <div class="table-wrap">
                 <table>
                   <thead><tr><th>Customer</th><th>Status</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead>
@@ -266,12 +268,12 @@
           <!-- PENDING TRANSFERS -->
           <section id="view-transfers" class="view">
             <div class="panel">
-              <h2>Pending Customer Transfers</h2>
-              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Monitor customer transfers waiting for OTP verification (Static OTP: 241800).</p>
+              <h2>Customer Transfers & Status Management</h2>
+              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Monitor and change transfer statuses (Pending, Processing, On Hold, Completed).</p>
               <div class="table-wrap">
                 <table>
-                  <thead><tr><th>Customer</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead>
-                  <tbody id="pendingTransfersBody"><tr><td colspan="4" class="empty">Loading transfers…</td></tr></tbody>
+                  <thead><tr><th>Customer</th><th>Description</th><th>Amount</th><th>Status</th><th>Change Status</th></tr></thead>
+                  <tbody id="pendingTransfersBody"><tr><td colspan="5" class="empty">Loading transfers…</td></tr></tbody>
                 </table>
               </div>
             </div>
@@ -366,7 +368,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Clean URL if it has a trailing ? or query string from redirects
     if (window.location.search || window.location.href.endsWith("?")) {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -434,6 +435,38 @@
       });
     });
 
+    // --- LOCK / UNLOCK CUSTOMER ACCOUNT ---
+    async function toggleLockCustomer(userId, currentStatus) {
+      const newStatus = currentStatus === 'locked' ? 'active' : 'locked';
+      const actionText = newStatus === 'locked' ? 'lock' : 'unlock';
+      
+      if(!confirm(`Are you sure you want to ${actionText} this customer account?`)) return;
+
+      const { error } = await sb.from("profiles").update({ status: newStatus }).eq("id", userId);
+      if(error) {
+        toast("Error updating account status: " + error.message);
+      } else {
+        toast(`✅ Customer account ${newStatus === 'locked' ? 'locked' : 'unlocked'} successfully.`);
+        await loadAll();
+        renderOverview();
+        renderCustomers();
+      }
+    }
+
+    // --- UPDATE TRANSACTION STATUS ---
+    async function updateTxStatus(txId) {
+      const selectEl = document.getElementById(`status-select-${txId}`);
+      const newStatus = selectEl.value;
+
+      const { error } = await sb.from("transactions").update({ status: newStatus }).eq("id", txId);
+      if(error) {
+        toast("Error updating transaction status: " + error.message);
+      } else {
+        toast(`✅ Transaction status updated to '${newStatus}'.`);
+        loadPendingTransfers();
+      }
+    }
+
     // --- CUSTOMER DETAILS + PIN 2121 ---
     let detailsUserId = null;
     let pendingDetailField = null;
@@ -495,7 +528,7 @@
       pendingDetailField = null;
     }
 
-    // --- MODAL LOGIC ---
+    // --- DEPOSIT MODAL LOGIC ---
     function openDepositModal(userId) {
       const c = customers.find(x => x.id === userId);
       if(!c) return;
@@ -507,7 +540,6 @@
       $("depStatus").innerHTML = statusBadge(c.status);
       $("depBalance").textContent = eur(c.balance || 0);
 
-      // Clear form fields
       $("depFirstName").value = "";
       $("depLastName").value = "";
       $("depIban").value = "";
@@ -587,7 +619,6 @@
       }
     }
 
-    // --- AUTH & DATA LOGIC ---
     function showLoginError(msg) { $("loginErr").textContent = msg || ""; }
     function showPageError(msg) { $("pageErr").textContent = msg || ""; }
     function showLoginMessage(msg, success = false) {
@@ -606,7 +637,11 @@
     function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
     function statusBadge(status) {
       const v = String(status ?? "Unknown"); const l = v.toLowerCase();
-      const css = l === "active" ? "active" : l.includes("pending") ? "pending" : "";
+      let css = "";
+      if (l === "active") css = "active";
+      else if (l.includes("pending")) css = "pending";
+      else if (l === "locked") css = "locked";
+      else if (l === "processing" || l === "on_hold") css = "processing";
       return `<span class="status ${css}">${escapeHtml(v)}</span>`;
     }
 
@@ -616,18 +651,15 @@
       showLoginMessage(msg, success);
     }
 
-    // UPDATED: Secure Login checking database role
     async function tryLogin(e) {
       e.preventDefault(); showLoginError("");
       const email = $("aEmail").value.trim(), password = $("aPass").value;
       const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
       
       try {
-        // 1. Authenticate with Supabase normally
         const { data, error } = await sb.auth.signInWithPassword({ email, password });
         if (error) throw error;
         
-        // 2. Fetch profile to verify they are an admin
         const { data: profile, error: pError } = await sb.from("profiles")
           .select("role")
           .eq("id", data.user.id)
@@ -635,13 +667,11 @@
           
         if (pError) throw pError;
         
-        // 3. Deny access if they do not have the 'admin' role
         if (profile.role !== 'admin') {
           await sb.auth.signOut();
           throw new Error("Access Denied: You do not have administrator privileges.");
         }
 
-        // 4. Success - boot up the dashboard
         await boot(data.user);
         
       } catch (error) {
@@ -652,7 +682,6 @@
       }
     }
 
-    // UPDATED: Added role verification on page refresh/load
     async function boot(user) {
       $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
       showLoginError(""); showPageError("");
@@ -663,7 +692,6 @@
         const { data: profile, error: pError } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
         if (pError) throw pError;
 
-        // Verify admin role on every load
         if (profile.role !== 'admin') {
           await sb.auth.signOut();
           throw new Error("Access Denied: Administrator privileges required.");
@@ -719,7 +747,9 @@
     }
 
     function renderCustomers() {
-      $("custBody").innerHTML = customers.map((c, i) => `
+      $("custBody").innerHTML = customers.map((c, i) => {
+        const isLocked = c.status === 'locked';
+        return `
         <tr>
           <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
           <td>${statusBadge(c.status)}</td>
@@ -729,9 +759,11 @@
             ${isPending(c.status) ? `<button class="btn ghost approve-btn small" type="button" data-index="${i}">Approve</button>` : ""}
             <button class="btn small" style="background:var(--accent); color:#fff;" onclick="openDepositModal('${c.id}')">+ Deposit</button>
             <button class="btn ghost small" onclick="openCustomerDetails('${c.id}')">View</button>
+            <button class="btn small" style="background:${isLocked ? 'var(--ok)' : 'var(--bad)'}; color:#fff;" onclick="toggleLockCustomer('${c.id}', '${c.status}')">${isLocked ? 'Unlock' : 'Lock'}</button>
             <button class="btn ghost small" onclick="sendPasswordReset('${c.email}')">Reset PW</button>
           </td>
-        </tr>`).join("") || '<tr><td colspan="5" class="empty">No profiles.</td></tr>';
+        </tr>`;
+      }).join("") || '<tr><td colspan="5" class="empty">No profiles.</td></tr>';
     }
 
     function renderApprovals() {
@@ -791,21 +823,20 @@
 
     async function loadPendingTransfers() {
       const tbody = $("pendingTransfersBody");
-      tbody.innerHTML = '<tr><td colspan="4" class="empty">Loading transfers…</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">Loading transfers…</td></tr>';
 
       const { data: txData, error: txError } = await sb
         .from("transactions")
         .select("*")
-        .eq("status", "pending")
         .order("created_at", { ascending: false });
 
       if (txError) {
-        tbody.innerHTML = `<tr><td colspan="4" class="empty" style="color:var(--bad)">Error: ${txError.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--bad)">Error: ${txError.message}</td></tr>`;
         return;
       }
 
       if (!txData || txData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="empty">No pending transfers.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">No customer transfers found.</td></tr>';
         return;
       }
 
@@ -819,12 +850,24 @@
 
       tbody.innerHTML = txData.map(tx => {
         const profile = profileMap[tx.user_id] || {};
+        const currentStatus = tx.status || 'pending';
         return `
           <tr>
             <td>${profile.name || "Unknown"}<br><small>${profile.email || ""}</small></td>
             <td>${escapeHtml(tx.description)}</td>
             <td style="font-weight:bold;">${eur(tx.amount)}</td>
-            <td><span style="color:var(--gold); font-weight:bold;">Waiting for customer OTP (241800)...</span></td>
+            <td>${statusBadge(currentStatus)}</td>
+            <td>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <select id="status-select-${tx.id}" style="background:rgba(0,0,0,0.3); border:1px solid var(--line); color:#fff; padding:6px 10px; border-radius:8px; outline:none;">
+                  <option value="pending" ${currentStatus==='pending'?'selected':''}>Pending</option>
+                  <option value="processing" ${currentStatus==='processing'?'selected':''}>Processing</option>
+                  <option value="on_hold" ${currentStatus==='on_hold'?'selected':''}>On Hold</option>
+                  <option value="completed" ${currentStatus==='completed'?'selected':''}>Completed</option>
+                </select>
+                <button class="btn small" style="padding:6px 12px;" onclick="updateTxStatus('${tx.id}')">Update</button>
+              </div>
+            </td>
           </tr>
         `;
       }).join("");
