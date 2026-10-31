@@ -389,7 +389,6 @@
       if (!window.supabase) return alert("Supabase failed to load.");
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       
-      // CATCH PASSWORD RECOVERY EVENT ON ADMIN PAGE
       sb.auth.onAuthStateChange((event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           $("loginScreen").classList.remove("hidden");
@@ -726,9 +725,12 @@
       const btn = $("forgotPasswordBtn"); btn.disabled = true;
       try {
         await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });
-        showLoginMessage("Reset link sent. Check your inbox.", true);
-      } catch (e) { showLoginMessage(e.message); } 
-      finally { btn.disabled = false; }
+        showLoginMessage("✅ Password reset link sent to your email address", true);
+      } catch (e) { 
+        showLoginMessage(e.message); 
+      } finally { 
+        btn.disabled = false; 
+      }
     }
     
     async function saveNewPassword(e) {
