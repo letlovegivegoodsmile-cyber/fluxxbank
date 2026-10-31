@@ -27,22 +27,146 @@
     --ok:#34d399; --bad:#f87171;
     --r:16px;
   }
-  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,"Hiragino Kaku Gothic ProN","Meiryo",system-ui,sans-serif}
   html{scroll-behavior:smooth}
   body{background:var(--ink);color:var(--txt);overflow-x:hidden; transition: background 0.3s;}
   a{color:inherit;text-decoration:none}
   button{font:inherit;cursor:pointer;border:none}
   .hidden{display:none !important}
 
+  /* LANGUAGE TOGGLE SWITCH */
+  .lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .lang-btn {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--mut);
+    background: transparent;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }
+  .lang-btn.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(79,124,255,0.4);
+  }
+  .lang-btn:hover:not(.active) {
+    color: var(--txt);
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* 5.5-SECOND LANGUAGE CYCLE BUFFER SCREEN */
+  #langCycleScreen {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #161f3d 0%, var(--ink) 70%);
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+  .cycle-logo-wrap {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    display: grid;
+    place-items: center;
+  }
+  .cycle-ring-outer {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.06);
+    border-top-color: var(--accent2);
+    border-right-color: var(--accent);
+    animation: cycleSpin 1.1s linear infinite;
+    box-shadow: 0 0 30px rgba(34,211,238,0.25);
+  }
+  .cycle-ring-inner {
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.04);
+    border-bottom-color: var(--accent3);
+    border-left-color: var(--gold);
+    animation: cycleSpinReverse 1.6s linear infinite;
+  }
+  .cycle-mark {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 0 28px rgba(79,124,255,0.65);
+    animation: cycleLogoTurn 2.2s ease-in-out infinite;
+  }
+  .cycle-mark svg {
+    width: 30px;
+    height: 30px;
+  }
+  .cycle-title {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-align: center;
+  }
+  .cycle-sub {
+    color: var(--mut);
+    font-size: 0.92rem;
+    margin-top: -12px;
+  }
+  .cycle-progress-track {
+    width: 240px;
+    height: 6px;
+    background: var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .cycle-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+  }
+  .cycle-progress-fill.run {
+    animation: loadCycleProgress 5.5s linear forwards;
+  }
+  @keyframes cycleSpin { to { transform: rotate(360deg); } }
+  @keyframes cycleSpinReverse { to { transform: rotate(-360deg); } }
+  @keyframes cycleLogoTurn {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.08); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+  @keyframes loadCycleProgress { to { width: 100%; } }
+
   #welcomeScreen {
     position: fixed; inset: 0; background: var(--ink); z-index: 9999;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
   .welcome-text {
-    font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800;
+    font-size: clamp(2.2rem, 6vw, 4.2rem); font-weight: 800;
     background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
     -webkit-background-clip: text; background-clip: text; color: transparent;
     opacity: 0; transform: translateY(20px); animation: fadeInScale 2s ease forwards;
+    text-align: center; padding: 0 20px;
   }
   .progress-bar-container {
     width: 250px; height: 6px; background: var(--line);
@@ -57,7 +181,7 @@
   @keyframes loadProgress { to { width: 100%; } }
 
   nav.landing-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
-      padding:16px 5%;background:rgba(11,16,32,.75);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+      padding:16px 5%;background:rgba(11,16,32,.75);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);gap:12px}
   .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;letter-spacing:.5px}
   .logo .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
       background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 22px rgba(79,124,255,.55)}
@@ -78,7 +202,7 @@
                  radial-gradient(500px 400px at 10% 90%,rgba(168,85,247,.12),transparent 60%);pointer-events:none}
   .eyebrow{display:inline-block;padding:6px 14px;border:1px solid var(--line);border-radius:999px;color:var(--accent2);
       font-size:.8rem;letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;background:rgba(34,211,238,.06)}
-  h1{font-size:clamp(2.4rem,5vw,4rem);line-height:1.08;font-weight:800}
+  h1{font-size:clamp(2.2rem,4.6vw,3.8rem);line-height:1.12;font-weight:800}
   h1 .grad{background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;background-clip:text;color:transparent}
   .hero p.lead{margin:22px 0 30px;color:var(--mut);font-size:1.1rem;max-width:520px;line-height:1.7}
   .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
@@ -254,7 +378,7 @@
   }
 
   .sidebar { width: 260px; background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 10; }
-  .sidebar .logo { margin-bottom: 40px; padding-left: 10px; }
+  .sidebar .logo { margin-bottom: 24px; padding-left: 10px; }
   .side-menu { list-style: none; flex: 1; }
   .side-menu li { margin-bottom: 8px; }
   .side-menu a { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; transition: all 0.2s; cursor: pointer; }
@@ -273,7 +397,7 @@
   .logout-btn:hover { transform: scale(1.1); }
 
   .main-content { flex: 1; margin-left: 260px; padding: 40px; max-width: 1400px; }
-  .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+  .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 14px; }
   .top-header h1 { font-size: 2rem; font-weight: 700; }
   .top-header p { color: var(--mut); margin-top: 5px; }
 
@@ -352,7 +476,7 @@
   
   .receipt-paper {
     background: #ffffff; color: #0f172a; width: min(440px, 94vw); border-radius: 24px; padding: 40px 24px 32px;
-    font-family: "Segoe UI", Inter, system-ui, sans-serif; box-shadow: 0 30px 70px rgba(59, 130, 246, 0.25);
+    font-family: "Segoe UI", Inter, "Hiragino Kaku Gothic ProN", "Meiryo", system-ui, sans-serif; box-shadow: 0 30px 70px rgba(59, 130, 246, 0.25);
     position: relative; overflow: hidden; border: 1px solid rgba(59, 130, 246, 0.15);
   }
 
@@ -387,7 +511,7 @@
 
   .r-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
   .r-table td { padding: 9px 0; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-  .r-table td:first-child { color: #64748b; width: 40%; font-weight: 500; }
+  .r-table td:first-child { color: #64748b; width: 42%; font-weight: 500; }
   .r-table td:last-child { font-weight: 600; text-align: right; color: #1e293b; }
 
   .r-actions { display: flex; gap: 10px; justify-content: center; margin-top: 22px; }
@@ -438,18 +562,36 @@
   @media (max-width: 768px) {
     #appDashboard { flex-direction: column; }
     .sidebar { display: none; }
-    .mobile-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(11, 16, 32, 0.9); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); }
+    .mobile-nav { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: rgba(11, 16, 32, 0.9); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); gap: 8px; }
     .main-content { margin-left: 0; padding: 20px; padding-bottom: 80px; }
     .top-header h1 { font-size: 1.5rem; }
     .mobile-bottom-bar { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(11, 16, 32, 0.95); border-top: 1px solid var(--line); padding: 15px; justify-content: space-around; z-index: 50; backdrop-filter: blur(20px); }
     .mobile-bottom-bar a { color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.75rem; cursor: pointer; }
     .mobile-bottom-bar a.active { color: var(--accent2); }
     .mobile-bottom-bar span { font-size: 1.2rem; }
+    nav.landing-nav { padding: 12px 4%; }
+    nav.landing-nav .btn { padding: 9px 14px; font-size: 0.82rem; }
   }
   @media (min-width: 769px) { .mobile-nav, .mobile-bottom-bar { display: none !important; } }
 </style>
 </head>
 <body>
+
+<!-- 5.5-SECOND LANGUAGE CYCLE BUFFER OVERLAY -->
+<div id="langCycleScreen" class="hidden">
+  <div class="cycle-logo-wrap">
+    <div class="cycle-ring-outer"></div>
+    <div class="cycle-ring-inner"></div>
+    <div class="cycle-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+    </div>
+  </div>
+  <div class="cycle-title" id="langCycleTitle">Switching Language...</div>
+  <div class="cycle-sub" id="langCycleSub">Applying localization across Fluxxbank...</div>
+  <div class="cycle-progress-track">
+    <div class="cycle-progress-fill" id="langCycleFill"></div>
+  </div>
+</div>
 
 <div id="welcomeScreen" class="hidden">
   <div class="welcome-text" id="welcomeText">Welcome</div>
@@ -464,31 +606,38 @@
       <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank
     </a>
     <div class="navlinks">
-      <a href="#features">Features</a><a href="#accounts">Accounts</a><a href="#reviews">Reviews</a><a href="#showcase">Showcase</a>
+      <a href="#features" data-i18n="nav_features">Features</a>
+      <a href="#accounts" data-i18n="nav_accounts">Accounts</a>
+      <a href="#reviews" data-i18n="nav_reviews">Reviews</a>
+      <a href="#showcase" data-i18n="nav_showcase">Showcase</a>
     </div>
-    <div style="display:flex;gap:10px">
-      <button class="btn ghost" onclick="openModal()">Log in</button>
-      <button class="btn" onclick="openModal()">Get Started</button>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="lang-toggle" title="Switch Language">
+        <button type="button" class="lang-btn lang-btn-en active" onclick="triggerLanguageSwitch('en')">🇬🇧 EN</button>
+        <button type="button" class="lang-btn lang-btn-ja" onclick="triggerLanguageSwitch('ja')">🇯🇵 日本語</button>
+      </div>
+      <button class="btn ghost" onclick="openModal()" data-i18n="nav_login">Log in</button>
+      <button class="btn" onclick="openModal()" data-i18n="nav_get_started">Get Started</button>
     </div>
   </nav>
 
   <header class="hero" id="top">
     <div>
-      <span class="eyebrow">◆ Digital-first banking</span>
-      <h1>Banking that's<br>always <span class="grad">in motion.</span></h1>
-      <p class="lead">Fluxxbank is the standard for modern money — instant payments, fee-free accounts, and real-time insights, all from one beautiful app.</p>
+      <span class="eyebrow" data-i18n="hero_eyebrow">◆ Digital-first banking</span>
+      <h1 data-i18n-html="hero_title">Banking that's<br>always <span class="grad">in motion.</span></h1>
+      <p class="lead" data-i18n="hero_lead">Fluxxbank is the standard for modern money — instant payments, fee-free accounts, and real-time insights, all from one beautiful app.</p>
       <div class="hero-cta">
-        <a class="btn gold" href="#open">Open your account →</a>
-        <a class="btn ghost" onclick="openModal()">Try the live demo</a>
+        <a class="btn gold" href="#open" data-i18n="hero_cta_open">Open your account →</a>
+        <a class="btn ghost" onclick="openModal()" data-i18n="hero_cta_demo">Try the live demo</a>
       </div>
       <div class="rating-badge">
         <span class="stars-big">★★★★★</span>
-        <div style="text-align:left"><b>5.0 Rated Excellent</b><br><span>310,000+ verified customer reviews</span></div>
+        <div style="text-align:left"><b data-i18n="hero_rating_title">5.0 Rated Excellent</b><br><span data-i18n="hero_rating_sub">310,000+ verified customer reviews</span></div>
       </div>
       <div class="stats">
-        <div class="stat"><b id="st1">0</b><span>Customers</span></div>
-        <div class="stat"><b id="st2">0</b><span>Countries</span></div>
-        <div class="stat"><b>€0</b><span>Monthly fees</span></div>
+        <div class="stat"><b id="st1">0</b><span data-i18n="stat_customers">Customers</span></div>
+        <div class="stat"><b id="st2">0</b><span data-i18n="stat_countries">Countries</span></div>
+        <div class="stat"><b>€0</b><span data-i18n="stat_fees">Monthly fees</span></div>
       </div>
     </div>
     
@@ -496,42 +645,42 @@
       <div class="phone">
         <div class="ph-top"><span>9:41</span><span>⚡ FluxxPay</span></div>
         <div class="ph-bal">
-          <small>Total balance</small>
+          <small data-i18n="ph_total_bal">Total balance</small>
           <b>€24,806.12</b>
           <div class="chip"></div>
         </div>
-        <div class="ph-row"><span>Nordwind Salary</span><span class="up">+€3,850</span></div>
-        <div class="ph-row"><span>Blue Bottle Coffee</span><span class="dn">−€4.80</span></div>
-        <div class="ph-row"><span>Metro Transit</span><span class="dn">−€2.40</span></div>
+        <div class="ph-row"><span data-i18n="ph_tx1">Nordwind Salary</span><span class="up">+€3,850</span></div>
+        <div class="ph-row"><span data-i18n="ph_tx2">Blue Bottle Coffee</span><span class="dn">−€4.80</span></div>
+        <div class="ph-row"><span data-i18n="ph_tx3">Metro Transit</span><span class="dn">−€2.40</span></div>
         <div class="ph-actions">
-          <div>⇄ Send</div><div>＋ Top up</div><div>◔ Stats</div>
+          <div data-i18n="ph_act_send">⇄ Send</div><div data-i18n="ph_act_topup">＋ Top up</div><div data-i18n="ph_act_stats">◔ Stats</div>
         </div>
       </div>
     </div>
   </header>
 
   <section id="features">
-    <div class="sec-head"><h2>Everything money should do</h2><p>Built for people who move fast. Fluxxbank combines everyday banking, savings, and investing in one seamless experience.</p></div>
+    <div class="sec-head"><h2 data-i18n="feat_head_title">Everything money should do</h2><p data-i18n="feat_head_sub">Built for people who move fast. Fluxxbank combines everyday banking, savings, and investing in one seamless experience.</p></div>
     <div class="grid3">
-      <div class="card"><div class="icon">⚡</div><h3>Instant FluxxPay</h3><p>Send and receive money in under a second, 24/7 — even across borders, with zero hidden FX markup.</p></div>
-      <div class="card"><div class="icon">🛡️</div><h3>Bank-grade security</h3><p>Biometric login, disposable virtual cards, and real-time fraud detection on every single transaction.</p></div>
-      <div class="card"><div class="icon">📈</div><h3>Smart savings</h3><p>Auto-roundups, vaults with up to 4.1% interest, and AI-powered budgets that adapt to your lifestyle.</p></div>
+      <div class="card"><div class="icon">⚡</div><h3 data-i18n="feat1_title">Instant FluxxPay</h3><p data-i18n="feat1_desc">Send and receive money in under a second, 24/7 — even across borders, with zero hidden FX markup.</p></div>
+      <div class="card"><div class="icon">🛡️</div><h3 data-i18n="feat2_title">Bank-grade security</h3><p data-i18n="feat2_desc">Biometric login, disposable virtual cards, and real-time fraud detection on every single transaction.</p></div>
+      <div class="card"><div class="icon">📈</div><h3 data-i18n="feat3_title">Smart savings</h3><p data-i18n="feat3_desc">Auto-roundups, vaults with up to 4.1% interest, and AI-powered budgets that adapt to your lifestyle.</p></div>
     </div>
   </section>
 
   <section style="padding-top:0"><div class="ticker" id="ticker"></div></section>
-  <div class="trust"><p>Powered by trusted networks worldwide</p><div class="trust-row"><span>VISA</span><span>Mastercard</span><span>Apple Pay</span><span>Google Pay</span><span>SEPA</span><span>SWIFT</span></div></div>
+  <div class="trust"><p data-i18n="trust_title">Powered by trusted networks worldwide</p><div class="trust-row"><span>VISA</span><span>Mastercard</span><span>Apple Pay</span><span>Google Pay</span><span>SEPA</span><span>SWIFT</span></div></div>
 
   <section id="accounts">
-    <div class="sec-head"><h2>Pick your Fluxx</h2><p>Transparent pricing. No maintenance fees, no minimum balance, no asterisks.</p></div>
+    <div class="sec-head"><h2 data-i18n="acc_head_title">Pick your Fluxx</h2><p data-i18n="acc_head_sub">Transparent pricing. No maintenance fees, no minimum balance, no asterisks.</p></div>
     <div class="acc-grid">
-      <div class="acc"><h3>Fluxx Basic</h3><p style="color:var(--mut);font-size:.9rem">Everyday banking, done right.</p><div class="price">€0<small>/month</small></div><ul><li>Free EUR account & IBAN</li><li>1 virtual card</li><li>FluxxPay transfers</li><li>Standard support</li></ul><a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Basic</a></div>
-      <div class="acc pop"><span class="tag">MOST POPULAR</span><h3>Fluxx Plus</h3><p style="color:var(--mut);font-size:.9rem">For people whose money moves.</p><div class="price">€4.99<small>/month</small></div><ul><li>Everything in Basic</li><li>Metal card + 3 virtuals</li><li>1.5% cashback worldwide</li><li>4.1% savings vaults</li><li>Priority 24/7 support</li></ul><a class="btn gold" href="#open" style="width:100%;justify-content:center">Choose Plus</a></div>
-      <div class="acc"><h3>Fluxx Metal</h3><p style="color:var(--mut);font-size:.9rem">Premium banking without the premium attitude.</p><div class="price">€12.99<small>/month</small></div><ul><li>Everything in Plus</li><li>Obsidian metal card</li><li>3% cashback + lounge access</li><li>Free global transfers</li><li>Dedicated banker</li></ul><a class="btn ghost" href="#open" style="width:100%;justify-content:center">Choose Metal</a></div>
+      <div class="acc"><h3 data-i18n="acc1_title">Fluxx Basic</h3><p style="color:var(--mut);font-size:.9rem" data-i18n="acc1_sub">Everyday banking, done right.</p><div class="price">€0<small data-i18n="per_month">/month</small></div><ul><li data-i18n="acc1_li1">Free EUR account & IBAN</li><li data-i18n="acc1_li2">1 virtual card</li><li data-i18n="acc1_li3">FluxxPay transfers</li><li data-i18n="acc1_li4">Standard support</li></ul><a class="btn ghost" href="#open" style="width:100%;justify-content:center" data-i18n="acc1_btn">Choose Basic</a></div>
+      <div class="acc pop"><span class="tag" data-i18n="acc2_tag">MOST POPULAR</span><h3 data-i18n="acc2_title">Fluxx Plus</h3><p style="color:var(--mut);font-size:.9rem" data-i18n="acc2_sub">For people whose money moves.</p><div class="price">€4.99<small data-i18n="per_month">/month</small></div><ul><li data-i18n="acc2_li1">Everything in Basic</li><li data-i18n="acc2_li2">Metal card + 3 virtuals</li><li data-i18n="acc2_li3">1.5% cashback worldwide</li><li data-i18n="acc2_li4">4.1% savings vaults</li><li data-i18n="acc2_li5">Priority 24/7 support</li></ul><a class="btn gold" href="#open" style="width:100%;justify-content:center" data-i18n="acc2_btn">Choose Plus</a></div>
+      <div class="acc"><h3 data-i18n="acc3_title">Fluxx Metal</h3><p style="color:var(--mut);font-size:.9rem" data-i18n="acc3_sub">Premium banking without the premium attitude.</p><div class="price">€12.99<small data-i18n="per_month">/month</small></div><ul><li data-i18n="acc3_li1">Everything in Plus</li><li data-i18n="acc3_li2">Obsidian metal card</li><li data-i18n="acc3_li3">3% cashback + lounge access</li><li data-i18n="acc3_li4">Free global transfers</li><li data-i18n="acc3_li5">Dedicated banker</li></ul><a class="btn ghost" href="#open" style="width:100%;justify-content:center" data-i18n="acc3_btn">Choose Metal</a></div>
     </div>
   </section>
 
-  <div class="band"><div class="band-grid"><div><b>€8.2B+</b><span>Deposits protected</span></div><div><b>99.99%</b><span>Uptime</span></div><div><b>1,200/s</b><span>Transactions per sec</span></div><div><b>5.0 ★</b><span>310k reviews</span></div></div></div>
+  <div class="band"><div class="band-grid"><div><b>€8.2B+</b><span data-i18n="band1">Deposits protected</span></div><div><b>99.99%</b><span data-i18n="band2">Uptime</span></div><div><b>1,200/s</b><span data-i18n="band3">Transactions per sec</span></div><div><b>5.0 ★</b><span data-i18n="band4">310k reviews</span></div></div></div>
 
   <section class="reviews" id="reviews">
     <div class="rev-bg" id="revBg">
@@ -555,19 +704,19 @@
   </section>
 
   <section id="open">
-    <div class="sec-head"><h2>Open your account in minutes</h2><p>No paperwork, no branch visits, no waiting. Your card exists before your coffee gets cold.</p></div>
+    <div class="sec-head"><h2 data-i18n="open_head_title">Open your account in minutes</h2><p data-i18n="open_head_sub">No paperwork, no branch visits, no waiting. Your card exists before your coffee gets cold.</p></div>
     <div class="steps">
-      <div class="step"><h3>Verify in seconds</h3><p>Snap a photo of your ID and take a quick selfie. Our AI verifies you in under two minutes.</p></div>
-      <div class="step"><h3>Fund your account</h3><p>Top up instantly from any bank, card, or Apple/Google Pay. Your IBAN is ready immediately.</p></div>
-      <div class="step"><h3>Start Fluxxing</h3><p>Create virtual cards, set up vaults, and send your first FluxxPay transfer — all before lunch.</p></div>
+      <div class="step"><h3 data-i18n="step1_title">Verify in seconds</h3><p data-i18n="step1_desc">Snap a photo of your ID and take a quick selfie. Our AI verifies you in under two minutes.</p></div>
+      <div class="step"><h3 data-i18n="step2_title">Fund your account</h3><p data-i18n="step2_desc">Top up instantly from any bank, card, or Apple/Google Pay. Your IBAN is ready immediately.</p></div>
+      <div class="step"><h3 data-i18n="step3_title">Start Fluxxing</h3><p data-i18n="step3_desc">Create virtual cards, set up vaults, and send your first FluxxPay transfer — all before lunch.</p></div>
     </div>
-    <div style="text-align:center;margin-top:50px"><button class="btn gold" style="padding:16px 36px;font-size:1.05rem" onclick="openModal()">Open my Fluxxbank account →</button></div>
+    <div style="text-align:center;margin-top:50px"><button class="btn gold" style="padding:16px 36px;font-size:1.05rem" onclick="openModal()" data-i18n="open_cta_btn">Open my Fluxxbank account →</button></div>
   </section>
 
   <section id="showcase">
-    <div class="sec-head"><h2>Fluxxbank, in pictures</h2><p>Our cards, our buildings, our world — a look at the bank in motion. Auto-plays, or tap a thumbnail to explore.</p></div>
+    <div class="sec-head"><h2 data-i18n="gal_head_title">Fluxxbank, in pictures</h2><p data-i18n="gal_head_sub">Our cards, our buildings, our world — a look at the bank in motion. Auto-plays, or tap a thumbnail to explore.</p></div>
     <div class="gallery-stage" id="galStage">
-      <div class="gal-count" id="galCount">1 / 10</div>
+      <div class="gal-count" id="galCount">1 / 5</div>
       <div class="gal-cap" id="galCap"></div>
       <button class="gal-nav gal-prev" onclick="goGal(galCur-1)">‹</button>
       <button class="gal-nav gal-next" onclick="goGal(galCur+1)">›</button>
@@ -576,22 +725,22 @@
   </section>
 
   <section id="faq">
-    <div class="sec-head"><h2>Questions? Answers.</h2><p>Everything people usually ask before making the switch to Fluxxbank.</p></div>
+    <div class="sec-head"><h2 data-i18n="faq_head_title">Questions? Answers.</h2><p data-i18n="faq_head_sub">Everything people usually ask before making the switch to Fluxxbank.</p></div>
     <div class="faq">
-      <div class="qa"><button onclick="toggleQa(this)">Is Fluxxbank a real bank?<span class="chev">▾</span></button><div class="ans"><div>Yes — Fluxxbank is a fully licensed European bank. Your deposits are protected up to €100,000 per person.</div></div></div>
-      <div class="qa"><button onclick="toggleQa(this)">How long does it take to open an account?<span class="chev">▾</span></button><div class="ans"><div>Most customers finish in under 5 minutes. Verify with your ID and a quick selfie, fund your account, and you're ready to go.</div></div></div>
-      <div class="qa"><button onclick="toggleQa(this)">Are there really no fees?<span class="chev">▾</span></button><div class="ans"><div>Fluxx Basic is free forever — no maintenance fees, no minimum balance. Plus and Metal are optional upgrades.</div></div></div>
+      <div class="qa"><button onclick="toggleQa(this)"><span data-i18n="faq1_q">Is Fluxxbank a real bank?</span><span class="chev">▾</span></button><div class="ans"><div data-i18n="faq1_a">Yes — Fluxxbank is a fully licensed European bank. Your deposits are protected up to €100,000 per person.</div></div></div>
+      <div class="qa"><button onclick="toggleQa(this)"><span data-i18n="faq2_q">How long does it take to open an account?</span><span class="chev">▾</span></button><div class="ans"><div data-i18n="faq2_a">Most customers finish in under 5 minutes. Verify with your ID and a quick selfie, fund your account, and you're ready to go.</div></div></div>
+      <div class="qa"><button onclick="toggleQa(this)"><span data-i18n="faq3_q">Are there really no fees?</span><span class="chev">▾</span></button><div class="ans"><div data-i18n="faq3_a">Fluxx Basic is free forever — no maintenance fees, no minimum balance. Plus and Metal are optional upgrades.</div></div></div>
     </div>
   </section>
 
   <footer>
     <div class="foot-grid">
-      <div><a class="logo" href="#top" style="margin-bottom:14px"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a><p style="max-width:280px;line-height:1.6">Banking in motion. Licensed European bank.</p></div>
-      <div><h4>Bank</h4><a href="#">Accounts</a><a href="#">Cards</a><a href="#">Savings</a></div>
-      <div><h4>Company</h4><a href="#">About</a><a href="#">Careers</a><a href="#">Press</a></div>
-      <div><h4>Support</h4><a href="#">Help center</a><a href="#">Contact</a><a href="#">Security</a></div>
+      <div><a class="logo" href="#top" style="margin-bottom:14px"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a><p style="max-width:280px;line-height:1.6" data-i18n="foot_tagline">Banking in motion. Licensed European bank.</p></div>
+      <div><h4 data-i18n="foot_col1">Bank</h4><a href="#" data-i18n="foot_accounts">Accounts</a><a href="#" data-i18n="foot_cards">Cards</a><a href="#" data-i18n="foot_savings">Savings</a></div>
+      <div><h4 data-i18n="foot_col2">Company</h4><a href="#" data-i18n="foot_about">About</a><a href="#" data-i18n="foot_careers">Careers</a><a href="#" data-i18n="foot_press">Press</a></div>
+      <div><h4 data-i18n="foot_col3">Support</h4><a href="#" data-i18n="foot_help">Help center</a><a href="#" data-i18n="foot_contact">Contact</a><a href="#" data-i18n="foot_security">Security</a></div>
     </div>
-    <div class="foot-bottom"><span>© 2026 Fluxxbank AG. All rights reserved.</span><span>Privacy · Terms · Imprint</span></div>
+    <div class="foot-bottom"><span data-i18n="foot_copy">© 2026 Fluxxbank AG. All rights reserved.</span><span data-i18n="foot_links">Privacy · Terms · Imprint</span></div>
   </footer>
 </div>
 
@@ -606,22 +755,34 @@
 
   <div class="mobile-nav">
     <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a>
-    <div class="user-avatar" id="mobileAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="lang-toggle">
+        <button type="button" class="lang-btn lang-btn-en active" onclick="triggerLanguageSwitch('en')">🇬🇧 EN</button>
+        <button type="button" class="lang-btn lang-btn-ja" onclick="triggerLanguageSwitch('ja')">🇯🇵 日本語</button>
+      </div>
+      <div class="user-avatar" id="mobileAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
+    </div>
   </div>
 
   <aside class="sidebar">
     <a class="logo" href="#"><span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank</a>
+    <div style="padding: 0 10px 22px;">
+      <div class="lang-toggle" style="width:100%;justify-content:center;">
+        <button type="button" class="lang-btn lang-btn-en active" style="flex:1;justify-content:center;" onclick="triggerLanguageSwitch('en')">🇬🇧 EN</button>
+        <button type="button" class="lang-btn lang-btn-ja" style="flex:1;justify-content:center;" onclick="triggerLanguageSwitch('ja')">🇯🇵 日本語</button>
+      </div>
+    </div>
     <ul class="side-menu">
-      <li><a href="#" id="sideNavHome" class="active" onclick="switchDashboardTab('home', event)"><span>🏠</span> Dashboard</a></li>
-      <li><a href="#" id="sideNavTransfers" onclick="switchDashboardTab('transfers', event)"><span>💸</span> Transfers</a></li>
-      <li><a href="#" id="sideNavAnalytics" onclick="switchDashboardTab('analytics', event)"><span>📊</span> Analytics</a></li>
-      <li><a href="#" id="sideNavSettings" onclick="switchDashboardTab('settings', event)"><span>⚙️</span> Settings</a></li>
+      <li><a href="#" id="sideNavHome" class="active" onclick="switchDashboardTab('home', event)"><span>🏠</span> <span data-i18n="side_dash">Dashboard</span></a></li>
+      <li><a href="#" id="sideNavTransfers" onclick="switchDashboardTab('transfers', event)"><span>💸</span> <span data-i18n="side_transfers">Transfers</span></a></li>
+      <li><a href="#" id="sideNavAnalytics" onclick="switchDashboardTab('analytics', event)"><span>📊</span> <span data-i18n="side_analytics">Analytics</span></a></li>
+      <li><a href="#" id="sideNavSettings" onclick="switchDashboardTab('settings', event)"><span>⚙️</span> <span data-i18n="side_settings">Settings</span></a></li>
     </ul>
     <div class="user-profile">
       <div class="user-avatar" id="desktopAvatar" onclick="document.getElementById('avatarUpload').click()">U</div>
       <div class="user-info">
         <h4 id="userNameDisplay">Loading...</h4>
-        <p>Customer</p>
+        <p data-i18n="role_customer">Customer</p>
       </div>
       <button class="logout-btn" onclick="doLogout()" title="Log out">⏻</button>
     </div>
@@ -632,14 +793,18 @@
       <header class="top-header">
         <div>
           <h1 id="welcomeMessage">Good day 👋</h1>
-          <p>Here is what's happening with your money today.</p>
+          <p data-i18n="dash_sub">Here is what's happening with your money today.</p>
+        </div>
+        <div class="lang-toggle">
+          <button type="button" class="lang-btn lang-btn-en active" onclick="triggerLanguageSwitch('en')">🇬🇧 English</button>
+          <button type="button" class="lang-btn lang-btn-ja" onclick="triggerLanguageSwitch('ja')">🇯🇵 日本語</button>
         </div>
       </header>
 
       <div class="dashboard-grid">
         <div style="display: flex; flex-direction: column; gap: 24px;">
           <div class="dash-card balance-card">
-            <span class="balance-label">Total Available Balance</span>
+            <span class="balance-label" data-i18n="dash_avail_bal">Total Available Balance</span>
             <div class="balance-row">
               <div class="balance-amount" id="dashBal">€0.00</div>
               <button type="button" class="balance-toggle-btn" id="toggleBalanceBtn" onclick="toggleBalanceVisibility()" title="Toggle balance visibility">
@@ -649,37 +814,37 @@
               </button>
             </div>
             <div class="quick-actions">
-              <button class="action-btn" onclick="switchDashboardTab('transfers', event)"><span class="icon">⇄</span> Send</button>
-              <button class="action-btn" onclick="alert('Top up feature coming soon!')"><span class="icon">＋</span> Top Up</button>
-              <button class="action-btn" onclick="switchDashboardTab('analytics', event)"><span class="icon">◔</span> Stats</button>
+              <button class="action-btn" onclick="switchDashboardTab('transfers', event)"><span class="icon">⇄</span> <span data-i18n="qa_send">Send</span></button>
+              <button class="action-btn" onclick="alert(t('coming_soon_topup'))"><span class="icon">＋</span> <span data-i18n="qa_topup">Top Up</span></button>
+              <button class="action-btn" onclick="switchDashboardTab('analytics', event)"><span class="icon">◔</span> <span data-i18n="qa_stats">Stats</span></button>
             </div>
           </div>
 
           <div class="dash-card">
-            <h3 style="margin-bottom: 5px;">Recent Activity</h3>
-            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Your latest completed transactions (Click to view receipt)</p>
+            <h3 style="margin-bottom: 5px;" data-i18n="dash_recent_title">Recent Activity</h3>
+            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;" data-i18n="dash_recent_sub">Your latest completed transactions (Click to view receipt)</p>
             <div class="tx-list" id="txlist">
-              <p style="color: var(--mut); text-align: center; padding: 20px;">Loading transactions...</p>
+              <p style="color: var(--mut); text-align: center; padding: 20px;" data-i18n="loading_tx">Loading transactions...</p>
             </div>
           </div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 24px;">
           <div class="dash-card" id="send-money-section">
-            <h3 style="margin-bottom: 5px;">Send Money</h3>
-            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer</p>
+            <h3 style="margin-bottom: 5px;" data-i18n="dash_send_title">Send Money</h3>
+            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;" data-i18n="dash_send_sub">Instant FluxxPay transfer</p>
             
             <div style="text-align: center; padding: 20px 0;">
-              <p style="color: var(--mut); font-size: 0.95rem; margin-bottom: 20px;">Access full transfer details, custom recipient info, and complete transaction histories.</p>
-              <button class="send-btn" onclick="switchDashboardTab('transfers', event)" style="width: 100%;">⇄ Go to Transfers Page</button>
+              <p style="color: var(--mut); font-size: 0.95rem; margin-bottom: 20px;" data-i18n="dash_send_desc">Access full transfer details, custom recipient info, and complete transaction histories.</p>
+              <button class="send-btn" onclick="switchDashboardTab('transfers', event)" style="width: 100%;" data-i18n="dash_send_btn">⇄ Go to Transfers Page</button>
             </div>
           </div>
 
           <div class="dash-card" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(22, 31, 61, 0.7)); border-color: rgba(34, 211, 238, 0.2);">
-            <h3 style="margin-bottom: 5px;">Savings Vault</h3>
-            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Earn 4.1% APY</p>
-            <div style="font-size: 2rem; font-weight: 800; color: var(--accent2); margin-bottom: 20px;">€8,120.00</div>
-            <button class="btn ghost" style="width: 100%; justify-content: center;" onclick="alert('Vault management coming soon!')">Manage Vault</button>
+            <h3 style="margin-bottom: 5px;" data-i18n="dash_vault_title">Savings Vault</h3>
+            <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;" data-i18n="dash_vault_sub">Earn 4.1% APY</p>
+            <div id="savingsVaultBal" style="font-size: 2rem; font-weight: 800; color: var(--accent2); margin-bottom: 20px;">€8,120.00</div>
+            <button class="btn ghost" style="width: 100%; justify-content: center;" onclick="alert(t('coming_soon_vault'))" data-i18n="dash_vault_btn">Manage Vault</button>
           </div>
         </div>
       </div>
@@ -688,68 +853,72 @@
     <div id="tabTransfers" class="hidden">
       <header class="top-header">
         <div>
-          <h1>Transfers & History 💸</h1>
-          <p>Send secure funds and view your complete account history.</p>
+          <h1 data-i18n="tr_page_title">Transfers & History 💸</h1>
+          <p data-i18n="tr_page_sub">Send secure funds and view your complete account history.</p>
+        </div>
+        <div class="lang-toggle">
+          <button type="button" class="lang-btn lang-btn-en active" onclick="triggerLanguageSwitch('en')">🇬🇧 English</button>
+          <button type="button" class="lang-btn lang-btn-ja" onclick="triggerLanguageSwitch('ja')">🇯🇵 日本語</button>
         </div>
       </header>
 
       <div style="display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 800px; margin: 0 auto;">
         <div class="dash-card">
-          <h3 style="margin-bottom: 5px;">Send Money</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Instant FluxxPay transfer with custom recipient details</p>
+          <h3 style="margin-bottom: 5px;" data-i18n="dash_send_title">Send Money</h3>
+          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;" data-i18n="tr_form_sub">Instant FluxxPay transfer with custom recipient details</p>
           
           <form class="send-form" onsubmit="return doPay(event)">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
               <div class="input-group">
-                <label>Recipient First Name</label>
-                <input id="pFirstName" type="text" placeholder="e.g. John" required>
+                <label data-i18n="tr_fname">Recipient First Name</label>
+                <input id="pFirstName" type="text" placeholder="e.g. John" data-i18n-placeholder="tr_fname_ph" required>
               </div>
               <div class="input-group">
-                <label>Recipient Last Name</label>
-                <input id="pLastName" type="text" placeholder="e.g. Doe" required>
+                <label data-i18n="tr_lname">Recipient Last Name</label>
+                <input id="pLastName" type="text" placeholder="e.g. Doe" data-i18n-placeholder="tr_lname_ph" required>
               </div>
             </div>
 
             <div class="input-group">
-              <label>IBAN / Account Number</label>
-              <input id="pIban" type="text" placeholder="e.g. DE89 3704 0044 0532 0130 00" required>
+              <label data-i18n="tr_iban">IBAN / Account Number</label>
+              <input id="pIban" type="text" placeholder="e.g. DE89 3704 0044 0532 0130 00" data-i18n-placeholder="tr_iban_ph" required>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
               <div class="input-group">
-                <label>BIC / SWIFT Code</label>
-                <input id="pBic" type="text" placeholder="e.g. COBADEFFXXX" required>
+                <label data-i18n="tr_bic">BIC / SWIFT Code</label>
+                <input id="pBic" type="text" placeholder="e.g. COBADEFFXXX" data-i18n-placeholder="tr_bic_ph" required>
               </div>
               <div class="input-group">
-                <label>Bank Name</label>
-                <input id="pBank" type="text" placeholder="e.g. Commerzbank" required>
+                <label data-i18n="tr_bank">Bank Name</label>
+                <input id="pBank" type="text" placeholder="e.g. Commerzbank" data-i18n-placeholder="tr_bank_ph" required>
               </div>
             </div>
 
             <div class="input-group">
-              <label>Amount (€)</label>
+              <label id="transferAmtLabel">Amount (€)</label>
               <input id="pAmt" type="number" min="0.01" step="0.01" placeholder="0.00" required>
             </div>
 
             <div class="input-group">
-              <label>Purpose of Transfer</label>
-              <input id="pPurpose" type="text" placeholder="e.g. Rent, Invoice payment, Gift" required>
+              <label data-i18n="tr_purpose">Purpose of Transfer</label>
+              <input id="pPurpose" type="text" placeholder="e.g. Rent, Invoice payment, Gift" data-i18n-placeholder="tr_purpose_ph" required>
             </div>
 
-            <button class="send-btn" type="submit">⚡ Transfer</button>
+            <button class="send-btn" type="submit" data-i18n="tr_submit_btn">⚡ Transfer</button>
             <div class="error" id="paymsg" style="text-align: center; margin-top: 10px;"></div>
           </form>
         </div>
 
         <div class="dash-card">
-          <h3 style="margin-bottom: 5px;">Complete Transaction History</h3>
-          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">All past inflows and outflows</p>
+          <h3 style="margin-bottom: 5px;" data-i18n="tr_hist_title">Complete Transaction History</h3>
+          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;" data-i18n="tr_hist_sub">All past inflows and outflows</p>
           
           <div class="tx-list" id="fullTxList">
-            <p style="color: var(--mut); text-align: center; padding: 20px;">Loading history...</p>
+            <p style="color: var(--mut); text-align: center; padding: 20px;" data-i18n="loading_hist">Loading history...</p>
           </div>
 
-          <button class="show-more-btn" id="showMoreTxBtn" onclick="loadMoreTransactions()">Show More ↓</button>
+          <button class="show-more-btn" id="showMoreTxBtn" onclick="loadMoreTransactions()" data-i18n="show_more_btn">Show More ↓</button>
         </div>
       </div>
     </div>
@@ -757,24 +926,28 @@
     <div id="tabAnalytics" class="hidden">
       <header class="top-header">
         <div>
-          <h1>Portfolio Analytics 📊</h1>
-          <p>Logarithmic asset distribution and growth metrics.</p>
+          <h1 data-i18n="an_page_title">Portfolio Analytics 📊</h1>
+          <p data-i18n="an_page_sub">Logarithmic asset distribution and growth metrics.</p>
+        </div>
+        <div class="lang-toggle">
+          <button type="button" class="lang-btn lang-btn-en active" onclick="triggerLanguageSwitch('en')">🇬🇧 English</button>
+          <button type="button" class="lang-btn lang-btn-ja" onclick="triggerLanguageSwitch('ja')">🇯🇵 日本語</button>
         </div>
       </header>
 
       <div style="display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 800px; margin: 0 auto;">
         <div class="dash-card" style="text-align: center; padding: 40px;">
-          <h3 style="margin-bottom: 10px; font-size: 1.5rem;">Logarithmic Asset Allocation</h3>
-          <p style="color: var(--mut); font-size: 0.95rem; margin-bottom: 30px;">Visualized using logarithmic base scaling for balanced risk representation.</p>
+          <h3 style="margin-bottom: 10px; font-size: 1.5rem;" data-i18n="an_card_title">Logarithmic Asset Allocation</h3>
+          <p style="color: var(--mut); font-size: 0.95rem; margin-bottom: 30px;" data-i18n="an_card_sub">Visualized using logarithmic base scaling for balanced risk representation.</p>
           
           <div style="position: relative; max-width: 420px; margin: 0 auto;">
             <canvas id="logarithmicPieChart"></canvas>
           </div>
 
           <div style="display: flex; justify-content: center; gap: 30px; margin-top: 30px; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #4f7cff; display: inline-block;"></span><span style="font-size: 0.9rem; color: var(--mut);">Liquid Balance (45%)</span></div>
-            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #22d3ee; display: inline-block;"></span><span style="font-size: 0.9rem; color: var(--mut);">Savings Vault (35%)</span></div>
-            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #a855f7; display: inline-block;"></span><span style="font-size: 0.9rem; color: var(--mut);">Crypto & Assets (20%)</span></div>
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #4f7cff; display: inline-block;"></span><span style="font-size: 0.9rem; color: var(--mut);" data-i18n="an_leg1">Liquid Balance (45%)</span></div>
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #22d3ee; display: inline-block;"></span><span style="font-size: 0.9rem; color: var(--mut);" data-i18n="an_leg2">Savings Vault (35%)</span></div>
+            <div style="display: flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #a855f7; display: inline-block;"></span><span style="font-size: 0.9rem; color: var(--mut);" data-i18n="an_leg3">Crypto & Assets (20%)</span></div>
           </div>
         </div>
       </div>
@@ -783,8 +956,12 @@
     <div id="tabSettings" class="hidden">
       <header class="top-header">
         <div>
-          <h1>Account Settings ⚙️</h1>
-          <p>Manage your profile, security and preferences.</p>
+          <h1 data-i18n="set_page_title">Account Settings ⚙️</h1>
+          <p data-i18n="set_page_sub">Manage your profile, security and preferences.</p>
+        </div>
+        <div class="lang-toggle">
+          <button type="button" class="lang-btn lang-btn-en active" onclick="triggerLanguageSwitch('en')">🇬🇧 English</button>
+          <button type="button" class="lang-btn lang-btn-ja" onclick="triggerLanguageSwitch('ja')">🇯🇵 日本語</button>
         </div>
       </header>
 
@@ -794,8 +971,8 @@
             <span id="settingsAvatarInitial">U</span>
           </div>
           <h3 style="margin-bottom: 18px;" id="settingsProfileName">Customer</h3>
-          <button class="btn" style="width: auto; padding: 12px 28px;" onclick="document.getElementById('avatarUpload').click()">Upload new photo</button>
-          <p style="color: var(--mut); font-size: 0.8rem; margin-top: 10px;">Click the photo or button to upload. You can zoom, fit or fill before saving.</p>
+          <button class="btn" style="width: auto; padding: 12px 28px;" onclick="document.getElementById('avatarUpload').click()" data-i18n="set_upload_btn">Upload new photo</button>
+          <p style="color: var(--mut); font-size: 0.8rem; margin-top: 10px;" data-i18n="set_upload_sub">Click the photo or button to upload. You can zoom, fit or fill before saving.</p>
         </div>
 
         <div class="dash-card" style="padding: 0; overflow: hidden;">
@@ -804,43 +981,43 @@
               <div style="display:flex; align-items:center; gap:14px;">
                 <div style="width:42px; height:42px; border-radius:12px; background:rgba(79,124,255,0.15); display:grid; place-items:center; font-size:1.2rem;">👤</div>
                 <div style="text-align:left;">
-                  <strong>Personal details</strong>
-                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;">Name, age, location, and currency</div>
+                  <strong data-i18n="set_personal_title">Personal details</strong>
+                  <div style="color:var(--mut); font-size:0.82rem; font-weight:400;" data-i18n="set_personal_sub">Name, age, location, and currency</div>
                 </div>
               </div>
               <span class="chev">▾</span>
             </button>
             <div class="settings-body">
               <div class="settings-row">
-                <span>Full Name</span>
+                <span data-i18n="set_fullname">Full Name</span>
                 <div style="display:flex; align-items:center; gap:10px;">
                   <strong class="masked" data-field="name">••••••••</strong>
                   <button class="eye-btn" onclick="revealField(this, 'name')" title="Reveal">👁</button>
                 </div>
               </div>
               <div class="settings-row">
-                <span>Age</span>
+                <span data-i18n="set_age">Age</span>
                 <div style="display:flex; align-items:center; gap:10px;">
                   <strong class="masked" data-field="age">••••••••</strong>
                   <button class="eye-btn" onclick="revealField(this, 'age')" title="Reveal">👁</button>
                 </div>
               </div>
               <div class="settings-row">
-                <span>Country & State</span>
+                <span data-i18n="set_location">Country & State</span>
                 <div style="display:flex; align-items:center; gap:10px;">
                   <strong class="masked" data-field="location">••••••••</strong>
                   <button class="eye-btn" onclick="revealField(this, 'location')" title="Reveal">👁</button>
                 </div>
               </div>
               <div class="settings-row">
-                <span>Account Currency</span>
+                <span data-i18n="set_currency">Account Currency</span>
                 <div style="display:flex; align-items:center; gap:10px;">
                   <strong class="masked" data-field="currency">••••••••</strong>
                   <button class="eye-btn" onclick="revealField(this, 'currency')" title="Reveal">👁</button>
                 </div>
               </div>
               <div class="settings-row">
-                <span>Email</span>
+                <span data-i18n="set_email">Email</span>
                 <div style="display:flex; align-items:center; gap:10px;">
                   <strong class="masked" data-field="email">••••••••</strong>
                   <button class="eye-btn" onclick="revealField(this, 'email')" title="Reveal">👁</button>
@@ -854,68 +1031,74 @@
   </main>
 
   <div class="mobile-bottom-bar">
-    <a href="#" id="mobNavHome" class="active" onclick="switchDashboardTab('home', event)"><span>🏠</span> Home</a>
-    <a href="#" id="mobNavTransfers" onclick="switchDashboardTab('transfers', event)"><span>💸</span> Send</a>
-    <a href="#" id="mobNavAnalytics" onclick="switchDashboardTab('analytics', event)"><span>📊</span> Stats</a>
-    <a href="#" id="mobNavSettings" onclick="switchDashboardTab('settings', event)"><span>⚙️</span> Settings</a>
+    <a href="#" id="mobNavHome" class="active" onclick="switchDashboardTab('home', event)"><span>🏠</span> <small data-i18n="mob_home">Home</small></a>
+    <a href="#" id="mobNavTransfers" onclick="switchDashboardTab('transfers', event)"><span>💸</span> <small data-i18n="mob_send">Send</small></a>
+    <a href="#" id="mobNavAnalytics" onclick="switchDashboardTab('analytics', event)"><span>📊</span> <small data-i18n="mob_stats">Stats</small></a>
+    <a href="#" id="mobNavSettings" onclick="switchDashboardTab('settings', event)"><span>⚙️</span> <small data-i18n="mob_settings">Settings</small></a>
   </div>
 </div>
 
 <div class="modal-bg" id="cropModal" onclick="if(event.target===this)closeCropModal()">
   <div class="modal" style="width: min(420px, 94vw); text-align:center;">
-    <h3 style="margin-bottom:8px;">Adjust Profile Photo</h3>
-    <p style="color:var(--mut); font-size:0.88rem; margin-bottom:16px;">Zoom, fit or fill, then save.</p>
+    <h3 style="margin-bottom:8px;" data-i18n="crop_title">Adjust Profile Photo</h3>
+    <p style="color:var(--mut); font-size:0.88rem; margin-bottom:16px;" data-i18n="crop_sub">Zoom, fit or fill, then save.</p>
     <canvas id="cropCanvas" style="width:280px; height:280px; border-radius:50%; border:3px solid var(--accent); background:#0a0e1c; margin:0 auto 16px; display:block;"></canvas>
     <div style="margin-bottom:14px;">
-      <label style="color:var(--mut); font-size:0.82rem;">Zoom</label>
+      <label style="color:var(--mut); font-size:0.82rem;" data-i18n="crop_zoom">Zoom</label>
       <input type="range" id="zoomSlider" min="0.5" max="3" step="0.05" value="1" oninput="onZoomChange(this.value)" style="width:100%; margin-top:6px;">
     </div>
     <div style="display:flex; gap:10px; justify-content:center; margin-bottom:16px;">
-      <button class="btn ghost" style="width:auto; padding:10px 18px;" onclick="setCropMode('fit')">Fit</button>
-      <button class="btn ghost" style="width:auto; padding:10px 18px;" onclick="setCropMode('fill')">Fill</button>
+      <button class="btn ghost" style="width:auto; padding:10px 18px;" onclick="setCropMode('fit')" data-i18n="crop_fit">Fit</button>
+      <button class="btn ghost" style="width:auto; padding:10px 18px;" onclick="setCropMode('fill')" data-i18n="crop_fill">Fill</button>
     </div>
     <div style="display:flex; gap:10px;">
-      <button class="btn" onclick="saveCroppedAvatar()">Save Photo</button>
-      <button class="btn ghost" onclick="closeCropModal()">Cancel</button>
+      <button class="btn" onclick="saveCroppedAvatar()" data-i18n="crop_save">Save Photo</button>
+      <button class="btn ghost" onclick="closeCropModal()" data-i18n="btn_cancel">Cancel</button>
     </div>
   </div>
 </div>
 
 <div class="modal-bg" id="settingsPinModal" onclick="if(event.target===this)cancelSettingsPin()">
   <div class="modal">
-    <h3 style="text-align: center;">🔐 Security PIN Required</h3>
-    <p style="text-align: center;">Please input your 4 digit secret pin</p>
+    <h3 style="text-align: center;" data-i18n="pin_title">🔐 Security PIN Required</h3>
+    <p style="text-align: center;" data-i18n="pin_sub">Please input your 4 digit secret pin</p>
     <form onsubmit="event.preventDefault(); verifySettingsPin();">
       <input type="password" id="settingsPinInput" placeholder="----" maxlength="4" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;" required>
       <div class="error" id="settingsPinErr" style="margin-top: -5px;"></div>
-      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent)); justify-content: center;">Unlock</button>
+      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent)); justify-content: center;" data-i18n="pin_unlock">Unlock</button>
     </form>
-    <button class="btn ghost" onclick="cancelSettingsPin()" style="margin-top: 10px; width: 100%; justify-content: center;">Cancel</button>
+    <button class="btn ghost" onclick="cancelSettingsPin()" style="margin-top: 10px; width: 100%; justify-content: center;" data-i18n="btn_cancel">Cancel</button>
   </div>
 </div>
 
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
   <div class="modal">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+      <div class="lang-toggle">
+        <button type="button" class="lang-btn lang-btn-en active" onclick="triggerLanguageSwitch('en')">🇬🇧 EN</button>
+        <button type="button" class="lang-btn lang-btn-ja" onclick="triggerLanguageSwitch('ja')">🇯🇵 日本語</button>
+      </div>
+    </div>
     <h3 id="authTitle">Welcome back ⚡</h3>
     <p id="authSub">Log in to your Fluxxbank account.</p>
     
     <form onsubmit="event.preventDefault(); submitAuth();">
-      <input type="text" placeholder="Full name" id="authName" style="display:none; text-align:left;" autocomplete="off">
-      <input type="number" placeholder="Age" id="authAge" style="display:none; text-align:left;" min="1" max="120">
-      <input type="text" placeholder="Country" id="authCountry" style="display:none; text-align:left;" autocomplete="country-name">
-      <input type="text" placeholder="State / Province" id="authState" style="display:none; text-align:left;" autocomplete="address-level1">
+      <input type="text" placeholder="Full name" id="authName" data-i18n-placeholder="auth_name_ph" style="display:none; text-align:left;" autocomplete="off">
+      <input type="number" placeholder="Age" id="authAge" data-i18n-placeholder="auth_age_ph" style="display:none; text-align:left;" min="1" max="120">
+      <input type="text" placeholder="Country" id="authCountry" data-i18n-placeholder="auth_country_ph" style="display:none; text-align:left;" autocomplete="country-name">
+      <input type="text" placeholder="State / Province" id="authState" data-i18n-placeholder="auth_state_ph" style="display:none; text-align:left;" autocomplete="address-level1">
       
       <select id="authCurrency" style="display:none; text-align:left; background:#0d1330; border:1px solid var(--line); border-radius:10px; padding:12px 14px; color:var(--txt); margin-bottom:12px; outline:none; width:100%;">
-        <option value="" disabled selected>Select Currency (Over 200 available)</option>
+        <option value="" disabled selected id="authCurrencyDefault">Select Currency (Over 200 available)</option>
       </select>
 
-      <input type="email" placeholder="Email address" id="loginEmail" style="text-align:left;" autocomplete="email">
-      <input type="password" placeholder="Password" id="loginPass" style="text-align:left;" autocomplete="current-password">
+      <input type="email" placeholder="Email address" id="loginEmail" data-i18n-placeholder="auth_email_ph" style="text-align:left;" autocomplete="email">
+      <input type="password" placeholder="Password" id="loginPass" data-i18n-placeholder="auth_pass_ph" style="text-align:left;" autocomplete="current-password">
       
       <div class="error" id="authErr"></div>
       
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
-         <a href="#" id="forgotPasswordLink" onclick="showForgotPassword(event)" style="color:var(--accent2); font-size:0.82rem; text-decoration:none;">Forgot password?</a>
+         <a href="#" id="forgotPasswordLink" onclick="showForgotPassword(event)" style="color:var(--accent2); font-size:0.82rem; text-decoration:none;" data-i18n="auth_forgot">Forgot password?</a>
       </div>
 
       <button class="btn" id="authBtn" type="submit">Log in</button>
@@ -929,36 +1112,36 @@
 
 <div class="modal-bg" id="forgotPasswordModal" onclick="if(event.target===this)closeForgotPassword()">
   <div class="modal">
-    <h3 style="text-align: center;">Reset Password 🔑</h3>
-    <p style="text-align: center;">Enter your email address and we'll send you a secure link to reset your password.</p>
+    <h3 style="text-align: center;" data-i18n="fp_title">Reset Password 🔑</h3>
+    <p style="text-align: center;" data-i18n="fp_sub">Enter your email address and we'll send you a secure link to reset your password.</p>
     <form onsubmit="event.preventDefault(); sendResetLink();">
-      <input type="email" id="forgotEmail" placeholder="Email address" style="text-align:left;">
+      <input type="email" id="forgotEmail" placeholder="Email address" data-i18n-placeholder="auth_email_ph" style="text-align:left;">
       <div class="error" id="forgotErr" style="text-align:center; margin-bottom:10px;"></div>
-      <button class="btn" id="sendResetBtn" type="submit" style="margin-top: 10px;">Send Reset Link</button>
+      <button class="btn" id="sendResetBtn" type="submit" style="margin-top: 10px;" data-i18n="fp_btn">Send Reset Link</button>
     </form>
-    <button class="btn ghost" onclick="closeForgotPassword()" style="margin-top: 10px; width:100%; justify-content:center;">Back to Login</button>
+    <button class="btn ghost" onclick="closeForgotPassword()" style="margin-top: 10px; width:100%; justify-content:center;" data-i18n="fp_back">Back to Login</button>
   </div>
 </div>
 
 <div class="modal-bg" id="otpModal" onclick="if(event.target===this)closeOtpModal()">
   <div class="modal">
-    <h3 style="text-align: center;">🔒 Transfer Authorization</h3>
-    <p style="text-align: center;">Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">€0.00</strong> to <strong id="transferToDisplay" style="color: var(--txt);">Recipient</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.</p>
+    <h3 style="text-align: center;" data-i18n="otp_title">🔒 Transfer Authorization</h3>
+    <p style="text-align: center;" id="otpModalDesc">Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">€0.00</strong> to <strong id="transferToDisplay" style="color: var(--txt);">Recipient</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.</p>
     <form onsubmit="event.preventDefault(); verifyTransferOTP();">
       <input type="text" id="transferOtpInput" placeholder="------" maxlength="6" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;">
       <input type="hidden" id="currentTxId">
       <div class="error" id="otpErr" style="margin-top: -5px;"></div>
-      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent));">Verify & Complete</button>
+      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent));" data-i18n="otp_verify_btn">Verify & Complete</button>
     </form>
-    <button class="btn ghost" onclick="closeOtpModal()" style="margin-top: 10px; width: 100%; justify-content: center;">Cancel</button>
+    <button class="btn ghost" onclick="closeOtpModal()" style="margin-top: 10px; width: 100%; justify-content: center;" data-i18n="btn_cancel">Cancel</button>
   </div>
 </div>
 
 <div class="modal-bg" id="processingModal">
   <div class="modal" style="background: transparent; border: none; box-shadow: none;">
     <div class="spinner"></div>
-    <h3 style="text-align: center; font-size: 1.5rem;">Processing Transfer...</h3>
-    <p style="text-align: center; margin-top: 10px;">Securing your funds.<br>Please do not close this window.</p>
+    <h3 style="text-align: center; font-size: 1.5rem;" data-i18n="proc_title">Processing Transfer...</h3>
+    <p style="text-align: center; margin-top: 10px;" data-i18n-html="proc_sub">Securing your funds.<br>Please do not close this window.</p>
   </div>
 </div>
 
@@ -967,29 +1150,29 @@
   <div class="receipt-paper" id="receiptPaper">
     <div class="receipt-header-banner">
       <div class="receipt-logo"><span class="bolt">⚡</span> FLUXXBANK</div>
-      <div class="r-sub">Official Transaction Receipt</div>
+      <div class="r-sub" data-i18n="rcp_sub">Official Transaction Receipt</div>
     </div>
     
     <div class="r-total-box">
-      <small>Amount Sent</small>
+      <small data-i18n="rcp_amt_label">Amount Sent</small>
       <b id="rAmt">–</b>
     </div>
 
     <table class="r-table">
-      <tr><td>Status</td><td id="rStatus" style="color:#059669; font-weight:700;">⏳ Processing</td></tr>
-      <tr><td>Reference</td><td id="rRef" style="font-family: monospace; font-size: 0.82rem; color: #334155;">–</td></tr>
-      <tr><td>Date & Time</td><td id="rDateTime">–</td></tr>
-      <tr><td>Sender</td><td id="rFrom">–</td></tr>
-      <tr><td>Recipient Name</td><td id="rRecipientName">–</td></tr>
-      <tr><td>IBAN / Account</td><td id="rIban" style="font-family: monospace; font-size: 0.8rem;">–</td></tr>
-      <tr><td>BIC / SWIFT</td><td id="rBic" style="font-family: monospace; font-size: 0.8rem;">–</td></tr>
-      <tr><td>Bank Name</td><td id="rBank">–</td></tr>
-      <tr><td>Purpose</td><td id="rNote">–</td></tr>
+      <tr><td data-i18n="rcp_status">Status</td><td id="rStatus" style="color:#059669; font-weight:700;">⏳ Processing</td></tr>
+      <tr><td data-i18n="rcp_ref">Reference</td><td id="rRef" style="font-family: monospace; font-size: 0.82rem; color: #334155;">–</td></tr>
+      <tr><td data-i18n="rcp_datetime">Date & Time</td><td id="rDateTime">–</td></tr>
+      <tr><td data-i18n="rcp_sender">Sender</td><td id="rFrom">–</td></tr>
+      <tr><td data-i18n="rcp_recipient">Recipient Name</td><td id="rRecipientName">–</td></tr>
+      <tr><td data-i18n="rcp_iban">IBAN / Account</td><td id="rIban" style="font-family: monospace; font-size: 0.8rem;">–</td></tr>
+      <tr><td data-i18n="rcp_bic">BIC / SWIFT</td><td id="rBic" style="font-family: monospace; font-size: 0.8rem;">–</td></tr>
+      <tr><td data-i18n="rcp_bank">Bank Name</td><td id="rBank">–</td></tr>
+      <tr><td data-i18n="rcp_purpose">Purpose</td><td id="rNote">–</td></tr>
     </table>
 
     <div class="r-actions">
-      <button class="r-print" onclick="window.print()">🖨️ Share / Print PDF</button>
-      <button class="r-close" onclick="closeReceipt()">Done</button>
+      <button class="r-print" onclick="window.print()" data-i18n="rcp_print_btn">🖨️ Share / Print PDF</button>
+      <button class="r-close" onclick="closeReceipt()" data-i18n="rcp_done_btn">Done</button>
     </div>
   </div>
 </div>
@@ -1003,6 +1186,7 @@
   const SUPABASE_KEY = "sb_publishable_WzE8F6fwrln4M3ExyLKKjQ_qzZSlPOe";
   let sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   
+  let currentLang = localStorage.getItem("fluxxLang") || "en";
   let authMode = "login";
   let isFirstLogin = true; 
   let userTransactions = []; 
@@ -1010,11 +1194,688 @@
   let logarithmicChartInstance = null;
   let txDisplayLimit = 5; 
   let currentUserProfile = null;
-  const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
+  let activeReceiptTx = null;
+
+  /* =========================================================
+     COMPLETE ENGLISH & JAPANESE TRANSLATION DICTIONARY (i18n)
+     ========================================================= */
+  const i18nDict = {
+    en: {
+      nav_features: "Features",
+      nav_accounts: "Accounts",
+      nav_reviews: "Reviews",
+      nav_showcase: "Showcase",
+      nav_login: "Log in",
+      nav_get_started: "Get Started",
+      hero_eyebrow: "◆ Digital-first banking",
+      hero_title: "Banking that's<br>always <span class=\"grad\">in motion.</span>",
+      hero_lead: "Fluxxbank is the standard for modern money — instant payments, fee-free accounts, and real-time insights, all from one beautiful app.",
+      hero_cta_open: "Open your account →",
+      hero_cta_demo: "Try the live demo",
+      hero_rating_title: "5.0 Rated Excellent",
+      hero_rating_sub: "310,000+ verified customer reviews",
+      stat_customers: "Customers",
+      stat_countries: "Countries",
+      stat_fees: "Monthly fees",
+      ph_total_bal: "Total balance",
+      ph_tx1: "Nordwind Salary",
+      ph_tx2: "Blue Bottle Coffee",
+      ph_tx3: "Metro Transit",
+      ph_act_send: "⇄ Send",
+      ph_act_topup: "＋ Top up",
+      ph_act_stats: "◔ Stats",
+      feat_head_title: "Everything money should do",
+      feat_head_sub: "Built for people who move fast. Fluxxbank combines everyday banking, savings, and investing in one seamless experience.",
+      feat1_title: "Instant FluxxPay",
+      feat1_desc: "Send and receive money in under a second, 24/7 — even across borders, with zero hidden FX markup.",
+      feat2_title: "Bank-grade security",
+      feat2_desc: "Biometric login, disposable virtual cards, and real-time fraud detection on every single transaction.",
+      feat3_title: "Smart savings",
+      feat3_desc: "Auto-roundups, vaults with up to 4.1% interest, and AI-powered budgets that adapt to your lifestyle.",
+      trust_title: "Powered by trusted networks worldwide",
+      acc_head_title: "Pick your Fluxx",
+      acc_head_sub: "Transparent pricing. No maintenance fees, no minimum balance, no asterisks.",
+      per_month: "/month",
+      acc1_title: "Fluxx Basic",
+      acc1_sub: "Everyday banking, done right.",
+      acc1_li1: "Free EUR account & IBAN",
+      acc1_li2: "1 virtual card",
+      acc1_li3: "FluxxPay transfers",
+      acc1_li4: "Standard support",
+      acc1_btn: "Choose Basic",
+      acc2_tag: "MOST POPULAR",
+      acc2_title: "Fluxx Plus",
+      acc2_sub: "For people whose money moves.",
+      acc2_li1: "Everything in Basic",
+      acc2_li2: "Metal card + 3 virtuals",
+      acc2_li3: "1.5% cashback worldwide",
+      acc2_li4: "4.1% savings vaults",
+      acc2_li5: "Priority 24/7 support",
+      acc2_btn: "Choose Plus",
+      acc3_title: "Fluxx Metal",
+      acc3_sub: "Premium banking without the premium attitude.",
+      acc3_li1: "Everything in Plus",
+      acc3_li2: "Obsidian metal card",
+      acc3_li3: "3% cashback + lounge access",
+      acc3_li4: "Free global transfers",
+      acc3_li5: "Dedicated banker",
+      acc3_btn: "Choose Metal",
+      band1: "Deposits protected",
+      band2: "Uptime",
+      band3: "Transactions per sec",
+      band4: "310k reviews",
+      open_head_title: "Open your account in minutes",
+      open_head_sub: "No paperwork, no branch visits, no waiting. Your card exists before your coffee gets cold.",
+      step1_title: "Verify in seconds",
+      step1_desc: "Snap a photo of your ID and take a quick selfie. Our AI verifies you in under two minutes.",
+      step2_title: "Fund your account",
+      step2_desc: "Top up instantly from any bank, card, or Apple/Google Pay. Your IBAN is ready immediately.",
+      step3_title: "Start Fluxxing",
+      step3_desc: "Create virtual cards, set up vaults, and send your first FluxxPay transfer — all before lunch.",
+      open_cta_btn: "Open my Fluxxbank account →",
+      gal_head_title: "Fluxxbank, in pictures",
+      gal_head_sub: "Our cards, our buildings, our world — a look at the bank in motion. Auto-plays, or tap a thumbnail to explore.",
+      faq_head_title: "Questions? Answers.",
+      faq_head_sub: "Everything people usually ask before making the switch to Fluxxbank.",
+      faq1_q: "Is Fluxxbank a real bank?",
+      faq1_a: "Yes — Fluxxbank is a fully licensed European bank. Your deposits are protected up to €100,000 per person.",
+      faq2_q: "How long does it take to open an account?",
+      faq2_a: "Most customers finish in under 5 minutes. Verify with your ID and a quick selfie, fund your account, and you're ready to go.",
+      faq3_q: "Are there really no fees?",
+      faq3_a: "Fluxx Basic is free forever — no maintenance fees, no minimum balance. Plus and Metal are optional upgrades.",
+      foot_tagline: "Banking in motion. Licensed European bank.",
+      foot_col1: "Bank",
+      foot_accounts: "Accounts",
+      foot_cards: "Cards",
+      foot_savings: "Savings",
+      foot_col2: "Company",
+      foot_about: "About",
+      foot_careers: "Careers",
+      foot_press: "Press",
+      foot_col3: "Support",
+      foot_help: "Help center",
+      foot_contact: "Contact",
+      foot_security: "Security",
+      foot_copy: "© 2026 Fluxxbank AG. All rights reserved.",
+      foot_links: "Privacy · Terms · Imprint",
+      side_dash: "Dashboard",
+      side_transfers: "Transfers",
+      side_analytics: "Analytics",
+      side_settings: "Settings",
+      role_customer: "Customer",
+      dash_sub: "Here is what's happening with your money today.",
+      dash_avail_bal: "Total Available Balance",
+      qa_send: "Send",
+      qa_topup: "Top Up",
+      qa_stats: "Stats",
+      dash_recent_title: "Recent Activity",
+      dash_recent_sub: "Your latest completed transactions (Click to view receipt)",
+      loading_tx: "Loading transactions...",
+      no_recent_tx: "No recent activity.",
+      dash_send_title: "Send Money",
+      dash_send_sub: "Instant FluxxPay transfer",
+      dash_send_desc: "Access full transfer details, custom recipient info, and complete transaction histories.",
+      dash_send_btn: "⇄ Go to Transfers Page",
+      dash_vault_title: "Savings Vault",
+      dash_vault_sub: "Earn 4.1% APY",
+      dash_vault_btn: "Manage Vault",
+      tr_page_title: "Transfers & History 💸",
+      tr_page_sub: "Send secure funds and view your complete account history.",
+      tr_form_sub: "Instant FluxxPay transfer with custom recipient details",
+      tr_fname: "Recipient First Name",
+      tr_fname_ph: "e.g. John",
+      tr_lname: "Recipient Last Name",
+      tr_lname_ph: "e.g. Doe",
+      tr_iban: "IBAN / Account Number",
+      tr_iban_ph: "e.g. DE89 3704 0044 0532 0130 00",
+      tr_bic: "BIC / SWIFT Code",
+      tr_bic_ph: "e.g. COBADEFFXXX",
+      tr_bank: "Bank Name",
+      tr_bank_ph: "e.g. Commerzbank",
+      tr_amt: "Amount",
+      tr_purpose: "Purpose of Transfer",
+      tr_purpose_ph: "e.g. Rent, Invoice payment, Gift",
+      tr_submit_btn: "⚡ Transfer",
+      tr_hist_title: "Complete Transaction History",
+      tr_hist_sub: "All past inflows and outflows",
+      loading_hist: "Loading history...",
+      no_hist_tx: "No transaction history found.",
+      show_more_btn: "Show More ↓",
+      an_page_title: "Portfolio Analytics 📊",
+      an_page_sub: "Logarithmic asset distribution and growth metrics.",
+      an_card_title: "Logarithmic Asset Allocation",
+      an_card_sub: "Visualized using logarithmic base scaling for balanced risk representation.",
+      an_leg1: "Liquid Balance (45%)",
+      an_leg2: "Savings Vault (35%)",
+      an_leg3: "Crypto & Assets (20%)",
+      an_chart_l1: "Liquid Balance",
+      an_chart_l2: "Savings Vault",
+      an_chart_l3: "Crypto & Assets",
+      set_page_title: "Account Settings ⚙️",
+      set_page_sub: "Manage your profile, security and preferences.",
+      set_upload_btn: "Upload new photo",
+      set_upload_sub: "Click the photo or button to upload. You can zoom, fit or fill before saving.",
+      set_personal_title: "Personal details",
+      set_personal_sub: "Name, age, location, and currency",
+      set_fullname: "Full Name",
+      set_age: "Age",
+      set_location: "Country & State",
+      set_currency: "Account Currency",
+      set_email: "Email",
+      mob_home: "Home",
+      mob_send: "Send",
+      mob_stats: "Stats",
+      mob_settings: "Settings",
+      crop_title: "Adjust Profile Photo",
+      crop_sub: "Zoom, fit or fill, then save.",
+      crop_zoom: "Zoom",
+      crop_fit: "Fit",
+      crop_fill: "Fill",
+      crop_save: "Save Photo",
+      btn_cancel: "Cancel",
+      pin_title: "🔐 Security PIN Required",
+      pin_sub: "Please input your 4 digit secret pin",
+      pin_unlock: "Unlock",
+      pin_err: "Incorrect password",
+      auth_login_title: "Welcome back ⚡",
+      auth_login_sub: "Log in to your Fluxxbank account.",
+      auth_signup_title: "Create your account ⚡",
+      auth_signup_sub: "Join 2.4 million people banking in motion.",
+      auth_login_btn: "Log in",
+      auth_signup_btn: "Create account",
+      auth_switch_to_signup: "New here? Create a free account →",
+      auth_switch_to_login: "Already have an account? Log in →",
+      auth_name_ph: "Full name",
+      auth_age_ph: "Age",
+      auth_country_ph: "Country",
+      auth_state_ph: "State / Province",
+      auth_currency_default: "Select Currency (Over 200 available)",
+      auth_email_ph: "Email address",
+      auth_pass_ph: "Password",
+      auth_forgot: "Forgot password?",
+      fp_title: "Reset Password 🔑",
+      fp_sub: "Enter your email address and we'll send you a secure link to reset your password.",
+      fp_btn: "Send Reset Link",
+      fp_sending: "Sending link...",
+      fp_back: "Back to Login",
+      otp_title: "🔒 Transfer Authorization",
+      otp_verify_btn: "Verify & Complete",
+      proc_title: "Processing Transfer...",
+      proc_sub: "Securing your funds.<br>Please do not close this window.",
+      rcp_sub: "Official Transaction Receipt",
+      rcp_amt_label: "Amount Sent",
+      rcp_status: "Status",
+      rcp_ref: "Reference",
+      rcp_datetime: "Date & Time",
+      rcp_sender: "Sender",
+      rcp_recipient: "Recipient Name",
+      rcp_iban: "IBAN / Account",
+      rcp_bic: "BIC / SWIFT",
+      rcp_bank: "Bank Name",
+      rcp_purpose: "Purpose",
+      rcp_print_btn: "🖨️ Share / Print PDF",
+      rcp_done_btn: "Done",
+      st_completed: "✔ Completed",
+      st_processing: "⏳ Processing",
+      st_on_hold: "⚠️ On Hold",
+      st_pending: "⏳ Pending",
+      status_word_completed: "Completed",
+      status_word_processing: "Processing",
+      status_word_on_hold: "On Hold",
+      status_word_pending: "Pending",
+      welcome_user: "Welcome, {name}",
+      good_day_user: "Good day, {name} 👋",
+      years_old: " years",
+      not_set: "Not set",
+      coming_soon_topup: "Top up feature coming soon!",
+      coming_soon_vault: "Vault management coming soon!",
+      trans_transfers_title: "Loading Transfers & History",
+      trans_transfers_sub: "Fetching secure transaction records...",
+      trans_analytics_title: "Loading Analytics Data",
+      trans_analytics_sub: "Preparing logarithmic distribution...",
+      trans_settings_title: "Loading Settings Data",
+      trans_settings_sub: "Fetching your account preferences...",
+      err_valid_email: "Please enter a valid email address.",
+      err_enter_pass: "Please enter your password.",
+      err_pass_len: "Password needs at least 6 characters.",
+      err_enter_name: "Please enter your full name.",
+      err_enter_age: "Please enter a valid age.",
+      err_enter_country: "Please enter your country.",
+      err_enter_state: "Please enter your state.",
+      err_select_cur: "Please select an account currency.",
+      msg_acc_created: "✅ Account created! Wait for admin activation.",
+      msg_logging_in: "Logging in...",
+      msg_creating_acc: "Creating account...",
+      msg_locked: "❌ Your account has been locked. Please contact support.",
+      prompt_2fa: "🔐 Security Check: Please enter the 6-digit 2FA code provided by the Admin.",
+      err_2fa: "❌ Invalid 2FA Code. Please contact admin.",
+      err_awaiting_approval: "⏳ Account awaiting approval — an admin must activate it first.",
+      msg_reset_sent: "✅ Password reset link sent to your email address",
+      msg_proc_transfer: "Processing transfer...",
+      err_insufficient: "Insufficient funds! Balance: ",
+      err_enter_otp: "Please enter the 6-digit code.",
+      err_invalid_otp: "❌ Invalid OTP. Please check your code and try again.",
+      rcp_external_deposit: "External Deposit",
+      rcp_deposit: "Deposit",
+      rcp_unknown: "Unknown",
+      rcp_none: "None"
+    },
+    ja: {
+      nav_features: "機能",
+      nav_accounts: "口座プラン",
+      nav_reviews: "レビュー",
+      nav_showcase: "ギャラリー",
+      nav_login: "ログイン",
+      nav_get_started: "口座開設",
+      hero_eyebrow: "◆ デジタルファースト銀行",
+      hero_title: "常に進化し続ける、<br><span class=\"grad\">次世代バンキング。</span>",
+      hero_lead: "Fluxxbankは現代の金融スタンダードです。即時送金、手数料無料の口座、リアルタイムの資産分析を美しいひとつのアプリで。",
+      hero_cta_open: "口座を開設する →",
+      hero_cta_demo: "ライブデモを試す",
+      hero_rating_title: "5.0 最高評価",
+      hero_rating_sub: "310,000件以上の認証済みカスタマーレビュー",
+      stat_customers: "顧客数",
+      stat_countries: "対応国・地域",
+      stat_fees: "月額維持費",
+      ph_total_bal: "総残高",
+      ph_tx1: "給与振込 (Nordwind)",
+      ph_tx2: "ブルーボトルコーヒー",
+      ph_tx3: "メトロ交通",
+      ph_act_send: "⇄ 送金",
+      ph_act_topup: "＋ チャージ",
+      ph_act_stats: "◔ 統計",
+      feat_head_title: "お金に求められるすべてを",
+      feat_head_sub: "スピードを重視する人々のために構築。日常の決済、貯蓄、投資をシームレスなひとつの体験に統合しました。",
+      feat1_title: "即時送金 FluxxPay",
+      feat1_desc: "24時間365日、1秒未満で国内外へ送金・受取が可能。隠れた為替手数料も一切ありません。",
+      feat2_title: "銀行レベルの高度なセキュリティ",
+      feat2_desc: "生体認証ログイン、使い捨てバーチャルカード、すべての取引におけるリアルタイム不正検知を搭載。",
+      feat3_title: "スマート貯蓄ボールト",
+      feat3_desc: "おつり自動貯金や最大年利4.1%のボールト、AIによる家計管理があなたのライフスタイルをサポートします。",
+      trust_title: "世界中の信頼される決済ネットワークと連携",
+      acc_head_title: "最適なプランを選択",
+      acc_head_sub: "透明性の高い料金体系。口座維持費なし、最低残高条件なし、隠れた規約もありません。",
+      per_month: "/月",
+      acc1_title: "Fluxx ベーシック",
+      acc1_sub: "毎日のバンキングをシンプルに。",
+      acc1_li1: "無料の口座 & 専用IBAN",
+      acc1_li2: "バーチャルカード 1枚",
+      acc1_li3: "FluxxPay 高速送金",
+      acc1_li4: "スタンダードサポート",
+      acc1_btn: "ベーシックを選択",
+      acc2_tag: "人気 No.1",
+      acc2_title: "Fluxx プラス",
+      acc2_sub: "アクティブに資金を動かす方へ。",
+      acc2_li1: "ベーシックの全機能",
+      acc2_li2: "メタルカード + バーチャル3枚",
+      acc2_li3: "世界中の決済で1.5%キャッシュバック",
+      acc2_li4: "年利4.1% 貯蓄ボールト",
+      acc2_li5: "24時間365日 優先サポート",
+      acc2_btn: "プラスを選択",
+      acc3_title: "Fluxx メタル",
+      acc3_sub: "最高峰のプレミアムバンキング体験。",
+      acc3_li1: "プラスの全機能",
+      acc3_li2: "オブシディアン製メタルカード",
+      acc3_li3: "3%還元 + 空港ラウンジ無料利用",
+      acc3_li4: "海外送金手数料が完全無料",
+      acc3_li5: "専任プライベートバンカー",
+      acc3_btn: "メタルを選択",
+      band1: "保護預金総額",
+      band2: "システム稼働率",
+      band3: "秒間処理件数",
+      band4: "31万件の高評価",
+      open_head_title: "わずか数分で口座を開設",
+      open_head_sub: "書類郵送不要、来店不要、待ち時間なし。コーヒーが冷める前にあなたのカードが発行されます。",
+      step1_title: "数秒で本人確認",
+      step1_desc: "身分証の写真とセルフィーを撮影するだけ。AIが2分以内に本人確認を完了します。",
+      step2_title: "口座へ即時入金",
+      step2_desc: "銀行振込、カード、Apple Pay / Google Payから即座にチャージ。専用IBANもすぐにご利用いただけます。",
+      step3_title: "取引をスタート",
+      step3_desc: "バーチャルカードの発行、貯蓄ボールトの設定、FluxxPayでの即時送金をすぐにお使いいただけます。",
+      open_cta_btn: "Fluxxbank口座を開設する →",
+      gal_head_title: "写真で見る Fluxxbank",
+      gal_head_sub: "カード、フラッグシップ拠点、そして私たちの世界。サムネイルをタップしてご覧ください。",
+      faq_head_title: "よくあるご質問",
+      faq_head_sub: "Fluxxbankへの切り替え前によく寄せられるご質問と回答です。",
+      faq1_q: "Fluxxbankは正規の銀行ですか？",
+      faq1_a: "はい、Fluxxbankは正式な認可を受けた銀行です。お客様の預金はお一人様あたり最大€100,000まで保護されています。",
+      faq2_q: "口座開設にはどのくらい時間がかかりますか？",
+      faq2_a: "ほとんどのお客様が5分以内に完了しています。身分証とセルフィーで本人確認を行い、入金すればすぐにご利用可能です。",
+      faq3_q: "本当に手数料は無料ですか？",
+      faq3_a: "Fluxx ベーシックは永年無料です。口座維持費や最低残高条件もありません。プラスとメタルは任意のアップグレードプランです。",
+      foot_tagline: "常に進化する銀行。正式認可欧州デジタルバンク。",
+      foot_col1: "銀行サービス",
+      foot_accounts: "口座プラン",
+      foot_cards: "カード",
+      foot_savings: "貯蓄ボールト",
+      foot_col2: "企業情報",
+      foot_about: "会社概要",
+      foot_careers: "採用情報",
+      foot_press: "プレスリリース",
+      foot_col3: "サポート",
+      foot_help: "ヘルプセンター",
+      foot_contact: "お問い合わせ",
+      foot_security: "セキュリティ",
+      foot_copy: "© 2026 Fluxxbank AG. 無断複写・転載を禁じます。",
+      foot_links: "プライバシー · 利用規約 · 特定商取引法に基づく表記",
+      side_dash: "ダッシュボード",
+      side_transfers: "送金・履歴",
+      side_analytics: "資産分析",
+      side_settings: "設定",
+      role_customer: "カスタマー",
+      dash_sub: "本日のアカウント状況と資産概要です。",
+      dash_avail_bal: "利用可能残高合計",
+      qa_send: "送金",
+      qa_topup: "チャージ",
+      qa_stats: "統計",
+      dash_recent_title: "最近のアクティビティ",
+      dash_recent_sub: "最新の取引履歴（クリックで受領書を表示）",
+      loading_tx: "取引履歴を読み込み中...",
+      no_recent_tx: "最近の取引履歴はありません。",
+      dash_send_title: "送金する",
+      dash_send_sub: "即時 FluxxPay 送金",
+      dash_send_desc: "受取人情報の詳細指定や海外・国内送金、すべての取引履歴へのアクセスはこちら。",
+      dash_send_btn: "⇄ 送金ページへ移動",
+      dash_vault_title: "貯蓄ボールト",
+      dash_vault_sub: "年利 4.1% APY",
+      dash_vault_btn: "ボールトを管理",
+      tr_page_title: "送金・取引履歴 💸",
+      tr_page_sub: "安全な資金送金と、過去の全取引履歴を確認できます。",
+      tr_form_sub: "受取人詳細を指定して FluxxPay で即時送金",
+      tr_fname: "受取人の名 (ファーストネーム)",
+      tr_fname_ph: "例: 太郎",
+      tr_lname: "受取人の姓 (ラストネーム)",
+      tr_lname_ph: "例: 山田",
+      tr_iban: "IBAN / 口座番号",
+      tr_iban_ph: "例: DE89 3704 0044 0532 0130 00",
+      tr_bic: "BIC / SWIFTコード",
+      tr_bic_ph: "例: COBADEFFXXX",
+      tr_bank: "銀行名",
+      tr_bank_ph: "例: 三菱UFJ銀行 / Commerzbank",
+      tr_amt: "送金金額",
+      tr_purpose: "送金目的",
+      tr_purpose_ph: "例: 家賃、請求書支払い、ギフト",
+      tr_submit_btn: "⚡ 送金を実行",
+      tr_hist_title: "すべての取引履歴",
+      tr_hist_sub: "過去の入出金明細一覧",
+      loading_hist: "履歴を読み込み中...",
+      no_hist_tx: "取引履歴が見つかりません。",
+      show_more_btn: "さらに表示 ↓",
+      an_page_title: "ポートフォリオ分析 📊",
+      an_page_sub: "対数スケールによる資産配分と成長指標",
+      an_card_title: "対数スケール資産配分",
+      an_card_sub: "バランスの取れたリスク表示のため対数ベーススケーリングで視覚化しています。",
+      an_leg1: "流動残高 (45%)",
+      an_leg2: "貯蓄ボールト (35%)",
+      an_leg3: "暗号資産・その他 (20%)",
+      an_chart_l1: "流動残高",
+      an_chart_l2: "貯蓄ボールト",
+      an_chart_l3: "暗号資産・その他",
+      set_page_title: "アカウント設定 ⚙️",
+      set_page_sub: "プロフィール、セキュリティ、環境設定の管理",
+      set_upload_btn: "新しい写真をアップロード",
+      set_upload_sub: "写真またはボタンをクリックしてアップロード。保存前にズームや調整が可能です。",
+      set_personal_title: "個人情報詳細",
+      set_personal_sub: "氏名、年齢、居住地、口座通貨",
+      set_fullname: "氏名",
+      set_age: "年齢",
+      set_location: "国・都道府県",
+      set_currency: "口座通貨",
+      set_email: "メールアドレス",
+      mob_home: "ホーム",
+      mob_send: "送金",
+      mob_stats: "分析",
+      mob_settings: "設定",
+      crop_title: "プロフィール写真の調整",
+      crop_sub: "ズームや表示モードを調整して保存してください。",
+      crop_zoom: "ズーム",
+      crop_fit: "フィット",
+      crop_fill: "フィル",
+      crop_save: "写真を保存",
+      btn_cancel: "キャンセル",
+      pin_title: "🔐 セキュリティPINが必要です",
+      pin_sub: "4桁の暗証番号（PIN）を入力してください",
+      pin_unlock: "ロック解除",
+      pin_err: "暗証番号が正しくありません",
+      auth_login_title: "おかえりなさい ⚡",
+      auth_login_sub: "Fluxxbankアカウントにログインしてください。",
+      auth_signup_title: "新規アカウント作成 ⚡",
+      auth_signup_sub: "240万人が利用する次世代デジタルバンクへ。",
+      auth_login_btn: "ログイン",
+      auth_signup_btn: "アカウント作成",
+      auth_switch_to_signup: "初めてですか？無料アカウントを作成 →",
+      auth_switch_to_login: "すでにアカウントをお持ちですか？ログイン →",
+      auth_name_ph: "氏名（フルネーム）",
+      auth_age_ph: "年齢",
+      auth_country_ph: "国名",
+      auth_state_ph: "都道府県 / 州",
+      auth_currency_default: "通貨を選択（200種類以上対応）",
+      auth_email_ph: "メールアドレス",
+      auth_pass_ph: "パスワード",
+      auth_forgot: "パスワードをお忘れですか？",
+      fp_title: "パスワードのリセット 🔑",
+      fp_sub: "ご登録のメールアドレスを入力してください。パスワード再設定用の安全なリンクを送信します。",
+      fp_btn: "リセットリンクを送信",
+      fp_sending: "送信中...",
+      fp_back: "ログイン画面へ戻る",
+      otp_title: "🔒 送金承認（ワンタイムパスワード）",
+      otp_verify_btn: "認証して送金を完了",
+      proc_title: "送金を処理しています...",
+      proc_sub: "資金を安全に保護しています。<br>このウィンドウを閉じないでください。",
+      rcp_sub: "公式取引明細書 (受領書)",
+      rcp_amt_label: "送金金額",
+      rcp_status: "ステータス",
+      rcp_ref: "照会番号 (リファレンス)",
+      rcp_datetime: "取引日時",
+      rcp_sender: "送金人 (ご依頼人)",
+      rcp_recipient: "受取人名",
+      rcp_iban: "IBAN / 口座番号",
+      rcp_bic: "BIC / SWIFTコード",
+      rcp_bank: "受取銀行名",
+      rcp_purpose: "送金目的・摘要",
+      rcp_print_btn: "🖨️ 共有 / PDF印刷",
+      rcp_done_btn: "完了",
+      st_completed: "✔ 完了",
+      st_processing: "⏳ 処理中",
+      st_on_hold: "⚠️ 保留中",
+      st_pending: "⏳ 承認待ち",
+      status_word_completed: "完了",
+      status_word_processing: "処理中",
+      status_word_on_hold: "保留中",
+      status_word_pending: "承認待ち",
+      welcome_user: "ようこそ、{name}様",
+      good_day_user: "こんにちは、{name}様 👋",
+      years_old: " 歳",
+      not_set: "未設定",
+      coming_soon_topup: "チャージ機能は近日公開予定です！",
+      coming_soon_vault: "ボールト管理機能は近日公開予定です！",
+      trans_transfers_title: "送金・取引履歴を読み込み中",
+      trans_transfers_sub: "安全な取引レコードを取得しています...",
+      trans_analytics_title: "資産分析データを読み込み中",
+      trans_analytics_sub: "対数分布グラフを準備しています...",
+      trans_settings_title: "アカウント設定を読み込み中",
+      trans_settings_sub: "環境設定データを取得しています...",
+      err_valid_email: "有効なメールアドレスを入力してください。",
+      err_enter_pass: "パスワードを入力してください。",
+      err_pass_len: "パスワードは6文字以上で入力してください。",
+      err_enter_name: "氏名（フルネーム）を入力してください。",
+      err_enter_age: "有効な年齢を入力してください。",
+      err_enter_country: "国名を入力してください。",
+      err_enter_state: "都道府県・州を入力してください。",
+      err_select_cur: "口座通貨を選択してください。",
+      msg_acc_created: "✅ アカウントが作成されました！管理者の承認をお待ちください。",
+      msg_logging_in: "ログイン中...",
+      msg_creating_acc: "作成中...",
+      msg_locked: "❌ アカウントがロックされています。サポートまでお問い合わせください。",
+      prompt_2fa: "🔐 セキュリティ確認: 管理者から発行された6桁の2FAコードを入力してください。",
+      err_2fa: "❌ 2FAコードが無効です。管理者にお問い合わせください。",
+      err_awaiting_approval: "⏳ アカウント承認待ちです。管理者の有効化をお待ちください。",
+      msg_reset_sent: "✅ パスワード再設定リンクをメールアドレスに送信しました",
+      msg_proc_transfer: "送金処理中...",
+      err_insufficient: "残高不足です！ 現在の残高: ",
+      err_enter_otp: "6桁のコードを入力してください。",
+      err_invalid_otp: "❌ OTPコードが無効です。ご確認の上もう一度お試しください。",
+      rcp_external_deposit: "外部入金",
+      rcp_deposit: "入金",
+      rcp_unknown: "不明",
+      rcp_none: "なし"
+    }
+  };
+
+  function t(key) {
+    const pack = i18nDict[currentLang] || i18nDict.en;
+    return pack[key] !== undefined ? pack[key] : (i18nDict.en[key] || key);
+  }
+
+  // Trigger the 5.5-second spinning logo cycle when switching between English & Japanese
+  function triggerLanguageSwitch(targetLang) {
+    if (targetLang === currentLang) return;
+    const screen = document.getElementById("langCycleScreen");
+    const titleEl = document.getElementById("langCycleTitle");
+    const subEl = document.getElementById("langCycleSub");
+    const fillEl = document.getElementById("langCycleFill");
+
+    if (targetLang === "ja") {
+      titleEl.textContent = "日本語に切り替えています...";
+      subEl.textContent = "ダッシュボードと受領書を日本語に変換中...";
+    } else {
+      titleEl.textContent = "Switching to English...";
+      subEl.textContent = "Updating dashboard and receipt language...";
+    }
+
+    fillEl.classList.remove("run");
+    void fillEl.offsetWidth; // reset animation
+    fillEl.classList.add("run");
+    screen.classList.remove("hidden");
+
+    setTimeout(() => {
+      currentLang = targetLang;
+      localStorage.setItem("fluxxLang", currentLang);
+      applyLanguage();
+      screen.classList.add("hidden");
+    }, 5500);
+  }
+
+  function applyLanguage() {
+    document.documentElement.lang = currentLang === "ja" ? "ja" : "en";
+
+    // Update all toggle buttons active states
+    document.querySelectorAll(".lang-btn-en").forEach(b => b.classList.toggle("active", currentLang === "en"));
+    document.querySelectorAll(".lang-btn-ja").forEach(b => b.classList.toggle("active", currentLang === "ja"));
+
+    // Translate static text nodes
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const k = el.getAttribute("data-i18n");
+      el.textContent = t(k);
+    });
+
+    // Translate HTML nodes
+    document.querySelectorAll("[data-i18n-html]").forEach(el => {
+      const k = el.getAttribute("data-i18n-html");
+      el.innerHTML = t(k);
+    });
+
+    // Translate input placeholders
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+      const k = el.getAttribute("data-i18n-placeholder");
+      el.placeholder = t(k);
+    });
+
+    // Update Auth Modal dynamic labels
+    const sign = authMode === "signup";
+    document.getElementById("authTitle").textContent = sign ? t("auth_signup_title") : t("auth_login_title");
+    document.getElementById("authSub").textContent = sign ? t("auth_signup_sub") : t("auth_login_sub");
+    document.getElementById("authBtn").textContent = sign ? t("auth_signup_btn") : t("auth_login_btn");
+    document.getElementById("authSwitch").textContent = sign ? t("auth_switch_to_login") : t("auth_switch_to_signup");
+
+    const curDef = document.getElementById("authCurrencyDefault");
+    if (curDef) curDef.textContent = t("auth_currency_default");
+
+    // Update user greeting and transfer amount label if profile is loaded
+    if (currentUserProfile) {
+      const firstName = (currentUserProfile.name || "Customer").split(" ")[0];
+      document.getElementById("welcomeMessage").textContent = t("good_day_user").replace("{name}", firstName);
+      const amtLabelEl = document.getElementById("transferAmtLabel");
+      if (amtLabelEl) amtLabelEl.textContent = `${t("tr_amt")} (${getCurrencySymbol()} ${getActiveCurrencyCode()})`;
+    }
+
+    // Re-render dynamic lists, reviews, gallery, chart, and receipt if open
+    showRev(cur);
+    if (typeof window.showGal === "function") window.showGal(galCur);
+    renderRecentActivityList();
+    renderFullHistory();
+    if (logarithmicChartInstance) renderLogarithmicPieChart();
+    if (activeReceiptTx && document.getElementById("receiptModal").classList.contains("show")) {
+      const pName = document.getElementById("userNameDisplay").textContent;
+      populateAndShowReceipt(activeReceiptTx, pName);
+    }
+  }
+
+  // Dynamic Currency Formatter supporting all 200+ world currencies
+  function getActiveCurrencyCode(curCode = null) {
+    return curCode || (currentUserProfile && currentUserProfile.currency) || "EUR";
+  }
+
+  function getCurrencySymbol(curCode = null) {
+    const code = getActiveCurrencyCode(curCode);
+    try {
+      const parts = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: code,
+        currencyDisplay: "narrowSymbol"
+      }).formatToParts(0);
+      const sym = parts.find(p => p.type === "currency");
+      return sym ? sym.value : code;
+    } catch (e) {
+      return code;
+    }
+  }
+
+  const eur = (n, curCode = null) => {
+    const code = getActiveCurrencyCode(curCode);
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: code,
+        currencyDisplay: "narrowSymbol",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(Number(n || 0));
+    } catch (e) {
+      return code + " " + Number(n || 0).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+    }
+  };
+
+  function translateDescriptionText(desc) {
+    if (!desc) return "";
+    if (currentLang === "ja") {
+      return desc
+        .replace(/^Sent to\s+/i, "送金先: ")
+        .replace(/\|\s*IBAN:/i, "| 口座/IBAN:")
+        .replace(/\|\s*BIC:/i, "| BIC:")
+        .replace(/\|\s*Bank:/i, "| 銀行:");
+    }
+    return desc;
+  }
+
+  function translateStatusWord(st) {
+    const s = (st || "completed").toLowerCase();
+    if (s === "processing") return t("status_word_processing");
+    if (s === "pending") return t("status_word_pending");
+    if (s === "on_hold") return t("status_word_on_hold");
+    return t("status_word_completed");
+  }
+
+  function formatLocaleDate(dateStr) {
+    const loc = currentLang === "ja" ? "ja-JP" : "en-IE";
+    return new Date(dateStr).toLocaleDateString(loc, {day:'numeric', month:'short', year:'numeric'});
+  }
 
   const worldCurrencies = [
     {code: "EUR", name: "EUR — Euro (€)"},
     {code: "USD", name: "USD — US Dollar ($)"},
+    {code: "JPY", name: "JPY — Japanese Yen (¥)"},
+    {code: "GBP", name: "GBP — British Pound (£)"},
     {code: "AED", name: "AED — UAE Dirham"},
     {code: "AFN", name: "AFN — Afghan Afghani"},
     {code: "ALL", name: "ALL — Albanian Lek"},
@@ -1059,7 +1920,6 @@
     {code: "ETB", name: "ETB — Ethiopian Birr"},
     {code: "FJD", name: "FJD — Fijian Dollar"},
     {code: "FKP", name: "FKP — Falkland Islands Pound"},
-    {code: "GBP", name: "GBP — British Pound (£)"},
     {code: "GEL", name: "GEL — Georgian Lari"},
     {code: "GHS", name: "GHS — Ghanaian Cedi"},
     {code: "GIP", name: "GIP — Gibraltar Pound"},
@@ -1079,7 +1939,6 @@
     {code: "ISK", name: "ISK — Icelandic Króna"},
     {code: "JMD", name: "JMD — Jamaican Dollar"},
     {code: "JOD", name: "JOD — Jordanian Dinar"},
-    {code: "JPY", name: "JPY — Japanese Yen (¥)"},
     {code: "KES", name: "KES — Kenyan Shilling"},
     {code: "KGS", name: "KGS — Kyrgystani Som"},
     {code: "KHR", name: "KHR — Cambodian Riel"},
@@ -1178,6 +2037,7 @@
         currencySelect.appendChild(opt);
       });
     }
+    applyLanguage();
     checkSession();
   });
 
@@ -1194,7 +2054,7 @@
     const errEl = document.getElementById("settingsPinErr");
 
     if(pinVal !== "2121") {
-      errEl.textContent = "Incorrect password";
+      errEl.textContent = t("pin_err");
       return;
     }
 
@@ -1208,8 +2068,8 @@
       if(el && currentUserProfile) {
         let real = "—";
         if(field === "name") real = currentUserProfile.name || "—";
-        else if(field === "age") real = currentUserProfile.age ? currentUserProfile.age + " years" : "Not set";
-        else if(field === "location") real = (currentUserProfile.state || "") + ", " + (currentUserProfile.country || "Not set");
+        else if(field === "age") real = currentUserProfile.age ? currentUserProfile.age + t("years_old") : t("not_set");
+        else if(field === "location") real = (currentUserProfile.state || "") + ", " + (currentUserProfile.country || t("not_set"));
         else if(field === "currency") real = currentUserProfile.currency || "EUR";
         else if(field === "email") real = currentUserProfile.email || "—";
         el.textContent = real;
@@ -1283,14 +2143,14 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       if(tabName === 'transfers') {
-        transitionTitle.textContent = "Loading Transfers & History";
-        transitionSub.textContent = "Fetching secure transaction records...";
+        transitionTitle.textContent = t("trans_transfers_title");
+        transitionSub.textContent = t("trans_transfers_sub");
       } else if(tabName === 'analytics') {
-        transitionTitle.textContent = "Loading Analytics Data";
-        transitionSub.textContent = "Preparing logarithmic distribution...";
+        transitionTitle.textContent = t("trans_analytics_title");
+        transitionSub.textContent = t("trans_analytics_sub");
       } else if(tabName === 'settings') {
-        transitionTitle.textContent = "Loading Settings Data";
-        transitionSub.textContent = "Fetching your account preferences...";
+        transitionTitle.textContent = t("trans_settings_title");
+        transitionSub.textContent = t("trans_settings_sub");
       }
 
       dashboardMainArea.classList.add("dashboard-blurred");
@@ -1326,6 +2186,39 @@
     }
   }
 
+  function renderRecentActivityList() {
+    const txList = document.getElementById("txlist");
+    if (!txList) return;
+    if (userTransactions.length > 0) {
+      const recentTx = userTransactions.slice(0, 5);
+      txList.innerHTML = recentTx.map(txItem => {
+        const isPos = txItem.type === 'deposit';
+        let statusColor = "var(--txt)";
+        let statusRaw = (txItem.status || "completed").toLowerCase();
+        if (statusRaw === 'processing') statusColor = "var(--accent2)";
+        else if (statusRaw === 'pending') statusColor = "var(--gold)";
+        else if (statusRaw === 'on_hold') statusColor = "var(--bad)";
+
+        return `
+        <div class="tx-item" onclick="viewReceipt('${txItem.id}')">
+          <div class="tx-left">
+            <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
+            <div class="tx-details">
+              <h4>${translateDescriptionText(txItem.description)}</h4>
+              <p>${formatLocaleDate(txItem.created_at)} · <span style="text-transform:capitalize; color:${statusColor}; font-weight:600;">${translateStatusWord(statusRaw)}</span></p>
+            </div>
+          </div>
+          <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
+            ${isPos ? '+' : '−'}${eur(Math.abs(txItem.amount))}
+          </span>
+        </div>
+        `;
+      }).join("");
+    } else if (currentUserProfile) {
+      txList.innerHTML = `<p style="color: var(--mut); text-align: center; padding: 20px;">${t("no_recent_tx")}</p>`;
+    }
+  }
+
   function renderFullHistory() {
     const fullTxList = document.getElementById("fullTxList");
     const showMoreBtn = document.getElementById("showMoreTxBtn");
@@ -1333,25 +2226,25 @@
 
     if(userTransactions.length > 0) {
       const visibleTx = userTransactions.slice(0, txDisplayLimit);
-      fullTxList.innerHTML = visibleTx.map(t => {
-        const isPos = t.type === 'deposit';
+      fullTxList.innerHTML = visibleTx.map(txItem => {
+        const isPos = txItem.type === 'deposit';
         let statusColor = "var(--txt)";
-        let statusText = t.status || "completed";
-        if (statusText === 'processing') statusColor = "var(--accent2)";
-        else if (statusText === 'pending') statusColor = "var(--gold)";
-        else if (statusText === 'on_hold') statusColor = "var(--bad)";
+        let statusRaw = (txItem.status || "completed").toLowerCase();
+        if (statusRaw === 'processing') statusColor = "var(--accent2)";
+        else if (statusRaw === 'pending') statusColor = "var(--gold)";
+        else if (statusRaw === 'on_hold') statusColor = "var(--bad)";
 
         return `
-        <div class="tx-item" onclick="viewReceipt('${t.id}')">
+        <div class="tx-item" onclick="viewReceipt('${txItem.id}')">
           <div class="tx-left">
             <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
             <div class="tx-details">
-              <h4>${t.description}</h4>
-              <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})} · <span style="text-transform:capitalize; color:${statusColor}; font-weight:600;">${statusText}</span></p>
+              <h4>${translateDescriptionText(txItem.description)}</h4>
+              <p>${formatLocaleDate(txItem.created_at)} · <span style="text-transform:capitalize; color:${statusColor}; font-weight:600;">${translateStatusWord(statusRaw)}</span></p>
             </div>
           </div>
           <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
-            ${isPos ? '+' : '−'}${eur(Math.abs(t.amount))}
+            ${isPos ? '+' : '−'}${eur(Math.abs(txItem.amount))}
           </span>
         </div>
         `;
@@ -1361,7 +2254,7 @@
         showMoreBtn.style.display = txDisplayLimit >= userTransactions.length ? "none" : "block";
       }
     } else {
-      fullTxList.innerHTML = '<p style="color: var(--mut); text-align: center; padding: 20px;">No transaction history found.</p>';
+      fullTxList.innerHTML = `<p style="color: var(--mut); text-align: center; padding: 20px;">${t("no_hist_tx")}</p>`;
       if(showMoreBtn) showMoreBtn.style.display = "none";
     }
   }
@@ -1382,7 +2275,7 @@
     logarithmicChartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Liquid Balance', 'Savings Vault', 'Crypto & Assets'],
+        labels: [t("an_chart_l1"), t("an_chart_l2"), t("an_chart_l3")],
         datasets: [{
           data: [45, 35, 20],
           backgroundColor: ['#4f7cff', '#22d3ee', '#a855f7'],
@@ -1399,7 +2292,7 @@
               label: function(context) {
                 let label = context.label || '';
                 let val = context.raw;
-                return ` ${label}: Log scale index ${val}%`;
+                return ` ${label}: ${val}%`;
               }
             }
           }
@@ -1433,7 +2326,7 @@
     }
   }
 
-  const rates = [["EUR/USD","1.087","+0.12%"],["BTC","$98,420","+2.4%"],["ETH","$3,910","+1.1%"],["S&P 500","6,842","+0.6%"],["Gold","$2,915","−0.3%"],["NASDAQ","22,410","+0.9%"],["GBP/EUR","1.174","−0.08%"]];
+  const rates = [["EUR/USD","1.087","+0.12%"],["USD/JPY","153.40","+0.28%"],["BTC","$98,420","+2.4%"],["ETH","$3,910","+1.1%"],["S&P 500","6,842","+0.6%"],["Gold","$2,915","−0.3%"],["GBP/EUR","1.174","−0.08%"]];
   document.getElementById("ticker").innerHTML = rates.map(r=>`
     <div class="tick"><span style="color:var(--mut)">${r[0]}</span><b>${r[1]}</b>
     <span class="${r[2].startsWith("+")?"up":"dn"}">${r[2]}</span></div>`).join("");
@@ -1448,10 +2341,38 @@
   count("st1", 2400000, "+", 1800); count("st2", 190, "", 1800);
 
   const reviews = [
-    {img:"review 1.png", name:"Amira Saleh", role:"Fluxx Plus member · Berlin", quote:"\u201CI opened my account on the train and was paying friends before my stop. I've never seen a bank move this fast.\u201D"},
-    {img:"review 2.png", name:"Daniel Kovač", role:"Small business owner · Prague", quote:"\u201CFluxxbank replaced three apps for my café — payments, savings and my metal card all live in one place. Game changer.\u201D"},
-    {img:"review 3.png", name:"Sofia Marchetti", role:"Digital nomad · Lisbon", quote:"\u201CI get paid in dollars, spend in euros, and save in vaults at 4.1%. Zero FX surprises. It just works, everywhere.\u201D"},
-    {img:"review 4.png", name:"Henrik Larsen", role:"Retired teacher · Aarhus", quote:"\u201CI was skeptical of online banks, but Fluxx support walked me through everything on the phone. My pension is in good hands.\u201D"},
+    {
+      img:"review 1.png",
+      name:"Amira Saleh",
+      role_en:"Fluxx Plus member · Berlin",
+      role_ja:"Fluxx プラス会員 · ベルリン",
+      quote_en:"\u201CI opened my account on the train and was paying friends before my stop. I've never seen a bank move this fast.\u201D",
+      quote_ja:"「電車の中で口座を開設し、降りる前に友人へ送金できました。こんなにスピーディーな銀行は初めてです。」"
+    },
+    {
+      img:"review 2.png",
+      name:"Daniel Kovač",
+      role_en:"Small business owner · Prague",
+      role_ja:"カフェ経営者 · プラハ",
+      quote_en:"\u201CFluxxbank replaced three apps for my café — payments, savings and my metal card all live in one place. Game changer.\u201D",
+      quote_ja:"「私のカフェで使っていた3つのアプリがFluxxbankひとつにまとまりました。決済、貯蓄、メタルカードがすべて一箇所で完結します。」"
+    },
+    {
+      img:"review 3.png",
+      name:"Sofia Marchetti",
+      role_en:"Digital nomad · Lisbon",
+      role_ja:"デジタルノマド · リスボン",
+      quote_en:"\u201CI get paid in dollars, spend in euros, and save in vaults at 4.1%. Zero FX surprises. It just works, everywhere.\u201D",
+      quote_ja:"「ドルで報酬を受け取り、ユーロや円で使い、年利4.1%のボールトで貯蓄しています。隠れた為替手数料もなく快適です。」"
+    },
+    {
+      img:"review 4.png",
+      name:"Henrik Larsen",
+      role_en:"Retired teacher · Aarhus",
+      role_ja:"元教師 · オーフス",
+      quote_en:"\u201CI was skeptical of online banks, but Fluxx support walked me through everything on the phone. My pension is in good hands.\u201D",
+      quote_ja:"「オンライン銀行には懐疑的でしたが、Fluxxbankのサポートが丁寧に案内してくれました。大切な年金も安心して預けられます。」"
+    }
   ];
   let cur = 0, revTimer;
   const slides = document.querySelectorAll(".rev-slide");
@@ -1463,9 +2384,9 @@
     slides.forEach((s,k)=>s.classList.toggle("active", k===cur));
     dots.forEach((d,k)=>d.classList.toggle("on", k===cur));
     const r = reviews[cur];
-    if(document.getElementById("revQuote")) document.getElementById("revQuote").textContent = r.quote;
+    if(document.getElementById("revQuote")) document.getElementById("revQuote").textContent = currentLang === "ja" ? r.quote_ja : r.quote_en;
     if(document.getElementById("revName")) document.getElementById("revName").textContent = r.name;
-    if(document.getElementById("revRole")) document.getElementById("revRole").textContent = r.role;
+    if(document.getElementById("revRole")) document.getElementById("revRole").textContent = currentLang === "ja" ? r.role_ja : r.role_en;
     if(document.getElementById("revAva")) document.getElementById("revAva").src = r.img;
     if(document.getElementById("revCount")) document.getElementById("revCount").textContent = (cur+1) + " / " + reviews.length;
   }
@@ -1473,11 +2394,11 @@
   if(slides.length > 0) { showRev(0); revTimer = setInterval(()=>showRev(cur+1), 5200); }
 
   const gallery = [
-    {src:"show 1.png", cap:"Fluxx Debit · Visa", sub:"Your everyday card — free with every account", card:true},
-    {src:"show 2.png", cap:"Fluxx Credit", sub:"Up to 5,000 \u20AC limit · cashback on everything", card:true},
-    {src:"show 3.png", cap:"Fluxx Obsidian Metal", sub:"Our flagship 18g metal card for Metal members", card:true},
-    {src:"show 4.png", cap:"Fluxxbank HQ by night", sub:"Where the magic happens \u2014 Frankfurt flagship"},
-    {src:"show 5.png", cap:"Our flagship lobby", sub:"Marble, brass and zero queues"},
+    {src:"show 1.png", cap_en:"Fluxx Debit · Visa", sub_en:"Your everyday card — free with every account", cap_ja:"Fluxx デビット · Visa", sub_ja:"すべての口座に無料付帯するメインカード", card:true},
+    {src:"show 2.png", cap_en:"Fluxx Credit", sub_en:"Up to 5,000 € limit · cashback on everything", cap_ja:"Fluxx クレジット", sub_ja:"最大 €5,000 の利用枠 · 全決済でキャッシュバック", card:true},
+    {src:"show 3.png", cap_en:"Fluxx Obsidian Metal", sub_en:"Our flagship 18g metal card for Metal members", cap_ja:"Fluxx オブシディアン・メタル", sub_ja:"メタル会員限定の18g重厚フラッグシップカード", card:true},
+    {src:"show 4.png", cap_en:"Fluxxbank HQ by night", sub_en:"Where the magic happens — Frankfurt flagship", cap_ja:"夜の Fluxxbank 本社ビル", sub_ja:"フランクフルト・フラッグシップ拠点"},
+    {src:"show 5.png", cap_en:"Our flagship lobby", sub_en:"Marble, brass and zero queues", cap_ja:"フラッグシップ・ロビー", sub_ja:"洗練された空間と待ち時間ゼロの体験"}
   ];
   let galCur = 0, galTimer;
   const galStage = document.getElementById("galStage");
@@ -1485,7 +2406,7 @@
     gallery.forEach((g,i)=>{
       const s = document.createElement("div");
       s.className = "gal-slide" + (i===0 ? " active" : "") + (g.card ? " cardish" : "");
-      s.innerHTML = '<img src="'+g.src+'" alt="'+g.cap+'" loading="lazy">';
+      s.innerHTML = '<img src="'+g.src+'" alt="'+g.cap_en+'" loading="lazy">';
       galStage.insertBefore(s, galStage.firstChild);
     });
     const galSlides = galStage.querySelectorAll(".gal-slide");
@@ -1497,10 +2418,12 @@
       galSlides.forEach((s,k)=>s.classList.toggle("active", k===galCur));
       galThumbBtns.forEach((b,k)=>b.classList.toggle("on", k===galCur));
       const g = gallery[galCur];
-      document.getElementById("galCap").innerHTML = g.cap + "<small>" + g.sub + "</small>";
+      const cap = currentLang === "ja" ? g.cap_ja : g.cap_en;
+      const sub = currentLang === "ja" ? g.sub_ja : g.sub_en;
+      document.getElementById("galCap").innerHTML = cap + "<small>" + sub + "</small>";
       document.getElementById("galCount").textContent = (galCur+1) + " / " + gallery.length;
     }
-    window.goGal = function(i){ clearInterval(galTimer); showGal(i); revTimer = setInterval(()=>showGal(galCur+1), 4500); }
+    window.goGal = function(i){ clearInterval(galTimer); showGal(i); galTimer = setInterval(()=>showGal(galCur+1), 4500); }
     showGal(0);
     galTimer = setInterval(()=>showGal(galCur+1), 4500);
   }
@@ -1548,10 +2471,10 @@
     document.getElementById("authState").style.display = sign ? "block" : "none";
     document.getElementById("authCurrency").style.display = sign ? "block" : "none";
 
-    document.getElementById("authTitle").textContent = sign ? "Create your account ⚡" : "Welcome back ⚡";
-    document.getElementById("authSub").textContent = sign ? "Join 2.4 million people banking in motion." : "Log in to your Fluxxbank account.";
-    document.getElementById("authBtn").textContent = sign ? "Create account" : "Log in";
-    document.getElementById("authSwitch").textContent = sign ? "Already have an account? Log in →" : "New here? Create a free account →";
+    document.getElementById("authTitle").textContent = sign ? t("auth_signup_title") : t("auth_login_title");
+    document.getElementById("authSub").textContent = sign ? t("auth_signup_sub") : t("auth_login_sub");
+    document.getElementById("authBtn").textContent = sign ? t("auth_signup_btn") : t("auth_login_btn");
+    document.getElementById("authSwitch").textContent = sign ? t("auth_switch_to_login") : t("auth_switch_to_signup");
     document.getElementById("authErr").textContent = "";
     document.getElementById("forgotPasswordLink").style.display = sign ? "none" : "block";
   }
@@ -1570,27 +2493,33 @@
     err.style.color = "var(--bad)";
     err.textContent = "";
     
-    if(!em.includes("@")){ err.textContent = "Please enter a valid email address."; return; }
-    if(!pw){ err.textContent = "Please enter your password."; return; }
+    if(!em.includes("@")){ err.textContent = t("err_valid_email"); return; }
+    if(!pw){ err.textContent = t("err_enter_pass"); return; }
 
     btn.disabled = true;
     const origText = btn.textContent;
-    btn.textContent = authMode === "signup" ? "Creating account..." : "Logging in...";
+    btn.textContent = authMode === "signup" ? t("msg_creating_acc") : t("msg_logging_in");
 
     try {
       if(authMode === "signup"){
-        if(pw.length < 6){ err.textContent = "Password needs at least 6 characters."; return; }
-        if(!nm){ err.textContent = "Please enter your full name."; return; }
-        if(!age || isNaN(age) || age < 1){ err.textContent = "Please enter a valid age."; return; }
-        if(!country){ err.textContent = "Please enter your country."; return; }
-        if(!state){ err.textContent = "Please enter your state."; return; }
-        if(!currency){ err.textContent = "Please select an account currency."; return; }
+        if(pw.length < 6){ err.textContent = t("err_pass_len"); return; }
+        if(!nm){ err.textContent = t("err_enter_name"); return; }
+        if(!age || isNaN(age) || age < 1){ err.textContent = t("err_enter_age"); return; }
+        if(!country){ err.textContent = t("err_enter_country"); return; }
+        if(!state){ err.textContent = t("err_enter_state"); return; }
+        if(!currency){ err.textContent = t("err_select_cur"); return; }
 
-        const { data: su, error } = await sb.auth.signUp({ email: em, password: pw, options: { data: { name: nm } } });
+        const { data: su, error } = await sb.auth.signUp({ 
+          email: em, 
+          password: pw, 
+          options: { 
+            data: { name: nm, age: age, country: country, state: state, currency: currency } 
+          } 
+        });
         if(error) throw error;
         
         if(su.user){
-          const { error: insertErr } = await sb.from("profiles").insert({
+          const { error: upsertErr } = await sb.from("profiles").upsert({
             id: su.user.id, 
             name: nm, 
             email: em, 
@@ -1600,11 +2529,11 @@
             country: country,
             state: state,
             currency: currency
-          });
-          if (insertErr) console.error("Profile insert error:", insertErr);
+          }, { onConflict: "id" });
+          if (upsertErr) console.error("Profile upsert error:", upsertErr);
         }
         err.style.color = "var(--ok)";
-        err.textContent = "✅ Account created! Wait for admin activation.";
+        err.textContent = t("msg_acc_created");
       } else {
         const { data: authData, error } = await sb.auth.signInWithPassword({ email: em, password: pw });
         if(error) throw error;
@@ -1614,16 +2543,16 @@
         
         if (profile.status === 'locked') {
           await sb.auth.signOut();
-          throw new Error("❌ Your account has been locked. Please contact support.");
+          throw new Error(t("msg_locked"));
         }
 
         if (profile.role && profile.role.startsWith("2FA-")) {
           const correctCode = profile.role.replace("2FA-", "");
-          const enteredCode = prompt("🔐 Security Check: Please enter the 6-digit 2FA code provided by the Admin.");
+          const enteredCode = prompt(t("prompt_2fa"));
           
           if (enteredCode !== correctCode) {
             await sb.auth.signOut(); 
-            throw new Error("❌ Invalid 2FA Code. Please contact admin.");
+            throw new Error(t("err_2fa"));
           }
           
           await sb.from("profiles").update({ role: "customer", status: "active" }).eq("id", authData.user.id);
@@ -1632,7 +2561,7 @@
         
         if (profile.status !== "active") {
           await sb.auth.signOut(); 
-          throw new Error("⏳ Account awaiting approval — an admin must activate it first.");
+          throw new Error(t("err_awaiting_approval"));
         }
         
         closeModal();
@@ -1641,7 +2570,7 @@
       }
     } catch(e) {
       err.style.color = "var(--bad)";
-      err.textContent = e.message || "Something went wrong. Try again.";
+      err.textContent = e.message || "Error";
     } finally {
       btn.disabled = false;
       btn.textContent = origText;
@@ -1655,13 +2584,13 @@
     
     if(!em.includes("@")){
       err.style.color = "var(--bad)";
-      err.textContent = "Please enter a valid email address.";
+      err.textContent = t("err_valid_email");
       return;
     }
     
     err.textContent = "";
     btn.disabled = true;
-    btn.textContent = "Sending link...";
+    btn.textContent = t("fp_sending");
 
     setTimeout(async () => {
       try {
@@ -1670,12 +2599,12 @@
         });
         
         btn.disabled = false;
-        btn.textContent = "Send Reset Link";
+        btn.textContent = t("fp_btn");
         
         if(error) throw error;
 
         err.style.color = "var(--ok)";
-        err.textContent = "✅ Password reset link sent to your email address";
+        err.textContent = t("msg_reset_sent");
 
         setTimeout(() => {
           forgotPwBg.classList.remove("show");
@@ -1684,9 +2613,9 @@
 
       } catch(error) {
         btn.disabled = false;
-        btn.textContent = "Send Reset Link";
+        btn.textContent = t("fp_btn");
         err.style.color = "var(--bad)";
-        err.textContent = error.message || "Failed to send link. Try again.";
+        err.textContent = error.message || "Error";
       }
     }, 2000); 
   }
@@ -1785,19 +2714,34 @@
     if(settingsAvatar) settingsAvatar.innerHTML = `<img src="${base64String}" alt="User" style="width:100%;height:100%;object-fit:cover;">`;
 
     closeCropModal();
-    alert("Profile photo updated successfully.");
   }
 
   async function loadDashboardData(session, profile) {
+    const meta = (session && session.user && session.user.user_metadata) || {};
+    const updates = {};
+    if (!profile.currency && meta.currency) { profile.currency = meta.currency; updates.currency = meta.currency; }
+    if (!profile.age && meta.age) { profile.age = meta.age; updates.age = meta.age; }
+    if (!profile.country && meta.country) { profile.country = meta.country; updates.country = meta.country; }
+    if (!profile.state && meta.state) { profile.state = meta.state; updates.state = meta.state; }
+    if (Object.keys(updates).length > 0) {
+      await sb.from("profiles").update(updates).eq("id", session.user.id);
+    }
+
     currentUserProfile = profile;
-    const firstName = profile.name.split(" ")[0];
+    const firstName = (profile.name || "Customer").split(" ")[0];
     
     currentActualBalance = Number(profile.balance || 0);
     const isHidden = localStorage.getItem('hideBalance') === 'true';
     applyBalanceVisibility(isHidden);
 
+    const vaultEl = document.getElementById("savingsVaultBal");
+    if (vaultEl) vaultEl.textContent = eur(8120);
+
+    const amtLabelEl = document.getElementById("transferAmtLabel");
+    if (amtLabelEl) amtLabelEl.textContent = `${t("tr_amt")} (${getCurrencySymbol()} ${getActiveCurrencyCode()})`;
+
     document.getElementById("userNameDisplay").textContent = profile.name;
-    document.getElementById("welcomeMessage").textContent = `Good day, ${firstName} 👋`;
+    document.getElementById("welcomeMessage").textContent = t("good_day_user").replace("{name}", firstName);
 
     const avatarHtml = profile.avatar_url ? `<img src="${profile.avatar_url}" alt="User">` : firstName.charAt(0).toUpperCase();
     document.getElementById("desktopAvatar").innerHTML = avatarHtml;
@@ -1818,36 +2762,7 @@
     
     userTransactions = txData || []; 
 
-    const txList = document.getElementById("txlist");
-    if(userTransactions.length > 0) {
-      const recentTx = userTransactions.slice(0, 5);
-      txList.innerHTML = recentTx.map(t => {
-        const isPos = t.type === 'deposit';
-        let statusColor = "var(--txt)";
-        let statusText = t.status || "completed";
-        if (statusText === 'processing') statusColor = "var(--accent2)";
-        else if (statusText === 'pending') statusColor = "var(--gold)";
-        else if (statusText === 'on_hold') statusColor = "var(--bad)";
-
-        return `
-        <div class="tx-item" onclick="viewReceipt('${t.id}')">
-          <div class="tx-left">
-            <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
-            <div class="tx-details">
-              <h4>${t.description}</h4>
-              <p>${new Date(t.created_at).toLocaleDateString("en-IE", {day:'numeric', month:'short', year:'numeric'})} · <span style="text-transform:capitalize; color:${statusColor}; font-weight:600;">${statusText}</span></p>
-            </div>
-          </div>
-          <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
-            ${isPos ? '+' : '−'}${eur(Math.abs(t.amount))}
-          </span>
-        </div>
-        `;
-      }).join("");
-    } else {
-      txList.innerHTML = '<p style="color: var(--mut); text-align: center; padding: 20px;">No recent activity.</p>';
-    }
-
+    renderRecentActivityList();
     renderFullHistory();
   }
 
@@ -1859,7 +2774,7 @@
       
       if (p && p.status === 'locked') {
         await sb.auth.signOut();
-        alert("❌ Your account has been locked by administration.");
+        alert(t("msg_locked"));
         location.reload();
         return;
       }
@@ -1867,8 +2782,8 @@
       document.getElementById("landingPage").classList.add("hidden");
 
       if (isFirstLogin) {
-        const firstName = p ? p.name.split(" ")[0] : "User";
-        document.getElementById("welcomeText").textContent = `Welcome, ${firstName}`;
+        const firstName = p && p.name ? p.name.split(" ")[0] : "User";
+        document.getElementById("welcomeText").textContent = t("welcome_user").replace("{name}", firstName);
         document.getElementById("welcomeScreen").classList.remove("hidden");
         document.getElementById("appDashboard").classList.add("hidden");
 
@@ -1908,7 +2823,7 @@
     const msg = document.getElementById("paymsg");
     
     msg.style.color = "white";
-    msg.textContent = "Processing transfer...";
+    msg.textContent = t("msg_proc_transfer");
 
     const { data: { session } } = await sb.auth.getSession();
     if(!session) return;
@@ -1919,7 +2834,7 @@
 
       if(Number(p.balance) < amt) {
         msg.style.color = "var(--bad)";
-        msg.textContent = "Insufficient funds! Balance: " + eur(p.balance);
+        msg.textContent = t("err_insufficient") + eur(p.balance);
         return false;
       }
 
@@ -1939,8 +2854,13 @@
 
       if(txError) throw new Error(txError.message);
 
-      document.getElementById("transferAmtDisplay").textContent = eur(amt);
-      document.getElementById("transferToDisplay").textContent = `${fName} ${lName}`;
+      const otpDescEl = document.getElementById("otpModalDesc");
+      if (currentLang === "ja") {
+        otpDescEl.innerHTML = `<strong id="transferToDisplay" style="color: var(--txt);">${fName} ${lName}</strong> 様への <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">${eur(amt)}</strong> の送金は承認待ちです。<br><br>この送金を承認するには、ワンタイムOTPコードを入力してください。`;
+      } else {
+        otpDescEl.innerHTML = `Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">${eur(amt)}</strong> to <strong id="transferToDisplay" style="color: var(--txt);">${fName} ${lName}</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.`;
+      }
+
       document.getElementById("currentTxId").value = txData.id;
       
       msg.textContent = ""; 
@@ -1967,13 +2887,13 @@
     const errDisplay = document.getElementById("otpErr");
 
     if(!enteredOTP) {
-      errDisplay.textContent = "Please enter the 6-digit code.";
+      errDisplay.textContent = t("err_enter_otp");
       return;
     }
 
     if (enteredOTP !== "241800") {
       errDisplay.style.color = "var(--bad)";
-      errDisplay.textContent = "❌ Invalid OTP. Please check your code and try again.";
+      errDisplay.textContent = t("err_invalid_otp");
       return;
     }
 
@@ -1998,29 +2918,31 @@
         await checkSession();
       } catch (err) {
         processingBg.classList.remove("show");
-        alert("Something went wrong completing the transaction.");
+        alert("Error completing transaction.");
       }
     }, 7000);
   }
 
   function viewReceipt(txId) {
-    const tx = userTransactions.find(t => t.id === txId);
+    const tx = userTransactions.find(item => item.id === txId);
     if(!tx) return;
     const profileName = document.getElementById("userNameDisplay").textContent;
     populateAndShowReceipt(tx, profileName);
   }
 
   function populateAndShowReceipt(tx, profileName) {
+    activeReceiptTx = tx;
     const dateObj = new Date(tx.created_at); 
-    const formattedDate = dateObj.toLocaleDateString("en-IE", {day:'2-digit', month:'short', year:'numeric'});
-    const formattedTime = dateObj.toLocaleTimeString("en-IE", {hour:'2-digit', minute:'2-digit'});
+    const loc = currentLang === "ja" ? "ja-JP" : "en-IE";
+    const formattedDate = dateObj.toLocaleDateString(loc, {day:'2-digit', month:'short', year:'numeric'});
+    const formattedTime = dateObj.toLocaleTimeString(loc, {hour:'2-digit', minute:'2-digit'});
     
-    document.getElementById("rDateTime").textContent = `${formattedDate}, ${formattedTime}`;
+    document.getElementById("rDateTime").textContent = `${formattedDate} ${formattedTime}`;
     document.getElementById("rRef").textContent = tx.reference || "N/A";
     document.getElementById("rFrom").textContent = profileName;
     
-    let recipient = "Unknown";
-    let purpose = "None";
+    let recipient = t("rcp_unknown");
+    let purpose = t("rcp_none");
     let iban = "N/A";
     let bic = "N/A";
     let bank = "N/A";
@@ -2029,9 +2951,9 @@
       const matchName = tx.description.match(/Sent to (.*?) \((.*?)\)/);
       if (matchName) {
         recipient = matchName[1];
-        purpose = matchName[2] || "None";
+        purpose = matchName[2] || t("rcp_none");
       } else {
-        recipient = tx.description;
+        recipient = translateDescriptionText(tx.description);
       }
 
       const ibanMatch = tx.description.match(/IBAN:\s*([^|]+)/);
@@ -2043,8 +2965,8 @@
       const bankMatch = tx.description.match(/Bank:\s*([^|]+)/);
       if (bankMatch) bank = bankMatch[1].trim();
     } else if (tx.type === 'deposit') {
-      recipient = "External Deposit";
-      purpose = tx.description || "Deposit";
+      recipient = t("rcp_external_deposit");
+      purpose = tx.description || t("rcp_deposit");
     }
 
     document.getElementById("rRecipientName").textContent = recipient;
@@ -2058,16 +2980,16 @@
     const st = (tx.status || 'processing').toLowerCase();
     
     if (st === 'completed') {
-      statusEl.textContent = "✔ Completed";
+      statusEl.textContent = t("st_completed");
       statusEl.style.color = "#059669";
     } else if (st === 'processing') {
-      statusEl.textContent = "⏳ Processing";
+      statusEl.textContent = t("st_processing");
       statusEl.style.color = "#0284c7";
     } else if (st === 'on_hold') {
-      statusEl.textContent = "⚠️ On Hold";
+      statusEl.textContent = t("st_on_hold");
       statusEl.style.color = "#dc2626";
     } else {
-      statusEl.textContent = "⏳ Pending";
+      statusEl.textContent = t("st_pending");
       statusEl.style.color = "#d97706";
     }
 
