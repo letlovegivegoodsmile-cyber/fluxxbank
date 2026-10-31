@@ -389,6 +389,17 @@
       if (!window.supabase) return alert("Supabase failed to load.");
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       
+      // CATCH PASSWORD RECOVERY EVENT ON ADMIN PAGE
+      sb.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          $("loginScreen").classList.remove("hidden");
+          $("loginForm").classList.add("hidden");
+          $("forgotWrap").classList.add("hidden");
+          $("newPasswordForm").classList.remove("hidden");
+          $("loginSubtitle").textContent = "Please enter your new administrator password.";
+        }
+      });
+
       const { data } = await sb.auth.getSession();
       if (data.session) { boot(data.session.user); } 
       else { $("loginScreen").classList.remove("hidden"); }
@@ -435,7 +446,6 @@
       });
     });
 
-    // --- LOCK / UNLOCK CUSTOMER ACCOUNT ---
     async function toggleLockCustomer(userId, currentStatus) {
       const newStatus = currentStatus === 'locked' ? 'active' : 'locked';
       const actionText = newStatus === 'locked' ? 'lock' : 'unlock';
@@ -453,7 +463,6 @@
       }
     }
 
-    // --- UPDATE TRANSACTION STATUS ---
     async function updateTxStatus(txId) {
       const selectEl = document.getElementById(`status-select-${txId}`);
       const newStatus = selectEl.value;
@@ -467,7 +476,6 @@
       }
     }
 
-    // --- CUSTOMER DETAILS + PIN 2121 ---
     let detailsUserId = null;
     let pendingDetailField = null;
 
@@ -528,7 +536,6 @@
       pendingDetailField = null;
     }
 
-    // --- DEPOSIT MODAL LOGIC ---
     function openDepositModal(userId) {
       const c = customers.find(x => x.id === userId);
       if(!c) return;
