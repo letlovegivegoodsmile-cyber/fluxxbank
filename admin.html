@@ -285,11 +285,11 @@
     </div>
   </div>
 
-  <!-- DEPOSIT MODAL -->
+  <!-- DEPOSIT MODAL WITH BACKDATING -->
   <div class="modal-bg" id="depositModal" onclick="if(event.target===this) closeDepositModal()">
     <div class="modal-box">
-      <h3>💰 Deposit Funds</h3>
-      <p>Add money to customer's account securely.</p>
+      <h3>💰 Credit / Deposit Funds</h3>
+      <p>Add money to customer's account with optional backdating.</p>
       
       <div class="customer-info-box">
         <div class="info-row"><span>Customer Name</span><strong id="depName">-</strong></div>
@@ -324,11 +324,11 @@
       <label class="modal-label">Purpose of Transfer</label>
       <input type="text" id="depPurpose" class="modal-input" placeholder="e.g. Salary, Refund, Gift" required>
 
-      <label class="modal-label">Transaction Date & Time (optional — leave blank for now)</label>
+      <label class="modal-label">Transaction Date & Time (Backdate)</label>
       <input type="datetime-local" id="depDateTime" class="modal-input" style="text-align:left;">
       
       <div class="modal-actions">
-        <button class="btn" onclick="submitDeposit()">Confirm Deposit</button>
+        <button class="btn" onclick="submitDeposit()">Confirm & Credit</button>
         <button class="btn ghost" onclick="closeDepositModal()">Cancel</button>
       </div>
     </div>
@@ -389,6 +389,7 @@
       if (!window.supabase) return alert("Supabase failed to load.");
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       
+      // CATCH PASSWORD RECOVERY EVENT ON ADMIN PAGE
       sb.auth.onAuthStateChange((event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           $("loginScreen").classList.remove("hidden");
@@ -553,7 +554,10 @@
       $("depBank").value = "";
       $("depositAmountInput").value = "";
       $("depPurpose").value = "";
-      $("depDateTime").value = "";
+
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      $("depDateTime").value = now.toISOString().slice(0, 16);
       
       $("depositModal").classList.add("show");
       $("depFirstName").focus();
@@ -611,9 +615,10 @@
           txPayload.created_at = new Date(customDate).toISOString();
         }
 
-        await sb.from("transactions").insert(txPayload);
+        const { error: txErr } = await sb.from("transactions").insert(txPayload);
+        if(txErr) throw txErr;
         
-        toast(`✅ Deposited ${eur(amount)} successfully!`);
+        toast(`✅ Credited ${eur(amount)} successfully (Backdated/Timed)!`);
         closeDepositModal();
         await loadAll(); 
         renderCustomers();
@@ -621,7 +626,7 @@
         toast("Error: " + error.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = "Confirm Deposit";
+        btn.textContent = "Confirm & Credit";
       }
     }
 
@@ -769,7 +774,7 @@
             <button class="btn small" style="background:var(--accent); color:#fff;" onclick="openDepositModal('${c.id}')">+ Deposit</button>
             <button class="btn ghost small" onclick="openCustomerDetails('${c.id}')">View</button>
             <button class="btn small" style="background:${isLocked ? 'var(--ok)' : 'var(--bad)'}; color:#fff;" onclick="toggleLockCustomer('${c.id}', '${c.status}')">${isLocked ? 'Unlock' : 'Lock'}</button>
-            <button class="btn ghost small" onclick="sendPasswordReset('${c.email}')">Reset PW</button>
+            <button class="btn ghost small" onclick="sendPasswordResetLink('${c.email}')">Reset PW</button>
           </td>
         </tr>`;
       }).join("") || '<tr><td colspan="5" class="empty">No profiles.</td></tr>';
@@ -816,7 +821,7 @@
       }
     }
 
-    async function sendPasswordReset(email) {
+    async function sendPasswordResetLink(email) {
       if(!confirm(`Send a secure password reset link to ${email}?`)) return;
       
       const { error } = await sb.auth.resetPasswordForEmail(email, {
