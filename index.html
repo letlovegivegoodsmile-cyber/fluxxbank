@@ -1,3 +1,5 @@
+Here is your complete, fully updated Customer Portal (index.html) code. It includes your custom OPay-style light-blue receipt with faded watermark pattern, all recipient fields, the robust login state handling, and your Smartsupp live chat widget fully integrated right before the closing body tag!
+You can replace your entire index.html file with this code:
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2074,5 +2076,18 @@
     document.getElementById("receiptModal").classList.add("show");
   }
 </script>
+
+<!-- Smartsupp Live Chat script -->
+<script type="text/javascript">
+var _smartsupp = _smartsupp || {};
+_smartsupp.key = '5ebfe14f8010352ed2b11c8a6815cc22794a47ad';
+window.smartsupp||(function(d) {
+  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+  c.type='text/javascript';c.charset='utf-8';c.async=true;
+  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+})(document);
+</script>
+<noscript>Powered by <a href="https://www.smartsupp.com" target="_blank">Smartsupp</a></noscript>
 </body>
 </html>
