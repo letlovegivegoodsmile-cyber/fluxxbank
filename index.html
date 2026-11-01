@@ -1796,7 +1796,7 @@
       const firstName = (currentUserProfile.name || "Customer").split(" ")[0];
       document.getElementById("welcomeMessage").textContent = t("good_day_user").replace("{name}", firstName);
       const amtLabelEl = document.getElementById("transferAmtLabel");
-      if (amtLabelEl) amtLabelEl.textContent = `${t("tr_amt")} (${getCurrencySymbol()} ${getActiveCurrencyCode()})`;
+      if (amtLabelEl) amtLabelEl.textContent = `\( {t("tr_amt")} ( \){getCurrencySymbol()} ${getActiveCurrencyCode()})`;
     }
 
     // Re-render dynamic lists, reviews, gallery, chart, and receipt if open
@@ -2205,11 +2205,11 @@
             <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
             <div class="tx-details">
               <h4>${translateDescriptionText(txItem.description)}</h4>
-              <p>${formatLocaleDate(txItem.created_at)} · <span style="text-transform:capitalize; color:${statusColor}; font-weight:600;">${translateStatusWord(statusRaw)}</span></p>
+              <p>\( {formatLocaleDate(txItem.created_at)} · <span style="text-transform:capitalize; color: \){statusColor}; font-weight:600;">${translateStatusWord(statusRaw)}</span></p>
             </div>
           </div>
           <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
-            ${isPos ? '+' : '−'}${eur(Math.abs(txItem.amount))}
+            \( {isPos ? '+' : '−'} \){eur(Math.abs(txItem.amount))}
           </span>
         </div>
         `;
@@ -2240,11 +2240,11 @@
             <div class="tx-icon">${isPos ? '↓' : '↑'}</div>
             <div class="tx-details">
               <h4>${translateDescriptionText(txItem.description)}</h4>
-              <p>${formatLocaleDate(txItem.created_at)} · <span style="text-transform:capitalize; color:${statusColor}; font-weight:600;">${translateStatusWord(statusRaw)}</span></p>
+              <p>\( {formatLocaleDate(txItem.created_at)} · <span style="text-transform:capitalize; color: \){statusColor}; font-weight:600;">${translateStatusWord(statusRaw)}</span></p>
             </div>
           </div>
           <span class="tx-amount ${isPos ? 'pos' : 'neg'}">
-            ${isPos ? '+' : '−'}${eur(Math.abs(txItem.amount))}
+            \( {isPos ? '+' : '−'} \){eur(Math.abs(txItem.amount))}
           </span>
         </div>
         `;
@@ -2328,8 +2328,8 @@
 
   const rates = [["EUR/USD","1.087","+0.12%"],["USD/JPY","153.40","+0.28%"],["BTC","$98,420","+2.4%"],["ETH","$3,910","+1.1%"],["S&P 500","6,842","+0.6%"],["Gold","$2,915","−0.3%"],["GBP/EUR","1.174","−0.08%"]];
   document.getElementById("ticker").innerHTML = rates.map(r=>`
-    <div class="tick"><span style="color:var(--mut)">${r[0]}</span><b>${r[1]}</b>
-    <span class="${r[2].startsWith("+")?"up":"dn"}">${r[2]}</span></div>`).join("");
+    <div class="tick"><span style="color:var(--mut)">\( {r[0]}</span><b> \){r[1]}</b>
+    <span class="\( {r[2].startsWith("+")?"up":"dn"}"> \){r[2]}</span></div>`).join("");
 
   function count(id, target, suffix, dur){
     const el = document.getElementById(id), t0 = performance.now();
@@ -2738,7 +2738,7 @@
     if (vaultEl) vaultEl.textContent = eur(8120);
 
     const amtLabelEl = document.getElementById("transferAmtLabel");
-    if (amtLabelEl) amtLabelEl.textContent = `${t("tr_amt")} (${getCurrencySymbol()} ${getActiveCurrencyCode()})`;
+    if (amtLabelEl) amtLabelEl.textContent = `\( {t("tr_amt")} ( \){getCurrencySymbol()} ${getActiveCurrencyCode()})`;
 
     document.getElementById("userNameDisplay").textContent = profile.name;
     document.getElementById("welcomeMessage").textContent = t("good_day_user").replace("{name}", firstName);
@@ -2840,7 +2840,7 @@
 
       const expectedBalance = Number(p.balance) - amt;
       const referenceCode = "FLX-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 100);
-      const description = `Sent to ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;
+      const description = `Sent to ${fName} \( {lName} ( \){purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;
 
       const { data: txData, error: txError } = await sb.from("transactions").insert({ 
         user_id: session.user.id, 
@@ -2856,9 +2856,9 @@
 
       const otpDescEl = document.getElementById("otpModalDesc");
       if (currentLang === "ja") {
-        otpDescEl.innerHTML = `<strong id="transferToDisplay" style="color: var(--txt);">${fName} ${lName}</strong> 様への <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">${eur(amt)}</strong> の送金は承認待ちです。<br><br>この送金を承認するには、ワンタイムOTPコードを入力してください。`;
+        otpDescEl.innerHTML = `<strong id="transferToDisplay" style="color: var(--txt);">${fName} \( {lName}</strong> 様への <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;"> \){eur(amt)}</strong> の送金は承認待ちです。<br><br>この送金を承認するには、ワンタイムOTPコードを入力してください。`;
       } else {
-        otpDescEl.innerHTML = `Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">${eur(amt)}</strong> to <strong id="transferToDisplay" style="color: var(--txt);">${fName} ${lName}</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.`;
+        otpDescEl.innerHTML = `Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">\( {eur(amt)}</strong> to <strong id="transferToDisplay" style="color: var(--txt);"> \){fName} ${lName}</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.`;
       }
 
       document.getElementById("currentTxId").value = txData.id;
