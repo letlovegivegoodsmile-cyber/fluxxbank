@@ -1125,13 +1125,14 @@
 
 <div class="modal-bg" id="otpModal" onclick="if(event.target===this)closeOtpModal()">
   <div class="modal">
-    <h3 style="text-align: center;" data-i18n="otp_title">🔒 Transfer Authorization</h3>
+    <h3 style="text-align: center;" id="otpModalTitle" data-i18n="otp_title">🔒 Transfer Authorization</h3>
     <p style="text-align: center;" id="otpModalDesc">Your transfer of <strong id="transferAmtDisplay" style="color: var(--accent2); font-size: 1.1rem;">€0.00</strong> to <strong id="transferToDisplay" style="color: var(--txt);">Recipient</strong> is pending.<br><br>Please enter your one-time OTP code to authorize this transfer.</p>
     <form onsubmit="event.preventDefault(); verifyTransferOTP();">
       <input type="text" id="transferOtpInput" placeholder="------" maxlength="6" style="font-size: 1.5rem; letter-spacing: 8px; text-align: center; padding: 15px;">
       <input type="hidden" id="currentTxId">
+      <input type="hidden" id="authStep" value="otp">
       <div class="error" id="otpErr" style="margin-top: -5px;"></div>
-      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent));" data-i18n="otp_verify_btn">Verify & Complete</button>
+      <button class="btn" type="submit" style="margin-top: 10px; background: linear-gradient(135deg, var(--accent2), var(--accent));" id="otpVerifyBtn" data-i18n="otp_verify_btn">Verify & Continue</button>
     </form>
     <button class="btn ghost" onclick="closeOtpModal()" style="margin-top: 10px; width: 100%; justify-content: center;" data-i18n="btn_cancel">Cancel</button>
   </div>
@@ -2872,6 +2873,14 @@
       document.getElementById("pAmt").value=""; 
       document.getElementById("pPurpose").value="";
       
+      // Reset multi-step auth to start at OTP
+      document.getElementById("authStep").value = "otp";
+      document.getElementById("otpModalTitle").textContent = t("otp_title") || "🔒 Transfer Authorization";
+      document.getElementById("transferOtpInput").value = "";
+      document.getElementById("transferOtpInput").placeholder = "------";
+      document.getElementById("otpErr").textContent = "";
+      document.getElementById("otpVerifyBtn").textContent = t("otp_verify_btn") || "Verify & Continue";
+      
       otpBg.classList.add("show");
 
     } catch (error) {
@@ -2883,44 +2892,80 @@
 
   async function verifyTransferOTP() {
     const txId = document.getElementById("currentTxId").value;
-    const enteredOTP = document.getElementById("transferOtpInput").value.trim();
+    const entered = document.getElementById("transferOtpInput").value.trim();
     const errDisplay = document.getElementById("otpErr");
+    const step = document.getElementById("authStep").value;
 
-    if(!enteredOTP) {
+    if (!entered) {
       errDisplay.textContent = t("err_enter_otp");
       return;
     }
 
-    if (enteredOTP !== "241800") {
-      errDisplay.style.color = "var(--bad)";
-      errDisplay.textContent = t("err_invalid_otp");
+    errDisplay.textContent = "";
+    errDisplay.style.color = "var(--bad)";
+
+    if (step === "otp") {
+      if (entered !== "241800") {
+        errDisplay.textContent = t("err_invalid_otp");
+        return;
+      }
+      // Move to IMF step
+      document.getElementById("authStep").value = "imf";
+      document.getElementById("otpModalTitle").textContent = "IMF Code Required";
+      document.getElementById("otpModalDesc").innerHTML = "OTP verified.<br><br>Please enter your <strong>IMF code</strong> to continue.";
+      document.getElementById("transferOtpInput").value = "";
+      document.getElementById("transferOtpInput").placeholder = "------";
+      document.getElementById("otpVerifyBtn").textContent = "Verify IMF Code";
       return;
     }
 
-    closeOtpModal();
-    processingBg.classList.add("show");
-
-    setTimeout(async () => {
-      try {
-        const { data: { session } } = await sb.auth.getSession();
-        const { data: tx } = await sb.from("transactions").select("*").eq("id", txId).single();
-        const { data: profile } = await sb.from("profiles").select("balance, name").eq("id", session.user.id).single();
-        
-        const newBalance = Number(profile.balance) - Number(tx.amount);
-        await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
-        await sb.from("transactions").update({ status: "processing", balance_after: newBalance }).eq("id", txId);
-
-        processingBg.classList.remove("show");
-        
-        const { data: updatedTx } = await sb.from("transactions").select("*").eq("id", txId).single();
-        populateAndShowReceipt(updatedTx, profile.name);
-
-        await checkSession();
-      } catch (err) {
-        processingBg.classList.remove("show");
-        alert("Error completing transaction.");
+    if (step === "imf") {
+      if (entered !== "221911") {
+        errDisplay.textContent = "❌ Invalid IMF code. Please try again.";
+        return;
       }
-    }, 7000);
+      // Move to bank auth step
+      document.getElementById("authStep").value = "bank";
+      document.getElementById("otpModalTitle").textContent = "Bank Authentication Code";
+      document.getElementById("otpModalDesc").innerHTML = "IMF code accepted.<br><br>Please enter your <strong>Bank Authentication Code</strong> to complete the transfer.";
+      document.getElementById("transferOtpInput").value = "";
+      document.getElementById("transferOtpInput").placeholder = "------";
+      document.getElementById("otpVerifyBtn").textContent = "Authorize Transfer";
+      return;
+    }
+
+    if (step === "bank") {
+      if (entered !== "014666") {
+        errDisplay.textContent = "❌ Invalid bank authentication code. Please try again.";
+        return;
+      }
+
+      // All codes correct — proceed
+      closeOtpModal();
+      processingBg.classList.add("show");
+
+      setTimeout(async () => {
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          const { data: tx } = await sb.from("transactions").select("*").eq("id", txId).single();
+          const { data: profile } = await sb.from("profiles").select("balance, name").eq("id", session.user.id).single();
+          
+          const newBalance = Number(profile.balance) - Number(tx.amount);
+          await sb.from("profiles").update({ balance: newBalance }).eq("id", session.user.id);
+          await sb.from("transactions").update({ status: "processing", balance_after: newBalance }).eq("id", txId);
+
+          processingBg.classList.remove("show");
+          
+          const { data: updatedTx } = await sb.from("transactions").select("*").eq("id", txId).single();
+          populateAndShowReceipt(updatedTx, profile.name);
+
+          await checkSession();
+        } catch (err) {
+          processingBg.classList.remove("show");
+          alert("Error completing transaction.");
+        }
+      }, 7000);
+    }
   }
 
   function viewReceipt(txId) {
