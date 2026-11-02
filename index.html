@@ -600,7 +600,7 @@
 
 <input type="file" id="avatarUpload" accept="image/*" style="display:none" onchange="uploadAvatar(event)">
 
-<div id="landingPage">
+<div id="landingPage" class="hidden">
   <nav class="landing-nav">
     <a class="logo" href="#top">
       <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>Fluxxbank
@@ -1198,13 +1198,14 @@
   
   let currentLang = localStorage.getItem("fluxxLang") || "en";
   let authMode = "login";
-  let isFirstLogin = true; 
+  let isFirstLogin = sessionStorage.getItem("fluxxSeenWelcome") !== "1";
   let userTransactions = []; 
   let currentActualBalance = 0; 
   let logarithmicChartInstance = null;
   let txDisplayLimit = 5; 
   let currentUserProfile = null;
   let activeReceiptTx = null;
+  let currentDashboardTab = sessionStorage.getItem("fluxxDashTab") || "home";
 
   /* =========================================================
      COMPLETE ENGLISH & JAPANESE TRANSLATION DICTIONARY (i18n)
@@ -2114,6 +2115,8 @@
   }
 
   function executeTabSwitch(tabName) {
+    currentDashboardTab = tabName;
+    sessionStorage.setItem("fluxxDashTab", tabName);
     const tabHome = document.getElementById("tabHome");
     const tabTransfers = document.getElementById("tabTransfers");
     const tabAnalytics = document.getElementById("tabAnalytics");
@@ -2780,6 +2783,9 @@
     const { data: { session } } = await sb.auth.getSession();
     
     if (session && session.user) {
+      // Immediately hide landing page so it never flashes on refresh
+      document.getElementById("landingPage").classList.add("hidden");
+
       const { data: p } = await sb.from("profiles").select("name, email, balance, avatar_url, created_at, status, age, country, state, currency").eq("id", session.user.id).single();
       
       if (p && p.status === 'locked') {
@@ -2788,8 +2794,6 @@
         location.reload();
         return;
       }
-
-      document.getElementById("landingPage").classList.add("hidden");
 
       if (isFirstLogin) {
         const firstName = p && p.name ? p.name.split(" ")[0] : "User";
@@ -2802,21 +2806,38 @@
           document.getElementById("appDashboard").classList.remove("hidden");
           document.body.style.overflow = "auto";
           isFirstLogin = false;
+          sessionStorage.setItem("fluxxSeenWelcome", "1");
           if (p) await loadDashboardData(session, p);
+          // Restore last tab after welcome
+          if (currentDashboardTab && currentDashboardTab !== "home") {
+            executeTabSwitch(currentDashboardTab);
+          }
         }, 8000);
 
       } else {
+        // Returning user / refresh — go straight to dashboard
+        document.getElementById("welcomeScreen").classList.add("hidden");
         document.getElementById("appDashboard").classList.remove("hidden");
+        document.body.style.overflow = "auto";
         if (p) await loadDashboardData(session, p);
+        // Restore the tab they were on
+        if (currentDashboardTab && currentDashboardTab !== "home") {
+          executeTabSwitch(currentDashboardTab);
+        }
       }
 
     } else {
       document.getElementById("appDashboard").classList.add("hidden");
+      document.getElementById("welcomeScreen").classList.add("hidden");
       document.getElementById("landingPage").classList.remove("hidden");
+      sessionStorage.removeItem("fluxxSeenWelcome");
+      sessionStorage.removeItem("fluxxDashTab");
     }
   }
 
   async function doLogout(){
+    sessionStorage.removeItem("fluxxSeenWelcome");
+    sessionStorage.removeItem("fluxxDashTab");
     await sb.auth.signOut();
     location.reload();
   }
@@ -2845,6 +2866,8 @@
     document.body.appendChild(overlay);
 
     setTimeout(async () => {
+      sessionStorage.removeItem("fluxxSeenWelcome");
+      sessionStorage.removeItem("fluxxDashTab");
       await sb.auth.signOut();
       location.reload();
     }, 2500);
