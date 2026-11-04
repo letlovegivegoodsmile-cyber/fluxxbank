@@ -215,7 +215,10 @@
             <h1 id="pageTitle">Overview</h1>
             <small id="adminIdentity">Administrator</small>
           </div>
-          <button class="btn ghost" id="logoutBtn" type="button" style="width: auto;">Sign out</button>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn ghost" type="button" style="width: auto;" onclick="openChangePasswordModal()">Change Password</button>
+            <button class="btn ghost" id="logoutBtn" type="button" style="width: auto;">Sign out</button>
+          </div>
         </header>
 
         <div class="content">
@@ -364,6 +367,27 @@
     </div>
   </div>
 
+  <!-- CHANGE ADMIN PASSWORD MODAL -->
+  <div class="modal-bg" id="changePwModal" onclick="if(event.target===this) closeChangePasswordModal()">
+    <div class="modal-box" style="max-width: 440px;">
+      <h3>🔑 Change Administrator Password</h3>
+      <p>Setting a new password invalidates your existing password and immediately logs out all active sessions on every device.</p>
+      
+      <label class="modal-label">New Password</label>
+      <input type="password" id="adminNewPw" class="modal-input" placeholder="Minimum 8 characters" minlength="8" autocomplete="new-password">
+      
+      <label class="modal-label">Confirm New Password</label>
+      <input type="password" id="adminConfirmPw" class="modal-input" placeholder="Re-enter new password" minlength="8" autocomplete="new-password">
+      
+      <div id="adminPwModalErr" class="error" style="margin-bottom: 14px;"></div>
+      
+      <div class="modal-actions">
+        <button class="btn" id="confirmChangePwBtn" onclick="submitAdminPasswordChange()">Save & Log Out Everywhere</button>
+        <button class="btn ghost" onclick="closeChangePasswordModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="hidden"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -389,26 +413,37 @@
       if (!window.supabase) return alert("Supabase failed to load.");
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       
-      // CATCH PASSWORD RECOVERY EVENT ON ADMIN PAGE
+      // AUTH STATE LISTENER: RECOVERY & GLOBAL REVOCATION KICK
       sb.auth.onAuthStateChange((event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           $("loginScreen").classList.remove("hidden");
+          $("app").classList.add("hidden");
           $("loginForm").classList.add("hidden");
           $("forgotWrap").classList.add("hidden");
           $("newPasswordForm").classList.remove("hidden");
           $("loginSubtitle").textContent = "Please enter your new administrator password.";
+        } else if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) {
+          $("app").classList.add("hidden");
+          $("loginScreen").classList.remove("hidden");
+          showSignInForm("Session terminated. Your password was changed or session was revoked.");
         }
       });
 
       const { data } = await sb.auth.getSession();
-      if (data.session) { boot(data.session.user); } 
-      else { $("loginScreen").classList.remove("hidden"); }
+      if (data.session) { 
+        boot(data.session.user); 
+      } else { 
+        $("loginScreen").classList.remove("hidden"); 
+      }
 
       $("loginForm").addEventListener("submit", tryLogin);
       $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);
       $("newPasswordForm").addEventListener("submit", saveNewPassword);
       $("backToLoginBtn").addEventListener("click", () => showSignInForm());
-      $("logoutBtn").addEventListener("click", async () => { await sb.auth.signOut(); location.reload(); });
+      $("logoutBtn").addEventListener("click", async () => { 
+        await sb.auth.signOut(); 
+        location.reload(); 
+      });
 
       document.querySelectorAll(".side-btn").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -630,6 +665,59 @@
       }
     }
 
+    /* IN-DASHBOARD CHANGE PASSWORD MODAL LOGIC */
+    function openChangePasswordModal() {
+      $("adminNewPw").value = "";
+      $("adminConfirmPw").value = "";
+      $("adminPwModalErr").textContent = "";
+      $("changePwModal").classList.add("show");
+      $("adminNewPw").focus();
+    }
+
+    function closeChangePasswordModal() {
+      $("changePwModal").classList.remove("show");
+    }
+
+    async function submitAdminPasswordChange() {
+      const pw = $("adminNewPw").value;
+      const cpw = $("adminConfirmPw").value;
+      const errEl = $("adminPwModalErr");
+      const btn = $("confirmChangePwBtn");
+
+      if (!pw || pw.length < 8) {
+        errEl.textContent = "Password must be at least 8 characters.";
+        return;
+      }
+      if (pw !== cpw) {
+        errEl.textContent = "Passwords do not match.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Updating & revoking sessions...";
+      errEl.textContent = "";
+
+      try {
+        // 1. Invalidate old password in Supabase Auth
+        const { error: updateError } = await sb.auth.updateUser({ password: pw });
+        if (updateError) throw updateError;
+
+        closeChangePasswordModal();
+        toast("Password updated. Terminating sessions on all devices...");
+
+        // 2. Invalidate all active sessions globally across all devices
+        await sb.auth.signOut({ scope: 'global' });
+
+        setTimeout(() => {
+          window.location.reload();
+        }, 1200);
+      } catch (error) {
+        errEl.textContent = error.message;
+        btn.disabled = false;
+        btn.textContent = "Save & Log Out Everywhere";
+      }
+    }
+
     function showLoginError(msg) { $("loginErr").textContent = msg || ""; }
     function showPageError(msg) { $("pageErr").textContent = msg || ""; }
     function showLoginMessage(msg, success = false) {
@@ -738,15 +826,35 @@
       }
     }
     
+    /* RECOVERY PASSWORD SUBMIT (Kicks all sessions globally) */
     async function saveNewPassword(e) {
       e.preventDefault();
       const pw = $("newPassword").value, cpw = $("confirmNewPassword").value;
-      if (pw.length < 8) return $("passwordResetErr").textContent = "Use 8+ characters.";
-      if (pw !== cpw) return $("passwordResetErr").textContent = "Passwords don't match.";
+      const errEl = $("passwordResetErr");
+      const btn = $("saveNewPasswordBtn");
+
+      if (pw.length < 8) return errEl.textContent = "Use 8+ characters.";
+      if (pw !== cpw) return errEl.textContent = "Passwords don't match.";
+
+      btn.disabled = true;
+      btn.textContent = "Updating password...";
+      errEl.textContent = "";
+
       try {
-        await sb.auth.updateUser({ password: pw });
-        await sb.auth.signOut(); showSignInForm("Password updated.", true);
-      } catch (error) { $("passwordResetErr").textContent = error.message; }
+        const { error: updateError } = await sb.auth.updateUser({ password: pw });
+        if (updateError) throw updateError;
+
+        await sb.auth.signOut({ scope: 'global' });
+        
+        $("newPassword").value = "";
+        $("confirmNewPassword").value = "";
+        showSignInForm("Password updated successfully. Please sign in with your new password.", true);
+      } catch (error) { 
+        errEl.textContent = error.message; 
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Save new password";
+      }
     }
 
     function renderOverview() {
@@ -889,3 +997,4 @@
   </script>
 </body>
 </html>
+
