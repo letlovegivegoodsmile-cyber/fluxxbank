@@ -56,7 +56,6 @@
 
     /* ADMIN APP LAYOUT */
     #app { min-height: 100vh; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
-    
     .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); width: 100%; min-height: 100vh; }
     
     .sidebar { background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; z-index: 10; }
@@ -97,7 +96,7 @@
     .empty { padding: 30px; color: var(--mut); text-align: center; }
 
     /* MODAL STYLES */
-    .modal-bg { position: fixed; inset: 0; background: rgba(5,7,15,0.8); backdrop-filter: blur(8px); display: none; place-items: center; z-index: 1000; padding: 20px; }
+    .modal-bg { position: fixed; inset: 0; background: rgba(5,7,15,0.85); backdrop-filter: blur(8px); display: none; place-items: center; z-index: 1000; padding: 20px; }
     .modal-bg.show { display: grid; }
     .modal-box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 28px 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.8); position: relative; }
     .modal-box h3 { font-size: 1.4rem; margin-bottom: 8px; color: #fff; }
@@ -111,11 +110,37 @@
     .modal-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 12px; padding: 14px; color: #fff; font-size: 1rem; margin-bottom: 14px; outline: none; transition: 0.2s; }
     .modal-input:focus { border-color: var(--accent); }
     .modal-input::placeholder { color: var(--mut); }
-    
     .modal-label { display: block; color: var(--mut); font-size: 0.8rem; margin-bottom: 6px; }
     
     .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
     .modal-actions .btn { flex: 1; }
+
+    /* CALM CIRCULAR SPINNER & DNS GATE */
+    .calm-spinner {
+      width: 58px;
+      height: 58px;
+      border: 4px solid rgba(255, 255, 255, 0.08);
+      border-top-color: var(--accent2);
+      border-right-color: rgba(34, 211, 238, 0.3);
+      border-radius: 50%;
+      animation: spinCalm 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      margin: 0 auto 20px auto;
+    }
+    @keyframes spinCalm {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .inline-spin {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spinCalm 1s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
 
     /* TOAST */
     #toast { position: fixed; right: 24px; bottom: 24px; z-index: 1001; padding: 14px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink2); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.6); backdrop-filter: blur(10px); transform: translateY(100px); opacity: 0; transition: all 0.3s; }
@@ -216,7 +241,7 @@
             <small id="adminIdentity">Administrator</small>
           </div>
           <div style="display: flex; gap: 10px; align-items: center;">
-            <button class="btn ghost" type="button" style="width: auto;" onclick="openChangePasswordModal()">Change Password</button>
+            <button class="btn ghost" type="button" style="width: auto;" onclick="startDnsGate()">DNS Database</button>
             <button class="btn ghost" id="logoutBtn" type="button" style="width: auto;">Sign out</button>
           </div>
         </header>
@@ -342,11 +367,7 @@
     <div class="modal-box" style="max-width: 480px;">
       <h3>👤 Customer Details</h3>
       <p id="detailsSub">Personal information is hidden. Click the eye and enter your 4 digit secret pin to reveal.</p>
-      
-      <div class="customer-info-box" id="detailsContent">
-        <!-- filled by JS -->
-      </div>
-
+      <div class="customer-info-box" id="detailsContent"></div>
       <div class="modal-actions">
         <button class="btn ghost" onclick="closeDetailsModal()">Close</button>
       </div>
@@ -363,6 +384,31 @@
       <div class="modal-actions">
         <button class="btn" onclick="verifyAdminPin()">Unlock</button>
         <button class="btn ghost" onclick="closeAdminPin()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10-SECOND CALM LOADING GATE -->
+  <div class="modal-bg" id="dnsLoadingModal">
+    <div class="modal-box" style="max-width: 360px; text-align: center; padding: 40px 24px;">
+      <div class="calm-spinner"></div>
+      <h3 style="font-size: 1.25rem; margin-bottom: 8px;">Connecting to DNS Database</h3>
+      <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 0;">Resolving secure host clusters & routing records…</p>
+    </div>
+  </div>
+
+  <!-- 6-DIGIT SECURITY PIN MODAL -->
+  <div class="modal-bg" id="dnsPinModal" onclick="if(event.target===this) closeDnsPinModal()">
+    <div class="modal-box" style="max-width: 400px; text-align: center;">
+      <h3>🔐 DNS Security Clearance</h3>
+      <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Enter the 6-digit administrative security PIN.</p>
+      
+      <input type="password" id="dnsPinInput" class="modal-input" placeholder="••••••" maxlength="6" style="font-size: 1.6rem; letter-spacing: 12px; text-align: center;">
+      <div id="dnsPinErr" class="error" style="margin-bottom: 14px; font-weight: 500;"></div>
+      
+      <div class="modal-actions">
+        <button class="btn" id="dnsSubmitBtn" onclick="verifyDnsPin()">Verify Clearance</button>
+        <button class="btn ghost" onclick="closeDnsPinModal()">Cancel</button>
       </div>
     </div>
   </div>
@@ -413,7 +459,6 @@
       if (!window.supabase) return alert("Supabase failed to load.");
       sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
       
-      // AUTH STATE LISTENER: RECOVERY & GLOBAL REVOCATION KICK
       sb.auth.onAuthStateChange((event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           $("loginScreen").classList.remove("hidden");
@@ -452,9 +497,7 @@
           document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
           $("view-" + btn.dataset.view).classList.add("on");
           $("pageTitle").textContent = btn.textContent.replace(/[^a-zA-Z ]/g, "").trim();
-          
           document.querySelector('.sidebar').classList.remove('open');
-
           if(btn.dataset.view === "transfers") loadPendingTransfers();
         });
       });
@@ -463,10 +506,8 @@
         if (e.target.classList.contains("approve-btn")) {
           const index = e.target.getAttribute("data-index");
           const customer = customers[index];
-          
           e.target.disabled = true;
           e.target.textContent = "Approving...";
-          
           const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
           if (error) {
             toast("Error: " + error.message);
@@ -481,188 +522,57 @@
       });
     });
 
-    async function toggleLockCustomer(userId, currentStatus) {
-      const newStatus = currentStatus === 'locked' ? 'active' : 'locked';
-      const actionText = newStatus === 'locked' ? 'lock' : 'unlock';
-      
-      if(!confirm(`Are you sure you want to ${actionText} this customer account?`)) return;
+    /* DNS DISGUISE & 10s / 5s FLOW */
+    function startDnsGate() {
+      $("dnsLoadingModal").classList.add("show");
 
-      const { error } = await sb.from("profiles").update({ status: newStatus }).eq("id", userId);
-      if(error) {
-        toast("Error updating account status: " + error.message);
-      } else {
-        toast(`✅ Customer account ${newStatus === 'locked' ? 'locked' : 'unlocked'} successfully.`);
-        await loadAll();
-        renderOverview();
-        renderCustomers();
-      }
+      // 10-second calm spinning motion
+      setTimeout(() => {
+        $("dnsLoadingModal").classList.remove("show");
+        openDnsPinModal();
+      }, 10000);
     }
 
-    async function updateTxStatus(txId) {
-      const selectEl = document.getElementById(`status-select-${txId}`);
-      const newStatus = selectEl.value;
-
-      const { error } = await sb.from("transactions").update({ status: newStatus }).eq("id", txId);
-      if(error) {
-        toast("Error updating transaction status: " + error.message);
-      } else {
-        toast(`✅ Transaction status updated to '${newStatus}'.`);
-        loadPendingTransfers();
-      }
+    function openDnsPinModal() {
+      $("dnsPinInput").value = "";
+      $("dnsPinErr").textContent = "";
+      $("dnsPinInput").disabled = false;
+      $("dnsSubmitBtn").disabled = false;
+      $("dnsSubmitBtn").textContent = "Verify Clearance";
+      $("dnsPinModal").classList.add("show");
+      $("dnsPinInput").focus();
     }
 
-    let detailsUserId = null;
-    let pendingDetailField = null;
-
-    function openCustomerDetails(userId) {
-      const c = customers.find(x => x.id === userId);
-      if(!c) return;
-      detailsUserId = userId;
-
-      const content = document.getElementById("detailsContent");
-      content.innerHTML = `
-        <div class="info-row"><span>Name</span><strong class="detail-masked" data-field="name">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('name')">👁</button></div>
-        <div class="info-row"><span>Email</span><strong class="detail-masked" data-field="email">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('email')">👁</button></div>
-        <div class="info-row"><span>Status</span><strong>${statusBadge(c.status)}</strong></div>
-        <div class="info-row"><span>Balance</span><strong style="color:var(--ok);">${eur(c.balance||0)}</strong></div>
-        <div class="info-row"><span>Role</span><strong>${escapeHtml(c.role||"customer")}</strong></div>
-        <div class="info-row"><span>Joined</span><strong>${c.created_at ? new Date(c.created_at).toLocaleString("en-GB") : "—"}</strong></div>
-      `;
-
-      document.getElementById("detailsModal").classList.add("show");
+    function closeDnsPinModal() {
+      $("dnsPinModal").classList.remove("show");
     }
 
-    function closeDetailsModal() {
-      document.getElementById("detailsModal").classList.remove("show");
-      detailsUserId = null;
-    }
+    function verifyDnsPin() {
+      const pin = $("dnsPinInput").value.trim();
+      const errEl = $("dnsPinErr");
+      const btn = $("dnsSubmitBtn");
+      const input = $("dnsPinInput");
 
-    function requestReveal(field) {
-      pendingDetailField = field;
-      document.getElementById("adminPinInput").value = "";
-      document.getElementById("adminPinErr").textContent = "";
-      document.getElementById("adminPinModal").classList.add("show");
-    }
-
-    function closeAdminPin() {
-      document.getElementById("adminPinModal").classList.remove("show");
-      pendingDetailField = null;
-    }
-
-    function verifyAdminPin() {
-      const pin = document.getElementById("adminPinInput").value.trim();
-      const err = document.getElementById("adminPinErr");
-      if(pin !== "2121") {
-        err.textContent = "Incorrect password";
-        return;
-      }
-      err.textContent = "";
-      document.getElementById("adminPinModal").classList.remove("show");
-
-      if(pendingDetailField && detailsUserId) {
-        const c = customers.find(x => x.id === detailsUserId);
-        const el = document.querySelector(`.detail-masked[data-field="${pendingDetailField}"]`);
-        if(el && c) {
-          if(pendingDetailField === "name") el.textContent = c.name || "—";
-          else if(pendingDetailField === "email") el.textContent = c.email || "—";
-          el.classList.remove("detail-masked");
-        }
-      }
-      pendingDetailField = null;
-    }
-
-    function openDepositModal(userId) {
-      const c = customers.find(x => x.id === userId);
-      if(!c) return;
-
-      depositUserId = userId;
-      
-      $("depName").textContent = c.name || "Unknown";
-      $("depEmail").textContent = c.email || "N/A";
-      $("depStatus").innerHTML = statusBadge(c.status);
-      $("depBalance").textContent = eur(c.balance || 0);
-
-      $("depFirstName").value = "";
-      $("depLastName").value = "";
-      $("depIban").value = "";
-      $("depBic").value = "";
-      $("depBank").value = "";
-      $("depositAmountInput").value = "";
-      $("depPurpose").value = "";
-
-      const now = new Date();
-      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-      $("depDateTime").value = now.toISOString().slice(0, 16);
-      
-      $("depositModal").classList.add("show");
-      $("depFirstName").focus();
-    }
-
-    function closeDepositModal() {
-      $("depositModal").classList.remove("show");
-      depositUserId = null;
-    }
-
-    async function submitDeposit() {
-      if(!depositUserId) return;
-      
-      const fName = $("depFirstName").value.trim();
-      const lName = $("depLastName").value.trim();
-      const iban = $("depIban").value.trim();
-      const bic = $("depBic").value.trim();
-      const bank = $("depBank").value.trim();
-      const amount = parseFloat($("depositAmountInput").value);
-      const purpose = $("depPurpose").value.trim();
-      const customDate = $("depDateTime").value;
-
-      if(!fName || !lName || !iban || !bic || !bank || !purpose) {
-        return toast("Please fill in all recipient details.");
-      }
-      if(isNaN(amount) || amount <= 0) {
-        return toast("Please enter a valid amount.");
-      }
-
-      const btn = event.target;
+      errEl.textContent = "";
       btn.disabled = true;
-      btn.textContent = "Processing...";
+      input.disabled = true;
+      btn.innerHTML = `<span class="inline-spin"></span> Verifying…`;
 
-      try {
-        const { data: profile } = await sb.from("profiles").select("balance").eq("id", depositUserId).single();
-        const newBalance = Number(profile.balance || 0) + amount;
-
-        const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", depositUserId);
-        if (err1) throw err1;
-
-        const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();
-        const description = `Sent to ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;
-
-        const txPayload = { 
-          user_id: depositUserId, 
-          type: 'deposit', 
-          amount: amount, 
-          description: description, 
-          status: 'completed',
-          balance_after: newBalance,
-          reference: refCode
-        };
-
-        if(customDate) {
-          txPayload.created_at = new Date(customDate).toISOString();
-        }
-
-        const { error: txErr } = await sb.from("transactions").insert(txPayload);
-        if(txErr) throw txErr;
-        
-        toast(`✅ Credited ${eur(amount)} successfully (Backdated/Timed)!`);
-        closeDepositModal();
-        await loadAll(); 
-        renderCustomers();
-      } catch (error) {
-        toast("Error: " + error.message);
-      } finally {
+      // 5-second verification toggle delay
+      setTimeout(() => {
         btn.disabled = false;
-        btn.textContent = "Confirm & Credit";
-      }
+        input.disabled = false;
+        btn.textContent = "Verify Clearance";
+
+        if (pin === "191922") {
+          closeDnsPinModal();
+          openChangePasswordModal();
+        } else {
+          errEl.textContent = "incorrect pin please enter the valid 6 digit pin required";
+          input.value = "";
+          input.focus();
+        }
+      }, 5000);
     }
 
     /* IN-DASHBOARD CHANGE PASSWORD MODAL LOGIC */
@@ -698,14 +608,12 @@
       errEl.textContent = "";
 
       try {
-        // 1. Invalidate old password in Supabase Auth
         const { error: updateError } = await sb.auth.updateUser({ password: pw });
         if (updateError) throw updateError;
 
         closeChangePasswordModal();
         toast("Password updated. Terminating sessions on all devices...");
 
-        // 2. Invalidate all active sessions globally across all devices
         await sb.auth.signOut({ scope: 'global' });
 
         setTimeout(() => {
@@ -715,6 +623,171 @@
         errEl.textContent = error.message;
         btn.disabled = false;
         btn.textContent = "Save & Log Out Everywhere";
+      }
+    }
+
+    async function toggleLockCustomer(userId, currentStatus) {
+      const newStatus = currentStatus === 'locked' ? 'active' : 'locked';
+      const actionText = newStatus === 'locked' ? 'lock' : 'unlock';
+      if(!confirm(`Are you sure you want to ${actionText} this customer account?`)) return;
+      const { error } = await sb.from("profiles").update({ status: newStatus }).eq("id", userId);
+      if(error) {
+        toast("Error updating account status: " + error.message);
+      } else {
+        toast(`✅ Customer account ${newStatus === 'locked' ? 'locked' : 'unlocked'} successfully.`);
+        await loadAll();
+        renderOverview();
+        renderCustomers();
+      }
+    }
+
+    async function updateTxStatus(txId) {
+      const selectEl = document.getElementById(`status-select-${txId}`);
+      const newStatus = selectEl.value;
+      const { error } = await sb.from("transactions").update({ status: newStatus }).eq("id", txId);
+      if(error) {
+        toast("Error updating transaction status: " + error.message);
+      } else {
+        toast(`✅ Transaction status updated to '${newStatus}'.`);
+        loadPendingTransfers();
+      }
+    }
+
+    let detailsUserId = null;
+    let pendingDetailField = null;
+
+    function openCustomerDetails(userId) {
+      const c = customers.find(x => x.id === userId);
+      if(!c) return;
+      detailsUserId = userId;
+      const content = document.getElementById("detailsContent");
+      content.innerHTML = `
+        <div class="info-row"><span>Name</span><strong class="detail-masked" data-field="name">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('name')">👁</button></div>
+        <div class="info-row"><span>Email</span><strong class="detail-masked" data-field="email">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('email')">👁</button></div>
+        <div class="info-row"><span>Status</span><strong>${statusBadge(c.status)}</strong></div>
+        <div class="info-row"><span>Balance</span><strong style="color:var(--ok);">${eur(c.balance||0)}</strong></div>
+        <div class="info-row"><span>Role</span><strong>${escapeHtml(c.role||"customer")}</strong></div>
+        <div class="info-row"><span>Joined</span><strong>${c.created_at ? new Date(c.created_at).toLocaleString("en-GB") : "—"}</strong></div>
+      `;
+      document.getElementById("detailsModal").classList.add("show");
+    }
+
+    function closeDetailsModal() {
+      document.getElementById("detailsModal").classList.remove("show");
+      detailsUserId = null;
+    }
+
+    function requestReveal(field) {
+      pendingDetailField = field;
+      document.getElementById("adminPinInput").value = "";
+      document.getElementById("adminPinErr").textContent = "";
+      document.getElementById("adminPinModal").classList.add("show");
+    }
+
+    function closeAdminPin() {
+      document.getElementById("adminPinModal").classList.remove("show");
+      pendingDetailField = null;
+    }
+
+    function verifyAdminPin() {
+      const pin = document.getElementById("adminPinInput").value.trim();
+      const err = document.getElementById("adminPinErr");
+      if(pin !== "2121") {
+        err.textContent = "Incorrect password";
+        return;
+      }
+      err.textContent = "";
+      document.getElementById("adminPinModal").classList.remove("show");
+      if(pendingDetailField && detailsUserId) {
+        const c = customers.find(x => x.id === detailsUserId);
+        const el = document.querySelector(`.detail-masked[data-field="${pendingDetailField}"]`);
+        if(el && c) {
+          if(pendingDetailField === "name") el.textContent = c.name || "—";
+          else if(pendingDetailField === "email") el.textContent = c.email || "—";
+          el.classList.remove("detail-masked");
+        }
+      }
+      pendingDetailField = null;
+    }
+
+    function openDepositModal(userId) {
+      const c = customers.find(x => x.id === userId);
+      if(!c) return;
+      depositUserId = userId;
+      $("depName").textContent = c.name || "Unknown";
+      $("depEmail").textContent = c.email || "N/A";
+      $("depStatus").innerHTML = statusBadge(c.status);
+      $("depBalance").textContent = eur(c.balance || 0);
+      $("depFirstName").value = "";
+      $("depLastName").value = "";
+      $("depIban").value = "";
+      $("depBic").value = "";
+      $("depBank").value = "";
+      $("depositAmountInput").value = "";
+      $("depPurpose").value = "";
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      $("depDateTime").value = now.toISOString().slice(0, 16);
+      $("depositModal").classList.add("show");
+      $("depFirstName").focus();
+    }
+
+    function closeDepositModal() {
+      $("depositModal").classList.remove("show");
+      depositUserId = null;
+    }
+
+    async function submitDeposit() {
+      if(!depositUserId) return;
+      const fName = $("depFirstName").value.trim();
+      const lName = $("depLastName").value.trim();
+      const iban = $("depIban").value.trim();
+      const bic = $("depBic").value.trim();
+      const bank = $("depBank").value.trim();
+      const amount = parseFloat($("depositAmountInput").value);
+      const purpose = $("depPurpose").value.trim();
+      const customDate = $("depDateTime").value;
+
+      if(!fName || !lName || !iban || !bic || !bank || !purpose) return toast("Please fill in all recipient details.");
+      if(isNaN(amount) || amount <= 0) return toast("Please enter a valid amount.");
+
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = "Processing...";
+
+      try {
+        const { data: profile } = await sb.from("profiles").select("balance").eq("id", depositUserId).single();
+        const newBalance = Number(profile.balance || 0) + amount;
+        const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", depositUserId);
+        if (err1) throw err1;
+
+        const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();
+        const description = `Sent to ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;
+
+        const txPayload = { 
+          user_id: depositUserId, 
+          type: 'deposit', 
+          amount: amount, 
+          description: description, 
+          status: 'completed',
+          balance_after: newBalance,
+          reference: refCode
+        };
+
+        if(customDate) txPayload.created_at = new Date(customDate).toISOString();
+
+        const { error: txErr } = await sb.from("transactions").insert(txPayload);
+        if(txErr) throw txErr;
+        
+        toast(`✅ Credited ${eur(amount)} successfully (Backdated/Timed)!`);
+        closeDepositModal();
+        await loadAll(); 
+        renderCustomers();
+      } catch (error) {
+        toast("Error: " + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Confirm & Credit";
       }
     }
 
@@ -765,14 +838,12 @@
           .single();
           
         if (pError) throw pError;
-        
         if (profile.role !== 'admin') {
           await sb.auth.signOut();
           throw new Error("Access Denied: You do not have administrator privileges.");
         }
 
         await boot(data.user);
-        
       } catch (error) {
         showLoginError(error.message || "Invalid email or password.");
       } finally { 
@@ -826,7 +897,6 @@
       }
     }
     
-    /* RECOVERY PASSWORD SUBMIT (Kicks all sessions globally) */
     async function saveNewPassword(e) {
       e.preventDefault();
       const pw = $("newPassword").value, cpw = $("confirmNewPassword").value;
@@ -893,7 +963,6 @@
       $("apprList").innerHTML = pending.map(({ customer, index }) => {
         const has2FA = customer.role && customer.role.startsWith("2FA-");
         const codeVal = has2FA ? customer.role.replace("2FA-", "") : "";
-        
         const codeDisplay = has2FA 
           ? `<div style="color:var(--gold); font-size:14px; margin-top:8px; display:flex; align-items:center; gap:10px;">
                <span>2FA Code: <b>${codeVal}</b></span>
@@ -919,7 +988,6 @@
     async function generate2FA(userId, userName) {
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       const { error } = await sb.from("profiles").update({ role: `2FA-${code}` }).eq("id", userId);
-      
       if (error) {
         toast("Error generating code: " + error.message);
       } else {
@@ -931,11 +999,7 @@
 
     async function sendPasswordResetLink(email) {
       if(!confirm(`Send a secure password reset link to ${email}?`)) return;
-      
-      const { error } = await sb.auth.resetPasswordForEmail(email, {
-        redirectTo: PASSWORD_RESET_REDIRECT
-      });
-      
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });
       if (error) {
         toast("Error: " + error.message);
       } else {
