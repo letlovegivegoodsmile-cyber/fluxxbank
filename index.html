@@ -1132,6 +1132,20 @@
   </div>
 </div>
 
+<!-- NEW: SET NEW PASSWORD MODAL (used when the recovery link is clicked) -->
+<div class="modal-bg" id="resetPasswordModal">
+  <div class="modal">
+    <h3 style="text-align: center;" data-i18n="rpw_title">Set a new password 🔑</h3>
+    <p style="text-align: center;" data-i18n="rpw_sub">Choose a new password for your Fluxxbank account.</p>
+    <form onsubmit="event.preventDefault(); submitNewPassword();">
+      <input type="password" id="newPass1" data-i18n-placeholder="rpw_new_ph" placeholder="New password" required autocomplete="new-password">
+      <input type="password" id="newPass2" data-i18n-placeholder="rpw_confirm_ph" placeholder="Confirm new password" required autocomplete="new-password">
+      <div class="error" id="newPassErr"></div>
+      <button class="btn" id="newPassBtn" type="submit" data-i18n="rpw_btn">Update password</button>
+    </form>
+  </div>
+</div>
+
 <div class="modal-bg" id="otpModal" onclick="if(event.target===this)closeOtpModal()">
   <div class="modal">
     <h3 style="text-align: center;" id="otpModalTitle" data-i18n="otp_title">🔒 Transfer Authorization</h3>
@@ -1206,6 +1220,15 @@
   let currentUserProfile = null;
   let activeReceiptTx = null;
   let currentDashboardTab = sessionStorage.getItem("fluxxDashTab") || "home";
+
+  /* =========================================================
+     RECOVERY MODE DETECTION (NEW)
+     Read the URL hash/query BEFORE checkSession() runs so that
+     a Supabase recovery link lands on the "Set new password"
+     screen instead of dumping the user into the dashboard.
+     ========================================================= */
+  let isRecoveryMode = /[?#&]type=recovery/.test(window.location.hash + window.location.search) ||
+                       /error_code=otp_expired/.test(window.location.hash);
 
   /* =========================================================
      COMPLETE ENGLISH & JAPANESE TRANSLATION DICTIONARY (i18n)
@@ -1409,6 +1432,15 @@
       fp_btn: "Send Reset Link",
       fp_sending: "Sending link...",
       fp_back: "Back to Login",
+      rpw_title: "Set a new password 🔑",
+      rpw_sub: "Choose a new password for your Fluxxbank account.",
+      rpw_new_ph: "New password",
+      rpw_confirm_ph: "Confirm new password",
+      rpw_btn: "Update password",
+      rpw_short: "Password needs at least 6 characters.",
+      rpw_mismatch: "Passwords do not match.",
+      rpw_success: "Password updated. Please log in with your new password.",
+      rpw_expired: "This reset link has expired or is invalid. Please request a new one.",
       otp_title: "🔒 Transfer Authorization",
       otp_verify_btn: "Verify & Complete",
       proc_title: "Processing Transfer...",
@@ -1669,6 +1701,15 @@
       fp_btn: "リセットリンクを送信",
       fp_sending: "送信中...",
       fp_back: "ログイン画面へ戻る",
+      rpw_title: "新しいパスワードを設定 🔑",
+      rpw_sub: "Fluxxbank アカウントの新しいパスワードを入力してください。",
+      rpw_new_ph: "新しいパスワード",
+      rpw_confirm_ph: "新しいパスワード（確認）",
+      rpw_btn: "パスワードを更新",
+      rpw_short: "パスワードは6文字以上で入力してください。",
+      rpw_mismatch: "パスワードが一致しません。",
+      rpw_success: "パスワードを更新しました。新しいパスワードでログインしてください。",
+      rpw_expired: "このリセットリンクは期限切れか無効です。もう一度リクエストしてください。",
       otp_title: "🔒 送金承認（ワンタイムパスワード）",
       otp_verify_btn: "認証して送金を完了",
       proc_title: "送金を処理しています...",
@@ -2051,6 +2092,58 @@
     applyLanguage();
     checkSession();
   });
+
+  /* =========================================================
+     PASSWORD RECOVERY HANDLERS (NEW)
+     Supabase fires PASSWORD_RECOVERY when the recovery link lands.
+     ========================================================= */
+  sb.auth.onAuthStateChange((event) => {
+    if (event === "PASSWORD_RECOVERY") {
+      isRecoveryMode = true;
+      showRecoveryScreen();
+    }
+  });
+
+  function showRecoveryScreen() {
+    document.getElementById("landingPage").classList.add("hidden");
+    document.getElementById("appDashboard").classList.add("hidden");
+    document.getElementById("welcomeScreen").classList.add("hidden");
+    document.getElementById("modalBg").classList.remove("show");
+    document.getElementById("forgotPasswordModal").classList.remove("show");
+    document.getElementById("resetPasswordModal").classList.add("show");
+    document.getElementById("newPassErr").textContent = "";
+    document.getElementById("newPass1").value = "";
+    document.getElementById("newPass2").value = "";
+  }
+
+  async function submitNewPassword() {
+    const p1 = document.getElementById("newPass1").value;
+    const p2 = document.getElementById("newPass2").value;
+    const err = document.getElementById("newPassErr");
+    const btn = document.getElementById("newPassBtn");
+    err.style.color = "var(--bad)";
+    err.textContent = "";
+
+    if (p1.length < 6) { err.textContent = t("rpw_short"); return; }
+    if (p1 !== p2)     { err.textContent = t("rpw_mismatch"); return; }
+
+    btn.disabled = true;
+    const orig = btn.textContent;
+    btn.textContent = "...";
+
+    const { error } = await sb.auth.updateUser({ password: p1 });
+    btn.disabled = false;
+    btn.textContent = orig;
+
+    if (error) { err.textContent = error.message; return; }
+
+    isRecoveryMode = false;
+    history.replaceState(null, "", window.location.pathname);
+    document.getElementById("resetPasswordModal").classList.remove("show");
+    await sb.auth.signOut();
+    alert(t("rpw_success"));
+    location.reload();
+  }
 
   function switchDashboardTab(tabName, e) {
     if(e) e.preventDefault();
@@ -2780,6 +2873,24 @@
   }
 
   async function checkSession() {
+    /* RECOVERY SHORT-CIRCUIT (NEW): if the URL came from a
+       Supabase reset-password email, do NOT load the dashboard.
+       Show the "Set new password" modal instead. */
+    if (isRecoveryMode) {
+      // If the token was already consumed by supabase-js we still have a session.
+      // If it wasn't, onAuthStateChange will trigger it. Either way, show the modal.
+      const { data: { session } } = await sb.auth.getSession();
+      if (session && session.user) {
+        showRecoveryScreen();
+        return;
+      }
+      if (/error_code=otp_expired/.test(window.location.hash)) {
+        alert(t("rpw_expired"));
+        history.replaceState(null, "", window.location.pathname);
+        isRecoveryMode = false;
+      }
+    }
+
     const { data: { session } } = await sb.auth.getSession();
     
     if (session && session.user) {
