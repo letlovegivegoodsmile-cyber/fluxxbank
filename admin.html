@@ -1,1063 +1,1027 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-  <title>Fluxxbank — Admin Console</title>
-  <style>
-    :root{
-      --ink:#0b1020; --ink2:#131a33; --card:#161f3d;
-      --accent:#4f7cff; --accent2:#22d3ee; --accent3:#a855f7;
-      --gold:#f5c451;
-      --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08);
-      --ok:#34d399; --bad:#f87171;
-      --r:16px;
-    }
-    *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}
-    body{background:var(--ink);color:var(--txt);min-height:100vh;overflow-x:hidden}
-    a{color:inherit;text-decoration:none}
-    button{font:inherit;cursor:pointer;border:none}
-    .hidden{display:none !important}
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <meta name="robots" content="noindex, nofollow">  
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />  
+  <meta http-equiv="Pragma" content="no-cache" />  
+  <meta http-equiv="Expires" content="0" />  
+  <title>Fluxxbank — Admin Console</title>  
+  <style>  
+    :root{  
+      --ink:#0b1020; --ink2:#131a33; --card:#161f3d;  
+      --accent:#4f7cff; --accent2:#22d3ee; --accent3:#a855f7;  
+      --gold:#f5c451;  
+      --txt:#eef1fb; --mut:#9aa6c8; --line:rgba(255,255,255,.08);  
+      --ok:#34d399; --bad:#f87171;  
+      --r:16px;  
+    }  
+    *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Inter,system-ui,sans-serif}  
+    body{background:var(--ink);color:var(--txt);min-height:100vh;overflow-x:hidden}  
+    a{color:inherit;text-decoration:none}  
+    button{font:inherit;cursor:pointer;border:none}  
+    .hidden{display:none !important}  /* LOGIN SCREEN */  
+#loginScreen {  
+  position: fixed; inset: 0; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%);  
+  display: grid; place-items: center; padding: 20px; z-index: 999;  
+}  
+.login-box {  
+  width: 100%; max-width: 440px; padding: 40px; background: rgba(22, 31, 61, 0.7);  
+  border: 1px solid var(--line); border-radius: 24px; backdrop-filter: blur(20px);  
+  box-shadow: 0 30px 80px rgba(0,0,0,.6);  
+}  
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.5rem; margin-bottom: 8px; }  
+.brand .mark { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 0 22px rgba(79,124,255,.55); }  
+.brand .mark svg { width: 20px; height: 20px; }  
+.subtitle { color: var(--mut); font-size: 0.9rem; line-height: 1.6; margin-bottom: 28px; }  
+  
+.input-group { margin-bottom: 18px; }  
+.input-group label { display: block; color: var(--mut); font-size: 0.85rem; margin-bottom: 6px; }  
+.input-group input { width: 100%; padding: 14px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--line); color: white; font-size: 1rem; outline: none; transition: 0.2s; }  
+.input-group input:focus { border-color: var(--accent); }  
 
-    /* LOGIN SCREEN */
-    #loginScreen {
-      position: fixed; inset: 0; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%);
-      display: grid; place-items: center; padding: 20px; z-index: 999;
-    }
-    .login-box {
-      width: 100%; max-width: 440px; padding: 40px; background: rgba(22, 31, 61, 0.7);
-      border: 1px solid var(--line); border-radius: 24px; backdrop-filter: blur(20px);
-      box-shadow: 0 30px 80px rgba(0,0,0,.6);
-    }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.5rem; margin-bottom: 8px; }
-    .brand .mark { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 0 22px rgba(79,124,255,.55); }
-    .brand .mark svg { width: 20px; height: 20px; }
-    .subtitle { color: var(--mut); font-size: 0.9rem; line-height: 1.6; margin-bottom: 28px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 22px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; background: linear-gradient(135deg, var(--accent), #3b5bdb); color: #fff; box-shadow: 0 6px 22px rgba(79,124,255,.35); transition: transform .15s, box-shadow .15s; width: 100%; }  
+.btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(79,124,255,.5); }  
+.btn.ghost { background: transparent; border: 1px solid var(--line); box-shadow: none; color: var(--txt); }  
+.btn:disabled { opacity: .6; cursor: wait; }  
+.btn.small { padding: 8px 12px; font-size: 0.8rem; width: auto; display: inline-block; margin-right: 5px; }  
+
+.error { color: var(--bad); font-size: 0.85rem; line-height: 1.5; margin-top: 10px; text-align: center; }  
+.success { color: var(--ok); font-size: 0.85rem; text-align: center; }  
+.login-links { display: flex; justify-content: flex-end; margin-top: 14px; }  
+.text-btn { background: transparent; color: var(--accent2); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }  
+
+/* ADMIN APP LAYOUT */  
+#app { min-height: 100vh; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }  
+.layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); width: 100%; min-height: 100vh; }  
+  
+.sidebar { background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; z-index: 10; }  
+.sidebar .brand { margin-bottom: 30px; }  
+.side-label { padding: 10px 16px; color: var(--mut); font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; }  
+.side-nav { list-style: none; flex: 1; display: flex; flex-direction: column; gap: 8px; }  
+.side-btn { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; background: transparent; text-align: left; transition: all 0.2s; }  
+.side-btn:hover, .side-btn.on { background: rgba(79, 124, 255, 0.1); color: var(--accent2); }  
+.side-btn.on { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }  
+
+main { padding: 40px; min-width: 0; width: 100%; }  
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }  
+.topbar h1 { font-size: 2rem; font-weight: 700; }  
+.topbar small { display: block; color: var(--mut); margin-top: 5px; }  
+
+.content { display: flex; flex-direction: column; gap: 24px; width: 100%; }  
+.view { display: none; }  
+.view.on { display: block; }  
+  
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 24px; width: 100%; }  
+.stat, .panel { background: rgba(22, 31, 61, 0.7); border: 1px solid var(--line); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); width: 100%; }  
+.stat-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }  
+.stat-value { margin-top: 10px; font-size: 2.5rem; font-weight: 800; }  
+
+.panel h2 { margin-bottom: 20px; font-size: 1.3rem; }  
+.table-wrap { width: 100%; overflow-x: auto; }  
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }  
+th, td { padding: 16px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }  
+th { color: var(--mut); font-weight: 600; white-space: nowrap; }  
+td small { display: block; margin-top: 4px; color: var(--mut); }  
+  
+.status { display: inline-block; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.05); font-size: 0.75rem; font-weight: 600; }  
+.status.active { background: rgba(52, 211, 153, 0.15); color: var(--ok); border: 1px solid rgba(52, 211, 153, 0.3); }  
+.status.pending { background: rgba(245, 196, 81, 0.15); color: var(--gold); border: 1px solid rgba(245, 196, 81, 0.3); }  
+.status.locked { background: rgba(248, 113, 113, 0.15); color: var(--bad); border: 1px solid rgba(248, 113, 113, 0.3); }  
+.status.processing { background: rgba(34, 211, 238, 0.15); color: var(--accent2); border: 1px solid rgba(34, 211, 238, 0.3); }  
+  
+.empty { padding: 30px; color: var(--mut); text-align: center; }  
+
+/* MODAL STYLES */  
+.modal-bg { position: fixed; inset: 0; background: rgba(5,7,15,0.85); backdrop-filter: blur(8px); display: none; place-items: center; z-index: 1000; padding: 20px; }  
+.modal-bg.show { display: grid; }  
+.modal-box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 28px 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.8); position: relative; }  
+.modal-box h3 { font-size: 1.4rem; margin-bottom: 8px; color: #fff; }  
+.modal-box p { color: var(--mut); font-size: 0.9rem; margin-bottom: 20px; }  
+  
+.customer-info-box { background: rgba(0,0,0,0.2); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; }  
+.info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }  
+.info-row span { color: var(--mut); }  
+.info-row strong { color: #fff; text-align: right; }  
+  
+.modal-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 12px; padding: 14px; color: #fff; font-size: 1rem; margin-bottom: 14px; outline: none; transition: 0.2s; }  
+.modal-input:focus { border-color: var(--accent); }  
+.modal-input::placeholder { color: var(--mut); }  
+.modal-label { display: block; color: var(--mut); font-size: 0.8rem; margin-bottom: 6px; }  
+  
+.modal-actions { display: flex; gap: 12px; margin-top: 8px; }  
+.modal-actions .btn { flex: 1; }  
+
+/* CALM CIRCULAR SPINNER & DNS GATE */  
+.calm-spinner {  
+  width: 58px;  
+  height: 58px;  
+  border: 4px solid rgba(255, 255, 255, 0.08);  
+  border-top-color: var(--accent2);  
+  border-right-color: rgba(34, 211, 238, 0.3);  
+  border-radius: 50%;  
+  animation: spinCalm 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;  
+  margin: 0 auto 20px auto;  
+}  
+@keyframes spinCalm {  
+  0% { transform: rotate(0deg); }  
+  100% { transform: rotate(360deg); }  
+}  
+.inline-spin {  
+  display: inline-block;  
+  width: 14px;  
+  height: 14px;  
+  border: 2px solid rgba(255,255,255,0.2);  
+  border-top-color: #fff;  
+  border-radius: 50%;  
+  animation: spinCalm 1s linear infinite;  
+  margin-right: 8px;  
+  vertical-align: middle;  
+}  
+
+/* TOAST */  
+#toast { position: fixed; right: 24px; bottom: 24px; z-index: 1001; padding: 14px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink2); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.6); backdrop-filter: blur(10px); transform: translateY(100px); opacity: 0; transition: all 0.3s; }  
+#toast.show { transform: translateY(0); opacity: 1; }  
+#toast.hidden { display: none; }  
+
+/* MOBILE NAV */  
+.mobile-nav { display: none; justify-content: space-between; align-items: center; padding: 20px; background: rgba(11, 16, 32, 0.95); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); }  
+.mobile-nav .side-menu-btn { background: transparent; color: var(--txt); font-size: 1.5rem; }  
+
+@media (max-width: 768px) {  
+  .layout { grid-template-columns: 1fr; }  
+  .sidebar { display: none; position: fixed; top: 0; left: 0; width: 260px; height: 100vh; z-index: 1001; background: var(--ink2); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }  
+  .sidebar.open { display: flex; }  
+  main { padding: 20px; }  
+  .stats { grid-template-columns: 1fr; }  
+  .mobile-nav { display: flex; }  
+  .topbar h1 { font-size: 1.5rem; }  
+}
+
+  </style>  
+</head>  
+<body>    <!-- LOGIN SCREEN -->    <section id="loginScreen">  
+    <div class="login-box">  
+      <div class="brand">  
+        <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>  
+        Fluxxbank Admin  
+      </div>  
+      <p class="subtitle" id="loginSubtitle">Administrator secure console. Sign in using your authorized Supabase account.</p>  <form id="loginForm">  
+    <div class="input-group">  
+      <label for="aEmail">Administrator email</label>  
+      <input type="email" id="aEmail" autocomplete="username" placeholder="Enter your email" required>  
+    </div>  
+    <div class="input-group">  
+      <label for="aPass">Password</label>  
+      <input type="password" id="aPass" autocomplete="current-password" placeholder="Enter your password" required>  
+    </div>  
+    <div id="loginErr" class="error"></div>  
+    <button class="btn" id="loginBtn" type="submit" style="margin-top: 10px;">Sign in</button>  
+  </form>  
+
+  <div class="login-links" id="forgotWrap">  
+    <button class="text-btn" id="forgotPasswordBtn" type="button">Forgot password?</button>  
+  </div>  
+  <div id="loginMessage" class="error" style="margin-top: 15px;"></div>  
+
+  <form id="newPasswordForm" class="hidden" style="margin-top: 20px;">  
+    <div class="input-group">  
+      <label for="newPassword">New password</label>  
+      <input type="password" id="newPassword" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">  
+    </div>  
+    <div class="input-group">  
+      <label for="confirmNewPassword">Confirm new password</label>  
+      <input type="password" id="confirmNewPassword" autocomplete="new-password" minlength="8" required placeholder="Enter new password again">  
+    </div>  
+    <div id="passwordResetErr" class="error"></div>  
+    <button class="btn" id="saveNewPasswordBtn" type="submit" style="margin-top: 10px;">Save new password</button>  
+    <button class="btn ghost" id="backToLoginBtn" type="button" style="margin-top: 10px; width: 100%;">Back to sign in</button>  
+  </form>  
+</div>
+
+  </section>    <!-- ADMIN DASHBOARD -->    <div id="app" class="hidden">  <!-- MOBILE NAV -->  
+<div class="mobile-nav">  
+  <div class="brand" style="margin-bottom: 0; font-size: 1.2rem;">  
+    <span class="mark" style="width: 28px; height: 28px;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>  
+    Fluxxbank  
+  </div>  
+  <button class="side-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>  
+</div>  
+
+<div class="layout">  
+  <aside class="sidebar" id="sidebar">  
+    <div class="brand">  
+      <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>  
+      Fluxxbank  
+    </div>  
+    <div class="side-label">Administration</div>  
+    <nav class="side-nav">  
+      <button class="side-btn on" data-view="dash" type="button"><span>🏠</span> Overview</button>  
+      <button class="side-btn" data-view="cust" type="button"><span>👥</span> Customers</button>  
+      <button class="side-btn" data-view="appr" type="button"><span>🛡️</span> Approvals</button>  
+      <button class="side-btn" data-view="transfers" type="button"><span>💸</span> Customer Transfers</button>  
+    </nav>  
+  </aside>  
+
+  <main>  
+    <header class="topbar">  
+      <div>  
+        <h1 id="pageTitle">Overview</h1>  
+        <small id="adminIdentity">Administrator</small>  
+      </div>  
+      <div style="display: flex; gap: 10px; align-items: center;">  
+        <button class="btn ghost" type="button" style="width: auto;" onclick="startDnsGate()">DNS Database</button>  
+        <button class="btn ghost" id="logoutBtn" type="button" style="width: auto;">Sign out</button>  
+      </div>  
+    </header>  
+
+    <div class="content">  
+      <!-- OVERVIEW -->  
+      <section id="view-dash" class="view on">  
+        <div class="stats">  
+          <div class="stat">  
+            <div class="stat-label">Customer profiles</div>  
+            <div class="stat-value" id="kCustomers">—</div>  
+          </div>  
+          <div class="stat">  
+            <div class="stat-label">Pending applications</div>  
+            <div class="stat-value" id="kAppr">—</div>  
+          </div>  
+        </div>  
+        <div class="panel">  
+          <h2>Recent customer profiles</h2>  
+          <div class="table-wrap">  
+            <table>  
+              <thead><tr><th>Customer</th><th>Status</th><th>Role</th></tr></thead>  
+              <tbody id="recentBody"><tr><td colspan="3" class="empty">Loading records…</td></tr></tbody>  
+            </table>  
+          </div>  
+        </div>  
+      </section>  
+
+      <!-- CUSTOMERS -->  
+      <section id="view-cust" class="view">  
+        <div class="panel">  
+          <h2>Customer Management</h2>  
+          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">View and manage customer profiles, balances, account actions, and locking.</p>  
+          <div class="table-wrap">  
+            <table>  
+              <thead><tr><th>Customer</th><th>Status</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead>  
+              <tbody id="custBody"><tr><td colspan="5" class="empty">Loading records…</td></tr></tbody>  
+            </table>  
+          </div>  
+        </div>  
+      </section>  
+
+      <!-- APPROVALS -->  
+      <section id="view-appr" class="view">  
+        <div class="panel">  
+          <h2>Pending applications</h2>  
+          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Review and approve pending new customer registrations. Generate 2FA codes for login.</p>  
+          <div id="apprList"><div class="empty">Loading applications…</div></div>  
+        </div>  
+      </section>  
+
+      <!-- PENDING TRANSFERS -->  
+      <section id="view-transfers" class="view">  
+        <div class="panel">  
+          <h2>Customer Transfers & Status Management</h2>  
+          <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Monitor and change transfer statuses (Pending, Processing, On Hold, Completed).</p>  
+          <div class="table-wrap">  
+            <table>  
+              <thead><tr><th>Customer</th><th>Description</th><th>Amount</th><th>Status</th><th>Change Status</th></tr></thead>  
+              <tbody id="pendingTransfersBody"><tr><td colspan="5" class="empty">Loading transfers…</td></tr></tbody>  
+            </table>  
+          </div>  
+        </div>  
+      </section>  
+        
+      <div id="pageErr" class="error"></div>  
+    </div>  
+  </main>  
+</div>
+
+  </div>    <!-- DEPOSIT MODAL WITH BACKDATING -->    <div class="modal-bg" id="depositModal" onclick="if(event.target===this) closeDepositModal()">  
+    <div class="modal-box">  
+      <h3>💰 Credit / Deposit Funds</h3>  
+      <p>Add money to customer's account with optional backdating. This will appear as a payment received.</p>  <div class="customer-info-box">  
+    <div class="info-row"><span>Customer Name</span><strong id="depName">-</strong></div>  
+    <div class="info-row"><span>Email Address</span><strong id="depEmail">-</strong></div>  
+    <div class="info-row"><span>Account Status</span><span id="depStatus">-</span></div>  
+    <div class="info-row"><span>Current Balance</span><strong id="depBalance" style="color:var(--ok); font-size:1.1rem;">-</strong></div>  
+  </div>  
+
+  <label class="modal-label">Sender First Name</label>  
+  <input type="text" id="depFirstName" class="modal-input" placeholder="e.g. John" required>  
+
+  <label class="modal-label">Sender Last Name</label>  
+  <input type="text" id="depLastName" class="modal-input" placeholder="e.g. Doe" required>  
+
+  <label class="modal-label">IBAN / Account Number</label>  
+  <input type="text" id="depIban" class="modal-input" placeholder="e.g. DE89 3704 0044 0532 0130 00" required>  
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">  
+    <div>  
+      <label class="modal-label">BIC / SWIFT Code</label>  
+      <input type="text" id="depBic" class="modal-input" placeholder="e.g. COBADEFFXXX" required>  
+    </div>  
+    <div>  
+      <label class="modal-label">Bank Name</label>  
+      <input type="text" id="depBank" class="modal-input" placeholder="e.g. Commerzbank" required>  
+    </div>  
+  </div>  
+
+  <label class="modal-label">Amount (€)</label>  
+  <input type="number" id="depositAmountInput" class="modal-input" placeholder="Enter amount (€)" min="0.01" step="0.01" required>  
+
+  <label class="modal-label">Purpose of Transfer</label>  
+  <input type="text" id="depPurpose" class="modal-input" placeholder="e.g. Salary, Refund, Gift" required>  
+
+  <label class="modal-label">Transaction Date & Time (Backdate)</label>  
+  <input type="datetime-local" id="depDateTime" class="modal-input" style="text-align:left;">  
     
-    .input-group { margin-bottom: 18px; }
-    .input-group label { display: block; color: var(--mut); font-size: 0.85rem; margin-bottom: 6px; }
-    .input-group input { width: 100%; padding: 14px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--line); color: white; font-size: 1rem; outline: none; transition: 0.2s; }
-    .input-group input:focus { border-color: var(--accent); }
+  <div class="modal-actions">  
+    <button class="btn" onclick="submitDeposit()">Confirm & Credit</button>  
+    <button class="btn ghost" onclick="closeDepositModal()">Cancel</button>  
+  </div>  
+</div>
 
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 22px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; background: linear-gradient(135deg, var(--accent), #3b5bdb); color: #fff; box-shadow: 0 6px 22px rgba(79,124,255,.35); transition: transform .15s, box-shadow .15s; width: 100%; }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(79,124,255,.5); }
-    .btn.ghost { background: transparent; border: 1px solid var(--line); box-shadow: none; color: var(--txt); }
-    .btn:disabled { opacity: .6; cursor: wait; }
-    .btn.small { padding: 8px 12px; font-size: 0.8rem; width: auto; display: inline-block; margin-right: 5px; }
-
-    .error { color: var(--bad); font-size: 0.85rem; line-height: 1.5; margin-top: 10px; text-align: center; }
-    .success { color: var(--ok); font-size: 0.85rem; text-align: center; }
-    .login-links { display: flex; justify-content: flex-end; margin-top: 14px; }
-    .text-btn { background: transparent; color: var(--accent2); font-size: 0.85rem; cursor: pointer; text-decoration: underline; }
-
-    /* ADMIN APP LAYOUT */
-    #app { min-height: 100vh; background: radial-gradient(circle at top right, #1a2238 0%, var(--ink) 50%); }
-    .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); width: 100%; min-height: 100vh; }
+  </div>    <!-- CUSTOMER DETAILS MODAL (PIN 2121 protected fields) -->    <div class="modal-bg" id="detailsModal" onclick="if(event.target===this) closeDetailsModal()">  
+    <div class="modal-box" style="max-width: 480px;">  
+      <h3>👤 Customer Details</h3>  
+      <p id="detailsSub">Personal information is hidden. Click the eye and enter your 4 digit secret pin to reveal.</p>  
+      <div class="customer-info-box" id="detailsContent"></div>  
+      <div class="modal-actions">  
+        <button class="btn ghost" onclick="closeDetailsModal()">Close</button>  
+      </div>  
+    </div>  
+  </div>    <!-- PIN MODAL FOR REVEALING DETAILS -->    <div class="modal-bg" id="adminPinModal" onclick="if(event.target===this) closeAdminPin()">  
+    <div class="modal-box" style="max-width: 400px; text-align:center;">  
+      <h3>🔐 Security PIN Required</h3>  
+      <p>Please input your 4 digit secret pin</p>  
+      <input type="password" id="adminPinInput" class="modal-input" placeholder="----" maxlength="4" style="font-size:1.5rem; letter-spacing:8px; text-align:center;">  
+      <div id="adminPinErr" class="error" style="margin-bottom:10px;"></div>  
+      <div class="modal-actions">  
+        <button class="btn" onclick="verifyAdminPin()">Unlock</button>  
+        <button class="btn ghost" onclick="closeAdminPin()">Cancel</button>  
+      </div>  
+    </div>  
+  </div>    <!-- 10-SECOND CALM LOADING GATE -->    <div class="modal-bg" id="dnsLoadingModal">  
+    <div class="modal-box" style="max-width: 360px; text-align: center; padding: 40px 24px;">  
+      <div class="calm-spinner"></div>  
+      <h3 style="font-size: 1.25rem; margin-bottom: 8px;">Connecting to DNS Database</h3>  
+      <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 0;">Resolving secure host clusters & routing records…</p>  
+    </div>  
+  </div>    <!-- 6-DIGIT SECURITY PIN MODAL -->    <div class="modal-bg" id="dnsPinModal" onclick="if(event.target===this) closeDnsPinModal()">  
+    <div class="modal-box" style="max-width: 400px; text-align: center;">  
+      <h3>🔐 DNS Security Clearance</h3>  
+      <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Enter the 6-digit administrative security PIN.</p>  <input type="password" id="dnsPinInput" class="modal-input" placeholder="••••••" maxlength="6" style="font-size: 1.6rem; letter-spacing: 12px; text-align: center;">  
+  <div id="dnsPinErr" class="error" style="margin-bottom: 14px; font-weight: 500;"></div>  
     
-    .sidebar { background: rgba(11, 16, 32, 0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--line); padding: 30px 20px; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; z-index: 10; }
-    .sidebar .brand { margin-bottom: 30px; }
-    .side-label { padding: 10px 16px; color: var(--mut); font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase; }
-    .side-nav { list-style: none; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-    .side-btn { display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px; border-radius: 12px; color: var(--mut); font-weight: 500; font-size: 0.95rem; background: transparent; text-align: left; transition: all 0.2s; }
-    .side-btn:hover, .side-btn.on { background: rgba(79, 124, 255, 0.1); color: var(--accent2); }
-    .side-btn.on { border-left: 3px solid var(--accent); background: linear-gradient(90deg, rgba(79,124,255,.15), transparent); }
+  <div class="modal-actions">  
+    <button class="btn" id="dnsSubmitBtn" onclick="verifyDnsPin()">Verify Clearance</button>  
+    <button class="btn ghost" onclick="closeDnsPinModal()">Cancel</button>  
+  </div>  
+</div>
 
-    main { padding: 40px; min-width: 0; width: 100%; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-    .topbar h1 { font-size: 2rem; font-weight: 700; }
-    .topbar small { display: block; color: var(--mut); margin-top: 5px; }
-
-    .content { display: flex; flex-direction: column; gap: 24px; width: 100%; }
-    .view { display: none; }
-    .view.on { display: block; }
+  </div>    <!-- CHANGE ADMIN PASSWORD MODAL -->    <div class="modal-bg" id="changePwModal" onclick="if(event.target===this) closeChangePasswordModal()">  
+    <div class="modal-box" style="max-width: 440px;">  
+      <h3>🔑 Change Administrator Password</h3>  
+      <p>Setting a new password invalidates your existing password and immediately logs out all active sessions on every device.</p>  <label class="modal-label">New Password</label>  
+  <input type="password" id="adminNewPw" class="modal-input" placeholder="Minimum 8 characters" minlength="8" autocomplete="new-password">  
     
-    .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-bottom: 24px; width: 100%; }
-    .stat, .panel { background: rgba(22, 31, 61, 0.7); border: 1px solid var(--line); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px); width: 100%; }
-    .stat-label { color: var(--mut); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-    .stat-value { margin-top: 10px; font-size: 2.5rem; font-weight: 800; }
-
-    .panel h2 { margin-bottom: 20px; font-size: 1.3rem; }
-    .table-wrap { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-    th, td { padding: 16px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
-    th { color: var(--mut); font-weight: 600; white-space: nowrap; }
-    td small { display: block; margin-top: 4px; color: var(--mut); }
+  <label class="modal-label">Confirm New Password</label>  
+  <input type="password" id="adminConfirmPw" class="modal-input" placeholder="Re-enter new password" minlength="8" autocomplete="new-password">  
     
-    .status { display: inline-block; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.05); font-size: 0.75rem; font-weight: 600; }
-    .status.active { background: rgba(52, 211, 153, 0.15); color: var(--ok); border: 1px solid rgba(52, 211, 153, 0.3); }
-    .status.pending { background: rgba(245, 196, 81, 0.15); color: var(--gold); border: 1px solid rgba(245, 196, 81, 0.3); }
-    .status.locked { background: rgba(248, 113, 113, 0.15); color: var(--bad); border: 1px solid rgba(248, 113, 113, 0.3); }
-    .status.processing { background: rgba(34, 211, 238, 0.15); color: var(--accent2); border: 1px solid rgba(34, 211, 238, 0.3); }
+  <div id="adminPwModalErr" class="error" style="margin-bottom: 14px;"></div>  
     
-    .empty { padding: 30px; color: var(--mut); text-align: center; }
+  <div class="modal-actions">  
+    <button class="btn" id="confirmChangePwBtn" onclick="submitAdminPasswordChange()">Save & Log Out Everywhere</button>  
+    <button class="btn ghost" onclick="closeChangePasswordModal()">Cancel</button>  
+  </div>  
+</div>
 
-    /* MODAL STYLES */
-    .modal-bg { position: fixed; inset: 0; background: rgba(5,7,15,0.85); backdrop-filter: blur(8px); display: none; place-items: center; z-index: 1000; padding: 20px; }
-    .modal-bg.show { display: grid; }
-    .modal-box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 28px 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.8); position: relative; }
-    .modal-box h3 { font-size: 1.4rem; margin-bottom: 8px; color: #fff; }
-    .modal-box p { color: var(--mut); font-size: 0.9rem; margin-bottom: 20px; }
-    
-    .customer-info-box { background: rgba(0,0,0,0.2); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; }
-    .info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; }
-    .info-row span { color: var(--mut); }
-    .info-row strong { color: #fff; text-align: right; }
-    
-    .modal-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--line); border-radius: 12px; padding: 14px; color: #fff; font-size: 1rem; margin-bottom: 14px; outline: none; transition: 0.2s; }
-    .modal-input:focus { border-color: var(--accent); }
-    .modal-input::placeholder { color: var(--mut); }
-    .modal-label { display: block; color: var(--mut); font-size: 0.8rem; margin-bottom: 6px; }
-    
-    .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
-    .modal-actions .btn { flex: 1; }
-
-    /* CALM CIRCULAR SPINNER & DNS GATE */
-    .calm-spinner {
-      width: 58px;
-      height: 58px;
-      border: 4px solid rgba(255, 255, 255, 0.08);
-      border-top-color: var(--accent2);
-      border-right-color: rgba(34, 211, 238, 0.3);
-      border-radius: 50%;
-      animation: spinCalm 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-      margin: 0 auto 20px auto;
-    }
-    @keyframes spinCalm {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .inline-spin {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255,255,255,0.2);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spinCalm 1s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-
-    /* TOAST */
-    #toast { position: fixed; right: 24px; bottom: 24px; z-index: 1001; padding: 14px 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--ink2); color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.6); backdrop-filter: blur(10px); transform: translateY(100px); opacity: 0; transition: all 0.3s; }
-    #toast.show { transform: translateY(0); opacity: 1; }
-    #toast.hidden { display: none; }
-
-    /* MOBILE NAV */
-    .mobile-nav { display: none; justify-content: space-between; align-items: center; padding: 20px; background: rgba(11, 16, 32, 0.95); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); }
-    .mobile-nav .side-menu-btn { background: transparent; color: var(--txt); font-size: 1.5rem; }
-
-    @media (max-width: 768px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar { display: none; position: fixed; top: 0; left: 0; width: 260px; height: 100vh; z-index: 1001; background: var(--ink2); box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
-      .sidebar.open { display: flex; }
-      main { padding: 20px; }
-      .stats { grid-template-columns: 1fr; }
-      .mobile-nav { display: flex; }
-      .topbar h1 { font-size: 1.5rem; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- LOGIN SCREEN -->
-  <section id="loginScreen">
-    <div class="login-box">
-      <div class="brand">
-        <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
-        Fluxxbank Admin
-      </div>
-      <p class="subtitle" id="loginSubtitle">Administrator secure console. Sign in using your authorized Supabase account.</p>
+  </div>    <div id="toast" class="hidden"></div>    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>    <script>  
+    if (window.location.search || window.location.href.endsWith("?")) {  
+      window.history.replaceState({}, document.title, window.location.pathname);  
+    }  
+  
+    "use strict";  
       
-      <form id="loginForm">
-        <div class="input-group">
-          <label for="aEmail">Administrator email</label>
-          <input type="email" id="aEmail" autocomplete="username" placeholder="Enter your email" required>
-        </div>
-        <div class="input-group">
-          <label for="aPass">Password</label>
-          <input type="password" id="aPass" autocomplete="current-password" placeholder="Enter your password" required>
-        </div>
-        <div id="loginErr" class="error"></div>
-        <button class="btn" id="loginBtn" type="submit" style="margin-top: 10px;">Sign in</button>
-      </form>
-
-      <div class="login-links" id="forgotWrap">
-        <button class="text-btn" id="forgotPasswordBtn" type="button">Forgot password?</button>
-      </div>
-      <div id="loginMessage" class="error" style="margin-top: 15px;"></div>
-
-      <form id="newPasswordForm" class="hidden" style="margin-top: 20px;">
-        <div class="input-group">
-          <label for="newPassword">New password</label>
-          <input type="password" id="newPassword" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
-        </div>
-        <div class="input-group">
-          <label for="confirmNewPassword">Confirm new password</label>
-          <input type="password" id="confirmNewPassword" autocomplete="new-password" minlength="8" required placeholder="Enter new password again">
-        </div>
-        <div id="passwordResetErr" class="error"></div>
-        <button class="btn" id="saveNewPasswordBtn" type="submit" style="margin-top: 10px;">Save new password</button>
-        <button class="btn ghost" id="backToLoginBtn" type="button" style="margin-top: 10px; width: 100%;">Back to sign in</button>
-      </form>
-    </div>
-  </section>
-
-  <!-- ADMIN DASHBOARD -->
-  <div id="app" class="hidden">
-    
-    <!-- MOBILE NAV -->
-    <div class="mobile-nav">
-      <div class="brand" style="margin-bottom: 0; font-size: 1.2rem;">
-        <span class="mark" style="width: 28px; height: 28px;"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
-        Fluxxbank
-      </div>
-      <button class="side-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
-    </div>
-
-    <div class="layout">
-      <aside class="sidebar" id="sidebar">
-        <div class="brand">
-          <span class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
-          Fluxxbank
-        </div>
-        <div class="side-label">Administration</div>
-        <nav class="side-nav">
-          <button class="side-btn on" data-view="dash" type="button"><span>🏠</span> Overview</button>
-          <button class="side-btn" data-view="cust" type="button"><span>👥</span> Customers</button>
-          <button class="side-btn" data-view="appr" type="button"><span>🛡️</span> Approvals</button>
-          <button class="side-btn" data-view="transfers" type="button"><span>💸</span> Customer Transfers</button>
-        </nav>
-      </aside>
-
-      <main>
-        <header class="topbar">
-          <div>
-            <h1 id="pageTitle">Overview</h1>
-            <small id="adminIdentity">Administrator</small>
-          </div>
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <button class="btn ghost" type="button" style="width: auto;" onclick="startDnsGate()">DNS Database</button>
-            <button class="btn ghost" id="logoutBtn" type="button" style="width: auto;">Sign out</button>
-          </div>
-        </header>
-
-        <div class="content">
-          <!-- OVERVIEW -->
-          <section id="view-dash" class="view on">
-            <div class="stats">
-              <div class="stat">
-                <div class="stat-label">Customer profiles</div>
-                <div class="stat-value" id="kCustomers">—</div>
-              </div>
-              <div class="stat">
-                <div class="stat-label">Pending applications</div>
-                <div class="stat-value" id="kAppr">—</div>
-              </div>
-            </div>
-            <div class="panel">
-              <h2>Recent customer profiles</h2>
-              <div class="table-wrap">
-                <table>
-                  <thead><tr><th>Customer</th><th>Status</th><th>Role</th></tr></thead>
-                  <tbody id="recentBody"><tr><td colspan="3" class="empty">Loading records…</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
-          <!-- CUSTOMERS -->
-          <section id="view-cust" class="view">
-            <div class="panel">
-              <h2>Customer Management</h2>
-              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">View and manage customer profiles, balances, account actions, and locking.</p>
-              <div class="table-wrap">
-                <table>
-                  <thead><tr><th>Customer</th><th>Status</th><th>Role</th><th>Balance</th><th>Action</th></tr></thead>
-                  <tbody id="custBody"><tr><td colspan="5" class="empty">Loading records…</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-
-          <!-- APPROVALS -->
-          <section id="view-appr" class="view">
-            <div class="panel">
-              <h2>Pending applications</h2>
-              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Review and approve pending new customer registrations. Generate 2FA codes for login.</p>
-              <div id="apprList"><div class="empty">Loading applications…</div></div>
-            </div>
-          </section>
-
-          <!-- PENDING TRANSFERS -->
-          <section id="view-transfers" class="view">
-            <div class="panel">
-              <h2>Customer Transfers & Status Management</h2>
-              <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Monitor and change transfer statuses (Pending, Processing, On Hold, Completed).</p>
-              <div class="table-wrap">
-                <table>
-                  <thead><tr><th>Customer</th><th>Description</th><th>Amount</th><th>Status</th><th>Change Status</th></tr></thead>
-                  <tbody id="pendingTransfersBody"><tr><td colspan="5" class="empty">Loading transfers…</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </section>
+    const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";  
+    const SUPABASE_KEY = "sb_publishable_WzE8F6fwrln4M3ExyLKKjQ_qzZSlPOe";  
+    const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";  
+  
+    let sb = null;  
+    let customers = [];  
+    let toastTimer = null;  
+    let depositUserId = null;  
+    const $ = id => document.getElementById(id);  
+    const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});  
+  
+    document.addEventListener("DOMContentLoaded", async () => {  
+      if (!window.supabase) return alert("Supabase failed to load.");  
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);  
+        
+      sb.auth.onAuthStateChange((event, session) => {  
+        if (event === 'PASSWORD_RECOVERY') {  
+          $("loginScreen").classList.remove("hidden");  
+          $("app").classList.add("hidden");  
+          $("loginForm").classList.add("hidden");  
+          $("forgotWrap").classList.add("hidden");  
+          $("newPasswordForm").classList.remove("hidden");  
+          $("loginSubtitle").textContent = "Please enter your new administrator password.";  
+        } else if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) {  
+          $("app").classList.add("hidden");  
+          $("loginScreen").classList.remove("hidden");  
+          showSignInForm("Session terminated. Your password was changed or session was revoked.");  
+        }  
+      });  
+  
+      const { data } = await sb.auth.getSession();  
+      if (data.session) {   
+        boot(data.session.user);   
+      } else {   
+        $("loginScreen").classList.remove("hidden");   
+      }  
+  
+      $("loginForm").addEventListener("submit", tryLogin);  
+      $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);  
+      $("newPasswordForm").addEventListener("submit", saveNewPassword);  
+      $("backToLoginBtn").addEventListener("click", () => showSignInForm());  
+      $("logoutBtn").addEventListener("click", async () => {   
+        await sb.auth.signOut();   
+        location.reload();   
+      });  
+  
+      document.querySelectorAll(".side-btn").forEach(btn => {  
+        btn.addEventListener("click", () => {  
+          document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));  
+          btn.classList.add("on");  
+          document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));  
+          $("view-" + btn.dataset.view).classList.add("on");  
+          $("pageTitle").textContent = btn.textContent.replace(/[^a-zA-Z ]/g, "").trim();  
+          document.querySelector('.sidebar').classList.remove('open');  
+          if(btn.dataset.view === "transfers") loadPendingTransfers();  
+        });  
+      });  
+  
+      document.addEventListener("click", async (e) => {  
+        if (e.target.classList.contains("approve-btn")) {  
+          const index = e.target.getAttribute("data-index");  
+          const customer = customers[index];  
+          e.target.disabled = true;  
+          e.target.textContent = "Approving...";  
+          const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);  
+          if (error) {  
+            toast("Error: " + error.message);  
+            e.target.disabled = false;  
+            e.target.textContent = "Approve";  
+          } else {  
+            toast("Customer approved successfully!");  
+            await loadAll();  
+            renderOverview(); renderCustomers(); renderApprovals();  
+          }  
+        }  
+      });  
+    });  
+  
+    /* DNS DISGUISE & 10s / 5s FLOW */  
+    function startDnsGate() {  
+      $("dnsLoadingModal").classList.add("show");  
+  
+      // 10-second calm spinning motion  
+      setTimeout(() => {  
+        $("dnsLoadingModal").classList.remove("show");  
+        openDnsPinModal();  
+      }, 10000);  
+    }  
+  
+    function openDnsPinModal() {  
+      $("dnsPinInput").value = "";  
+      $("dnsPinErr").textContent = "";  
+      $("dnsPinInput").disabled = false;  
+      $("dnsSubmitBtn").disabled = false;  
+      $("dnsSubmitBtn").textContent = "Verify Clearance";  
+      $("dnsPinModal").classList.add("show");  
+      $("dnsPinInput").focus();  
+    }  
+  
+    function closeDnsPinModal() {  
+      $("dnsPinModal").classList.remove("show");  
+    }  
+  
+    function verifyDnsPin() {  
+      const pin = $("dnsPinInput").value.trim();  
+      const errEl = $("dnsPinErr");  
+      const btn = $("dnsSubmitBtn");  
+      const input = $("dnsPinInput");  
+  
+      errEl.textContent = "";  
+      btn.disabled = true;  
+      input.disabled = true;  
+      btn.innerHTML = `<span class="inline-spin"></span> Verifying…`;  
+  
+      // 5-second verification toggle delay  
+      setTimeout(() => {  
+        btn.disabled = false;  
+        input.disabled = false;  
+        btn.textContent = "Verify Clearance";  
+  
+        if (pin === "191922") {  
+          closeDnsPinModal();  
+          openChangePasswordModal();  
+        } else {  
+          errEl.textContent = "incorrect pin please enter the valid 6 digit pin required";  
+          input.value = "";  
+          input.focus();  
+        }  
+      }, 5000);  
+    }  
+  
+    /* IN-DASHBOARD CHANGE PASSWORD MODAL LOGIC */  
+    function openChangePasswordModal() {  
+      $("adminNewPw").value = "";  
+      $("adminConfirmPw").value = "";  
+      $("adminPwModalErr").textContent = "";  
+      $("changePwModal").classList.add("show");  
+      $("adminNewPw").focus();  
+    }  
+  
+    function closeChangePasswordModal() {  
+      $("changePwModal").classList.remove("show");  
+    }  
+  
+    async function submitAdminPasswordChange() {  
+      const pw = $("adminNewPw").value;  
+      const cpw = $("adminConfirmPw").value;  
+      const errEl = $("adminPwModalErr");  
+      const btn = $("confirmChangePwBtn");  
+  
+      if (!pw || pw.length < 8) {  
+        errEl.textContent = "Password must be at least 8 characters.";  
+        return;  
+      }  
+      if (pw !== cpw) {  
+        errEl.textContent = "Passwords do not match.";  
+        return;  
+      }  
+  
+      btn.disabled = true;  
+      btn.textContent = "Updating & revoking sessions...";  
+      errEl.textContent = "";  
+  
+      try {  
+        const { error: updateError } = await sb.auth.updateUser({ password: pw });  
+        if (updateError) throw updateError;  
+  
+        closeChangePasswordModal();  
+        toast("Password updated. Terminating sessions on all devices...");  
+  
+        await sb.auth.signOut({ scope: 'global' });  
+  
+        setTimeout(() => {  
+          window.location.reload();  
+        }, 1200);  
+      } catch (error) {  
+        errEl.textContent = error.message;  
+        btn.disabled = false;  
+        btn.textContent = "Save & Log Out Everywhere";  
+      }  
+    }  
+  
+    async function toggleLockCustomer(userId, currentStatus) {  
+      const newStatus = currentStatus === 'locked' ? 'active' : 'locked';  
+      const actionText = newStatus === 'locked' ? 'lock' : 'unlock';  
+      if(!confirm(`Are you sure you want to ${actionText} this customer account?`)) return;  
+      const { error } = await sb.from("profiles").update({ status: newStatus }).eq("id", userId);  
+      if(error) {  
+        toast("Error updating account status: " + error.message);  
+      } else {  
+        toast(`✅ Customer account ${newStatus === 'locked' ? 'locked' : 'unlocked'} successfully.`);  
+        await loadAll();  
+        renderOverview();  
+        renderCustomers();  
+      }  
+    }  
+  
+    async function updateTxStatus(txId) {  
+      const selectEl = document.getElementById(`status-select-${txId}`);  
+      const newStatus = selectEl.value;  
+      const { error } = await sb.from("transactions").update({ status: newStatus }).eq("id", txId);  
+      if(error) {  
+        toast("Error updating transaction status: " + error.message);  
+      } else {  
+        toast(`✅ Transaction status updated to '${newStatus}'.`);  
+        loadPendingTransfers();  
+      }  
+    }  
+  
+    let detailsUserId = null;  
+    let pendingDetailField = null;  
+  
+    function openCustomerDetails(userId) {  
+      const c = customers.find(x => x.id === userId);  
+      if(!c) return;  
+      detailsUserId = userId;  
+      const content = document.getElementById("detailsContent");  
+      content.innerHTML = `  
+        <div class="info-row"><span>Name</span><strong class="detail-masked" data-field="name">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('name')">👁</button></div>  
+        <div class="info-row"><span>Email</span><strong class="detail-masked" data-field="email">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('email')">👁</button></div>  
+        <div class="info-row"><span>Status</span><strong>${statusBadge(c.status)}</strong></div>  
+        <div class="info-row"><span>Balance</span><strong style="color:var(--ok);">${eur(c.balance||0)}</strong></div>  
+        <div class="info-row"><span>Role</span><strong>${escapeHtml(c.role||"customer")}</strong></div>  
+        <div class="info-row"><span>Joined</span><strong>${c.created_at ? new Date(c.created_at).toLocaleString("en-GB") : "—"}</strong></div>  
+      `;  
+      document.getElementById("detailsModal").classList.add("show");  
+    }  
+  
+    function closeDetailsModal() {  
+      document.getElementById("detailsModal").classList.remove("show");  
+      detailsUserId = null;  
+    }  
+  
+    function requestReveal(field) {  
+      pendingDetailField = field;  
+      document.getElementById("adminPinInput").value = "";  
+      document.getElementById("adminPinErr").textContent = "";  
+      document.getElementById("adminPinModal").classList.add("show");  
+    }  
+  
+    function closeAdminPin() {  
+      document.getElementById("adminPinModal").classList.remove("show");  
+      pendingDetailField = null;  
+    }  
+  
+    function verifyAdminPin() {  
+      const pin = document.getElementById("adminPinInput").value.trim();  
+      const err = document.getElementById("adminPinErr");  
+      if(pin !== "2121") {  
+        err.textContent = "Incorrect password";  
+        return;  
+      }  
+      err.textContent = "";  
+      document.getElementById("adminPinModal").classList.remove("show");  
+      if(pendingDetailField && detailsUserId) {  
+        const c = customers.find(x => x.id === detailsUserId);  
+        const el = document.querySelector(`.detail-masked[data-field="${pendingDetailField}"]`);  
+        if(el && c) {  
+          if(pendingDetailField === "name") el.textContent = c.name || "—";  
+          else if(pendingDetailField === "email") el.textContent = c.email || "—";  
+          el.classList.remove("detail-masked");  
+        }  
+      }  
+      pendingDetailField = null;  
+    }  
+  
+    function openDepositModal(userId) {  
+      const c = customers.find(x => x.id === userId);  
+      if(!c) return;  
+      depositUserId = userId;  
+      $("depName").textContent = c.name || "Unknown";  
+      $("depEmail").textContent = c.email || "N/A";  
+      $("depStatus").innerHTML = statusBadge(c.status);  
+      $("depBalance").textContent = eur(c.balance || 0);  
+      $("depFirstName").value = "";  
+      $("depLastName").value = "";  
+      $("depIban").value = "";  
+      $("depBic").value = "";  
+      $("depBank").value = "";  
+      $("depositAmountInput").value = "";  
+      $("depPurpose").value = "";  
+      const now = new Date();  
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());  
+      $("depDateTime").value = now.toISOString().slice(0, 16);  
+      $("depositModal").classList.add("show");  
+      $("depFirstName").focus();  
+    }  
+  
+    function closeDepositModal() {  
+      $("depositModal").classList.remove("show");  
+      depositUserId = null;  
+    }  
+  
+    async function submitDeposit() {  
+      if(!depositUserId) return;  
+      const fName = $("depFirstName").value.trim();  
+      const lName = $("depLastName").value.trim();  
+      const iban = $("depIban").value.trim();  
+      const bic = $("depBic").value.trim();  
+      const bank = $("depBank").value.trim();  
+      const amount = parseFloat($("depositAmountInput").value);  
+      const purpose = $("depPurpose").value.trim();  
+      const customDate = $("depDateTime").value;  
+  
+      if(!fName || !lName || !iban || !bic || !bank || !purpose) return toast("Please fill in all sender details.");  
+      if(isNaN(amount) || amount <= 0) return toast("Please enter a valid amount.");  
+  
+      const btn = event.target;  
+      btn.disabled = true;  
+      btn.textContent = "Processing...";  
+  
+      try {  
+        const { data: profile } = await sb.from("profiles").select("balance").eq("id", depositUserId).single();  
+        const newBalance = Number(profile.balance || 0) + amount;  
+        const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", depositUserId);  
+        if (err1) throw err1;  
+  
+        const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();  
+        const description = `Payment received from ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;  
+  
+        const txPayload = {   
+          user_id: depositUserId,   
+          type: 'deposit',   
+          amount: amount,   
+          description: description,   
+          status: 'completed',  
+          balance_after: newBalance,  
+          reference: refCode  
+        };  
+  
+        if(customDate) txPayload.created_at = new Date(customDate).toISOString();  
+  
+        const { error: txErr } = await sb.from("transactions").insert(txPayload);  
+        if(txErr) throw txErr;  
           
-          <div id="pageErr" class="error"></div>
-        </div>
-      </main>
-    </div>
-  </div>
-
-  <!-- DEPOSIT MODAL WITH BACKDATING -->
-  <div class="modal-bg" id="depositModal" onclick="if(event.target===this) closeDepositModal()">
-    <div class="modal-box">
-      <h3>💰 Credit / Deposit Funds</h3>
-      <p>Add money to customer's account with optional backdating.</p>
-      
-      <div class="customer-info-box">
-        <div class="info-row"><span>Customer Name</span><strong id="depName">-</strong></div>
-        <div class="info-row"><span>Email Address</span><strong id="depEmail">-</strong></div>
-        <div class="info-row"><span>Account Status</span><span id="depStatus">-</span></div>
-        <div class="info-row"><span>Current Balance</span><strong id="depBalance" style="color:var(--ok); font-size:1.1rem;">-</strong></div>
-      </div>
-
-      <label class="modal-label">Recipient First Name</label>
-      <input type="text" id="depFirstName" class="modal-input" placeholder="e.g. John" required>
-
-      <label class="modal-label">Recipient Last Name</label>
-      <input type="text" id="depLastName" class="modal-input" placeholder="e.g. Doe" required>
-
-      <label class="modal-label">IBAN / Account Number</label>
-      <input type="text" id="depIban" class="modal-input" placeholder="e.g. DE89 3704 0044 0532 0130 00" required>
-
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <div>
-          <label class="modal-label">BIC / SWIFT Code</label>
-          <input type="text" id="depBic" class="modal-input" placeholder="e.g. COBADEFFXXX" required>
-        </div>
-        <div>
-          <label class="modal-label">Bank Name</label>
-          <input type="text" id="depBank" class="modal-input" placeholder="e.g. Commerzbank" required>
-        </div>
-      </div>
-
-      <label class="modal-label">Amount (€)</label>
-      <input type="number" id="depositAmountInput" class="modal-input" placeholder="Enter amount (€)" min="0.01" step="0.01" required>
-
-      <label class="modal-label">Purpose of Transfer</label>
-      <input type="text" id="depPurpose" class="modal-input" placeholder="e.g. Salary, Refund, Gift" required>
-
-      <label class="modal-label">Transaction Date & Time (Backdate)</label>
-      <input type="datetime-local" id="depDateTime" class="modal-input" style="text-align:left;">
-      
-      <div class="modal-actions">
-        <button class="btn" onclick="submitDeposit()">Confirm & Credit</button>
-        <button class="btn ghost" onclick="closeDepositModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CUSTOMER DETAILS MODAL (PIN 2121 protected fields) -->
-  <div class="modal-bg" id="detailsModal" onclick="if(event.target===this) closeDetailsModal()">
-    <div class="modal-box" style="max-width: 480px;">
-      <h3>👤 Customer Details</h3>
-      <p id="detailsSub">Personal information is hidden. Click the eye and enter your 4 digit secret pin to reveal.</p>
-      <div class="customer-info-box" id="detailsContent"></div>
-      <div class="modal-actions">
-        <button class="btn ghost" onclick="closeDetailsModal()">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PIN MODAL FOR REVEALING DETAILS -->
-  <div class="modal-bg" id="adminPinModal" onclick="if(event.target===this) closeAdminPin()">
-    <div class="modal-box" style="max-width: 400px; text-align:center;">
-      <h3>🔐 Security PIN Required</h3>
-      <p>Please input your 4 digit secret pin</p>
-      <input type="password" id="adminPinInput" class="modal-input" placeholder="----" maxlength="4" style="font-size:1.5rem; letter-spacing:8px; text-align:center;">
-      <div id="adminPinErr" class="error" style="margin-bottom:10px;"></div>
-      <div class="modal-actions">
-        <button class="btn" onclick="verifyAdminPin()">Unlock</button>
-        <button class="btn ghost" onclick="closeAdminPin()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 10-SECOND CALM LOADING GATE -->
-  <div class="modal-bg" id="dnsLoadingModal">
-    <div class="modal-box" style="max-width: 360px; text-align: center; padding: 40px 24px;">
-      <div class="calm-spinner"></div>
-      <h3 style="font-size: 1.25rem; margin-bottom: 8px;">Connecting to DNS Database</h3>
-      <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 0;">Resolving secure host clusters & routing records…</p>
-    </div>
-  </div>
-
-  <!-- 6-DIGIT SECURITY PIN MODAL -->
-  <div class="modal-bg" id="dnsPinModal" onclick="if(event.target===this) closeDnsPinModal()">
-    <div class="modal-box" style="max-width: 400px; text-align: center;">
-      <h3>🔐 DNS Security Clearance</h3>
-      <p style="color: var(--mut); font-size: 0.9rem; margin-bottom: 20px;">Enter the 6-digit administrative security PIN.</p>
-      
-      <input type="password" id="dnsPinInput" class="modal-input" placeholder="••••••" maxlength="6" style="font-size: 1.6rem; letter-spacing: 12px; text-align: center;">
-      <div id="dnsPinErr" class="error" style="margin-bottom: 14px; font-weight: 500;"></div>
-      
-      <div class="modal-actions">
-        <button class="btn" id="dnsSubmitBtn" onclick="verifyDnsPin()">Verify Clearance</button>
-        <button class="btn ghost" onclick="closeDnsPinModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CHANGE ADMIN PASSWORD MODAL -->
-  <div class="modal-bg" id="changePwModal" onclick="if(event.target===this) closeChangePasswordModal()">
-    <div class="modal-box" style="max-width: 440px;">
-      <h3>🔑 Change Administrator Password</h3>
-      <p>Setting a new password invalidates your existing password and immediately logs out all active sessions on every device.</p>
-      
-      <label class="modal-label">New Password</label>
-      <input type="password" id="adminNewPw" class="modal-input" placeholder="Minimum 8 characters" minlength="8" autocomplete="new-password">
-      
-      <label class="modal-label">Confirm New Password</label>
-      <input type="password" id="adminConfirmPw" class="modal-input" placeholder="Re-enter new password" minlength="8" autocomplete="new-password">
-      
-      <div id="adminPwModalErr" class="error" style="margin-bottom: 14px;"></div>
-      
-      <div class="modal-actions">
-        <button class="btn" id="confirmChangePwBtn" onclick="submitAdminPasswordChange()">Save & Log Out Everywhere</button>
-        <button class="btn ghost" onclick="closeChangePasswordModal()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast" class="hidden"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    if (window.location.search || window.location.href.endsWith("?")) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    "use strict";
-    
-    const SUPABASE_URL = "https://jthmxuecjbyvltvjfhyj.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_WzE8F6fwrln4M3ExyLKKjQ_qzZSlPOe";
-    const PASSWORD_RESET_REDIRECT = "https://fluxxbank.org.uk/admin.html";
-
-    let sb = null;
-    let customers = [];
-    let toastTimer = null;
-    let depositUserId = null;
-    const $ = id => document.getElementById(id);
-    const eur = n => "€" + Number(n || 0).toLocaleString("en-IE",{minimumFractionDigits:2,maximumFractionDigits:2});
-
-    document.addEventListener("DOMContentLoaded", async () => {
-      if (!window.supabase) return alert("Supabase failed to load.");
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      
-      sb.auth.onAuthStateChange((event, session) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          $("loginScreen").classList.remove("hidden");
-          $("app").classList.add("hidden");
-          $("loginForm").classList.add("hidden");
-          $("forgotWrap").classList.add("hidden");
-          $("newPasswordForm").classList.remove("hidden");
-          $("loginSubtitle").textContent = "Please enter your new administrator password.";
-        } else if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) {
-          $("app").classList.add("hidden");
-          $("loginScreen").classList.remove("hidden");
-          showSignInForm("Session terminated. Your password was changed or session was revoked.");
-        }
-      });
-
-      const { data } = await sb.auth.getSession();
-      if (data.session) { 
-        boot(data.session.user); 
-      } else { 
-        $("loginScreen").classList.remove("hidden"); 
-      }
-
-      $("loginForm").addEventListener("submit", tryLogin);
-      $("forgotPasswordBtn").addEventListener("click", requestPasswordReset);
-      $("newPasswordForm").addEventListener("submit", saveNewPassword);
-      $("backToLoginBtn").addEventListener("click", () => showSignInForm());
-      $("logoutBtn").addEventListener("click", async () => { 
-        await sb.auth.signOut(); 
-        location.reload(); 
-      });
-
-      document.querySelectorAll(".side-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".side-btn").forEach(b => b.classList.remove("on"));
-          btn.classList.add("on");
-          document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
-          $("view-" + btn.dataset.view).classList.add("on");
-          $("pageTitle").textContent = btn.textContent.replace(/[^a-zA-Z ]/g, "").trim();
-          document.querySelector('.sidebar').classList.remove('open');
-          if(btn.dataset.view === "transfers") loadPendingTransfers();
-        });
-      });
-
-      document.addEventListener("click", async (e) => {
-        if (e.target.classList.contains("approve-btn")) {
-          const index = e.target.getAttribute("data-index");
-          const customer = customers[index];
-          e.target.disabled = true;
-          e.target.textContent = "Approving...";
-          const { error } = await sb.from("profiles").update({ status: "active" }).eq("id", customer.id);
-          if (error) {
-            toast("Error: " + error.message);
-            e.target.disabled = false;
-            e.target.textContent = "Approve";
-          } else {
-            toast("Customer approved successfully!");
-            await loadAll();
-            renderOverview(); renderCustomers(); renderApprovals();
-          }
-        }
-      });
-    });
-
-    /* DNS DISGUISE & 10s / 5s FLOW */
-    function startDnsGate() {
-      $("dnsLoadingModal").classList.add("show");
-
-      // 10-second calm spinning motion
-      setTimeout(() => {
-        $("dnsLoadingModal").classList.remove("show");
-        openDnsPinModal();
-      }, 10000);
-    }
-
-    function openDnsPinModal() {
-      $("dnsPinInput").value = "";
-      $("dnsPinErr").textContent = "";
-      $("dnsPinInput").disabled = false;
-      $("dnsSubmitBtn").disabled = false;
-      $("dnsSubmitBtn").textContent = "Verify Clearance";
-      $("dnsPinModal").classList.add("show");
-      $("dnsPinInput").focus();
-    }
-
-    function closeDnsPinModal() {
-      $("dnsPinModal").classList.remove("show");
-    }
-
-    function verifyDnsPin() {
-      const pin = $("dnsPinInput").value.trim();
-      const errEl = $("dnsPinErr");
-      const btn = $("dnsSubmitBtn");
-      const input = $("dnsPinInput");
-
-      errEl.textContent = "";
-      btn.disabled = true;
-      input.disabled = true;
-      btn.innerHTML = `<span class="inline-spin"></span> Verifying…`;
-
-      // 5-second verification toggle delay
-      setTimeout(() => {
-        btn.disabled = false;
-        input.disabled = false;
-        btn.textContent = "Verify Clearance";
-
-        if (pin === "191922") {
-          closeDnsPinModal();
-          openChangePasswordModal();
-        } else {
-          errEl.textContent = "incorrect pin please enter the valid 6 digit pin required";
-          input.value = "";
-          input.focus();
-        }
-      }, 5000);
-    }
-
-    /* IN-DASHBOARD CHANGE PASSWORD MODAL LOGIC */
-    function openChangePasswordModal() {
-      $("adminNewPw").value = "";
-      $("adminConfirmPw").value = "";
-      $("adminPwModalErr").textContent = "";
-      $("changePwModal").classList.add("show");
-      $("adminNewPw").focus();
-    }
-
-    function closeChangePasswordModal() {
-      $("changePwModal").classList.remove("show");
-    }
-
-    async function submitAdminPasswordChange() {
-      const pw = $("adminNewPw").value;
-      const cpw = $("adminConfirmPw").value;
-      const errEl = $("adminPwModalErr");
-      const btn = $("confirmChangePwBtn");
-
-      if (!pw || pw.length < 8) {
-        errEl.textContent = "Password must be at least 8 characters.";
-        return;
-      }
-      if (pw !== cpw) {
-        errEl.textContent = "Passwords do not match.";
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = "Updating & revoking sessions...";
-      errEl.textContent = "";
-
-      try {
-        const { error: updateError } = await sb.auth.updateUser({ password: pw });
-        if (updateError) throw updateError;
-
-        closeChangePasswordModal();
-        toast("Password updated. Terminating sessions on all devices...");
-
-        await sb.auth.signOut({ scope: 'global' });
-
-        setTimeout(() => {
-          window.location.reload();
-        }, 1200);
-      } catch (error) {
-        errEl.textContent = error.message;
-        btn.disabled = false;
-        btn.textContent = "Save & Log Out Everywhere";
-      }
-    }
-
-    async function toggleLockCustomer(userId, currentStatus) {
-      const newStatus = currentStatus === 'locked' ? 'active' : 'locked';
-      const actionText = newStatus === 'locked' ? 'lock' : 'unlock';
-      if(!confirm(`Are you sure you want to ${actionText} this customer account?`)) return;
-      const { error } = await sb.from("profiles").update({ status: newStatus }).eq("id", userId);
-      if(error) {
-        toast("Error updating account status: " + error.message);
-      } else {
-        toast(`✅ Customer account ${newStatus === 'locked' ? 'locked' : 'unlocked'} successfully.`);
-        await loadAll();
-        renderOverview();
-        renderCustomers();
-      }
-    }
-
-    async function updateTxStatus(txId) {
-      const selectEl = document.getElementById(`status-select-${txId}`);
-      const newStatus = selectEl.value;
-      const { error } = await sb.from("transactions").update({ status: newStatus }).eq("id", txId);
-      if(error) {
-        toast("Error updating transaction status: " + error.message);
-      } else {
-        toast(`✅ Transaction status updated to '${newStatus}'.`);
-        loadPendingTransfers();
-      }
-    }
-
-    let detailsUserId = null;
-    let pendingDetailField = null;
-
-    function openCustomerDetails(userId) {
-      const c = customers.find(x => x.id === userId);
-      if(!c) return;
-      detailsUserId = userId;
-      const content = document.getElementById("detailsContent");
-      content.innerHTML = `
-        <div class="info-row"><span>Name</span><strong class="detail-masked" data-field="name">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('name')">👁</button></div>
-        <div class="info-row"><span>Email</span><strong class="detail-masked" data-field="email">••••••••</strong> <button class="btn small" style="width:auto;padding:4px 10px;" onclick="requestReveal('email')">👁</button></div>
-        <div class="info-row"><span>Status</span><strong>${statusBadge(c.status)}</strong></div>
-        <div class="info-row"><span>Balance</span><strong style="color:var(--ok);">${eur(c.balance||0)}</strong></div>
-        <div class="info-row"><span>Role</span><strong>${escapeHtml(c.role||"customer")}</strong></div>
-        <div class="info-row"><span>Joined</span><strong>${c.created_at ? new Date(c.created_at).toLocaleString("en-GB") : "—"}</strong></div>
-      `;
-      document.getElementById("detailsModal").classList.add("show");
-    }
-
-    function closeDetailsModal() {
-      document.getElementById("detailsModal").classList.remove("show");
-      detailsUserId = null;
-    }
-
-    function requestReveal(field) {
-      pendingDetailField = field;
-      document.getElementById("adminPinInput").value = "";
-      document.getElementById("adminPinErr").textContent = "";
-      document.getElementById("adminPinModal").classList.add("show");
-    }
-
-    function closeAdminPin() {
-      document.getElementById("adminPinModal").classList.remove("show");
-      pendingDetailField = null;
-    }
-
-    function verifyAdminPin() {
-      const pin = document.getElementById("adminPinInput").value.trim();
-      const err = document.getElementById("adminPinErr");
-      if(pin !== "2121") {
-        err.textContent = "Incorrect password";
-        return;
-      }
-      err.textContent = "";
-      document.getElementById("adminPinModal").classList.remove("show");
-      if(pendingDetailField && detailsUserId) {
-        const c = customers.find(x => x.id === detailsUserId);
-        const el = document.querySelector(`.detail-masked[data-field="${pendingDetailField}"]`);
-        if(el && c) {
-          if(pendingDetailField === "name") el.textContent = c.name || "—";
-          else if(pendingDetailField === "email") el.textContent = c.email || "—";
-          el.classList.remove("detail-masked");
-        }
-      }
-      pendingDetailField = null;
-    }
-
-    function openDepositModal(userId) {
-      const c = customers.find(x => x.id === userId);
-      if(!c) return;
-      depositUserId = userId;
-      $("depName").textContent = c.name || "Unknown";
-      $("depEmail").textContent = c.email || "N/A";
-      $("depStatus").innerHTML = statusBadge(c.status);
-      $("depBalance").textContent = eur(c.balance || 0);
-      $("depFirstName").value = "";
-      $("depLastName").value = "";
-      $("depIban").value = "";
-      $("depBic").value = "";
-      $("depBank").value = "";
-      $("depositAmountInput").value = "";
-      $("depPurpose").value = "";
-      const now = new Date();
-      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-      $("depDateTime").value = now.toISOString().slice(0, 16);
-      $("depositModal").classList.add("show");
-      $("depFirstName").focus();
-    }
-
-    function closeDepositModal() {
-      $("depositModal").classList.remove("show");
-      depositUserId = null;
-    }
-
-    async function submitDeposit() {
-      if(!depositUserId) return;
-      const fName = $("depFirstName").value.trim();
-      const lName = $("depLastName").value.trim();
-      const iban = $("depIban").value.trim();
-      const bic = $("depBic").value.trim();
-      const bank = $("depBank").value.trim();
-      const amount = parseFloat($("depositAmountInput").value);
-      const purpose = $("depPurpose").value.trim();
-      const customDate = $("depDateTime").value;
-
-      if(!fName || !lName || !iban || !bic || !bank || !purpose) return toast("Please fill in all recipient details.");
-      if(isNaN(amount) || amount <= 0) return toast("Please enter a valid amount.");
-
-      const btn = event.target;
-      btn.disabled = true;
-      btn.textContent = "Processing...";
-
-      try {
-        const { data: profile } = await sb.from("profiles").select("balance").eq("id", depositUserId).single();
-        const newBalance = Number(profile.balance || 0) + amount;
-        const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", depositUserId);
-        if (err1) throw err1;
-
-        const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();
-        const description = `Sent to ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;
-
-        const txPayload = { 
-          user_id: depositUserId, 
-          type: 'deposit', 
-          amount: amount, 
-          description: description, 
-          status: 'completed',
-          balance_after: newBalance,
-          reference: refCode
-        };
-
-        if(customDate) txPayload.created_at = new Date(customDate).toISOString();
-
-        const { error: txErr } = await sb.from("transactions").insert(txPayload);
-        if(txErr) throw txErr;
+        toast(`✅ Credited ${eur(amount)} successfully as payment received (Backdated/Timed)!`);  
+        closeDepositModal();  
+        await loadAll();   
+        renderCustomers();  
+      } catch (error) {  
+        toast("Error: " + error.message);  
+      } finally {  
+        btn.disabled = false;  
+        btn.textContent = "Confirm & Credit";  
+      }  
+    }  
+  
+    function showLoginError(msg) { $("loginErr").textContent = msg || ""; }  
+    function showPageError(msg) { $("pageErr").textContent = msg || ""; }  
+    function showLoginMessage(msg, success = false) {  
+      const el = $("loginMessage"); el.textContent = msg || "";  
+      el.classList.toggle("success", Boolean(success)); el.classList.toggle("error", !success);  
+    }  
+    function toast(msg) {  
+      const el = $("toast"); el.textContent = msg; el.classList.remove("hidden");  
+      el.classList.add("show");  
+      if (toastTimer) clearTimeout(toastTimer);  
+      toastTimer = setTimeout(() => { el.classList.remove("show"); setTimeout(()=>el.classList.add("hidden"), 300); }, 3500);  
+    }  
+    function escapeHtml(v) {  
+      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" })[ch]);  
+    }  
+    function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }  
+    function statusBadge(status) {  
+      const v = String(status ?? "Unknown"); const l = v.toLowerCase();  
+      let css = "";  
+      if (l === "active") css = "active";  
+      else if (l.includes("pending")) css = "pending";  
+      else if (l === "locked") css = "locked";  
+      else if (l === "processing" || l === "on_hold") css = "processing";  
+      return `<span class="status ${css}">${escapeHtml(v)}</span>`;  
+    }  
+  
+    function showSignInForm(msg = "", success = false) {  
+      $("loginForm").classList.remove("hidden"); $("forgotWrap").classList.remove("hidden");  
+      $("newPasswordForm").classList.add("hidden"); showLoginError("");  
+      showLoginMessage(msg, success);  
+    }  
+  
+    async function tryLogin(e) {  
+      e.preventDefault(); showLoginError("");  
+      const email = $("aEmail").value.trim(), password = $("aPass").value;  
+      const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";  
         
-        toast(`✅ Credited ${eur(amount)} successfully (Backdated/Timed)!`);
-        closeDepositModal();
-        await loadAll(); 
-        renderCustomers();
-      } catch (error) {
-        toast("Error: " + error.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Confirm & Credit";
-      }
-    }
-
-    function showLoginError(msg) { $("loginErr").textContent = msg || ""; }
-    function showPageError(msg) { $("pageErr").textContent = msg || ""; }
-    function showLoginMessage(msg, success = false) {
-      const el = $("loginMessage"); el.textContent = msg || "";
-      el.classList.toggle("success", Boolean(success)); el.classList.toggle("error", !success);
-    }
-    function toast(msg) {
-      const el = $("toast"); el.textContent = msg; el.classList.remove("hidden");
-      el.classList.add("show");
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { el.classList.remove("show"); setTimeout(()=>el.classList.add("hidden"), 300); }, 3500);
-    }
-    function escapeHtml(v) {
-      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);
-    }
-    function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }
-    function statusBadge(status) {
-      const v = String(status ?? "Unknown"); const l = v.toLowerCase();
-      let css = "";
-      if (l === "active") css = "active";
-      else if (l.includes("pending")) css = "pending";
-      else if (l === "locked") css = "locked";
-      else if (l === "processing" || l === "on_hold") css = "processing";
-      return `<span class="status ${css}">${escapeHtml(v)}</span>`;
-    }
-
-    function showSignInForm(msg = "", success = false) {
-      $("loginForm").classList.remove("hidden"); $("forgotWrap").classList.remove("hidden");
-      $("newPasswordForm").classList.add("hidden"); showLoginError("");
-      showLoginMessage(msg, success);
-    }
-
-    async function tryLogin(e) {
-      e.preventDefault(); showLoginError("");
-      const email = $("aEmail").value.trim(), password = $("aPass").value;
-      const btn = $("loginBtn"); btn.disabled = true; btn.textContent = "Signing in…";
-      
-      try {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        
-        const { data: profile, error: pError } = await sb.from("profiles")
-          .select("role")
-          .eq("id", data.user.id)
-          .single();
+      try {  
+        const { data, error } = await sb.auth.signInWithPassword({ email, password });  
+        if (error) throw error;  
           
-        if (pError) throw pError;
-        if (profile.role !== 'admin') {
-          await sb.auth.signOut();
-          throw new Error("Access Denied: You do not have administrator privileges.");
-        }
-
-        await boot(data.user);
-      } catch (error) {
-        showLoginError(error.message || "Invalid email or password.");
-      } finally { 
-        btn.disabled = false; 
-        btn.textContent = "Sign in"; 
-      }
-    }
-
-    async function boot(user) {
-      $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
-      showLoginError(""); showPageError("");
-      try {
-        if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }
-        if (!user) throw new Error("Please sign in.");
-        
-        const { data: profile, error: pError } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();
-        if (pError) throw pError;
-
-        if (profile.role !== 'admin') {
-          await sb.auth.signOut();
-          throw new Error("Access Denied: Administrator privileges required.");
-        }
-
-        $("adminIdentity").textContent = (profile && profile.name) || "Administrator";
-        await loadAll();
-        $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");
-        renderOverview(); renderCustomers(); renderApprovals();
-      } catch (error) {
-        $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");
-        showLoginError(error.message);
-      }
-    }
-
-    async function loadAll() {
-      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, created_at").order("created_at", { ascending: false });
-      if (error) throw error;
-      customers = data || [];
-    }
-
-    async function requestPasswordReset() {
-      const email = $("aEmail").value.trim();
-      if (!email) return showLoginMessage("Enter your email first.");
-      const btn = $("forgotPasswordBtn"); btn.disabled = true;
-      try {
-        await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });
-        showLoginMessage("✅ Password reset link sent to your email address", true);
-      } catch (e) { 
-        showLoginMessage(e.message); 
-      } finally { 
-        btn.disabled = false; 
-      }
-    }
-    
-    async function saveNewPassword(e) {
-      e.preventDefault();
-      const pw = $("newPassword").value, cpw = $("confirmNewPassword").value;
-      const errEl = $("passwordResetErr");
-      const btn = $("saveNewPasswordBtn");
-
-      if (pw.length < 8) return errEl.textContent = "Use 8+ characters.";
-      if (pw !== cpw) return errEl.textContent = "Passwords don't match.";
-
-      btn.disabled = true;
-      btn.textContent = "Updating password...";
-      errEl.textContent = "";
-
-      try {
-        const { error: updateError } = await sb.auth.updateUser({ password: pw });
-        if (updateError) throw updateError;
-
-        await sb.auth.signOut({ scope: 'global' });
-        
-        $("newPassword").value = "";
-        $("confirmNewPassword").value = "";
-        showSignInForm("Password updated successfully. Please sign in with your new password.", true);
-      } catch (error) { 
-        errEl.textContent = error.message; 
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Save new password";
-      }
-    }
-
-    function renderOverview() {
-      $("kCustomers").textContent = customers.length;
-      $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;
-      $("recentBody").innerHTML = customers.slice(0, 5).map(c => `
-        <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role)}</td>
-        </tr>`).join("") || '<tr><td colspan="3" class="empty">No profiles.</td></tr>';
-    }
-
-    function renderCustomers() {
-      $("custBody").innerHTML = customers.map((c, i) => {
-        const isLocked = c.status === 'locked';
-        return `
-        <tr>
-          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>
-          <td>${statusBadge(c.status)}</td>
-          <td>${escapeHtml(c.role)}</td>
-          <td style="font-weight:bold; color:var(--ok);">${eur(c.balance || 0)}</td>
-          <td>
-            ${isPending(c.status) ? `<button class="btn ghost approve-btn small" type="button" data-index="${i}">Approve</button>` : ""}
-            <button class="btn small" style="background:var(--accent); color:#fff;" onclick="openDepositModal('${c.id}')">+ Deposit</button>
-            <button class="btn ghost small" onclick="openCustomerDetails('${c.id}')">View</button>
-            <button class="btn small" style="background:${isLocked ? 'var(--ok)' : 'var(--bad)'}; color:#fff;" onclick="toggleLockCustomer('${c.id}', '${c.status}')">${isLocked ? 'Unlock' : 'Lock'}</button>
-            <button class="btn ghost small" onclick="sendPasswordResetLink('${c.email}')">Reset PW</button>
-          </td>
-        </tr>`;
-      }).join("") || '<tr><td colspan="5" class="empty">No profiles.</td></tr>';
-    }
-
-    function renderApprovals() {
-      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));
-      $("apprList").innerHTML = pending.map(({ customer, index }) => {
-        const has2FA = customer.role && customer.role.startsWith("2FA-");
-        const codeVal = has2FA ? customer.role.replace("2FA-", "") : "";
-        const codeDisplay = has2FA 
-          ? `<div style="color:var(--gold); font-size:14px; margin-top:8px; display:flex; align-items:center; gap:10px;">
-               <span>2FA Code: <b>${codeVal}</b></span>
-               <button class="btn small" style="background:rgba(255,255,255,0.1); color:#fff; padding:4px 10px; font-size:0.75rem;" onclick="navigator.clipboard.writeText('${codeVal}'); toast('2FA Code copied!')">Copy</button>
-             </div>` 
-          : '';
-
-        return `
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)">
-          <div style="min-width:0">
-            <strong>${escapeHtml(customer.name || "Unnamed")}</strong>
-            <div style="color:var(--mut);font-size:12px">${escapeHtml(customer.email || "")}</div>
-            ${codeDisplay}
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn ghost approve-btn small" type="button" data-index="${index}">Approve</button>
-            <button class="btn small" style="background:var(--accent2); color:#111827;" onclick="generate2FA('${customer.id}', '${customer.name}')">Generate 2FA</button>
-          </div>
-        </div>`;
-      }).join("") || '<div class="empty">No pending applications.</div>';
-    }
-
-    async function generate2FA(userId, userName) {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const { error } = await sb.from("profiles").update({ role: `2FA-${code}` }).eq("id", userId);
-      if (error) {
-        toast("Error generating code: " + error.message);
-      } else {
-        toast(`🔑 2FA Code for ${userName} is: ${code}`);
-        await loadAll();
-        renderApprovals();
-      }
-    }
-
-    async function sendPasswordResetLink(email) {
-      if(!confirm(`Send a secure password reset link to ${email}?`)) return;
-      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });
-      if (error) {
-        toast("Error: " + error.message);
-      } else {
-        toast(`✅ Reset link sent to ${email}`);
-      }
-    }
-
-    async function loadPendingTransfers() {
-      const tbody = $("pendingTransfersBody");
-      tbody.innerHTML = '<tr><td colspan="5" class="empty">Loading transfers…</td></tr>';
-
-      const { data: txData, error: txError } = await sb
-        .from("transactions")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (txError) {
-        tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--bad)">Error: ${txError.message}</td></tr>`;
-        return;
-      }
-
-      if (!txData || txData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">No customer transfers found.</td></tr>';
-        return;
-      }
-
-      const userIds = [...new Set(txData.map(tx => tx.user_id))];
-      const { data: profilesData } = await sb.from("profiles").select("id, name, email").in("id", userIds);
-
-      const profileMap = {};
-      if (profilesData) {
-        profilesData.forEach(p => profileMap[p.id] = p);
-      }
-
-      tbody.innerHTML = txData.map(tx => {
-        const profile = profileMap[tx.user_id] || {};
-        const currentStatus = tx.status || 'pending';
-        return `
-          <tr>
-            <td>${profile.name || "Unknown"}<br><small>${profile.email || ""}</small></td>
-            <td>${escapeHtml(tx.description)}</td>
-            <td style="font-weight:bold;">${eur(tx.amount)}</td>
-            <td>${statusBadge(currentStatus)}</td>
-            <td>
-              <div style="display:flex; gap:8px; align-items:center;">
-                <select id="status-select-${tx.id}" style="background:rgba(0,0,0,0.3); border:1px solid var(--line); color:#fff; padding:6px 10px; border-radius:8px; outline:none;">
-                  <option value="pending" ${currentStatus==='pending'?'selected':''}>Pending</option>
-                  <option value="processing" ${currentStatus==='processing'?'selected':''}>Processing</option>
-                  <option value="on_hold" ${currentStatus==='on_hold'?'selected':''}>On Hold</option>
-                  <option value="completed" ${currentStatus==='completed'?'selected':''}>Completed</option>
-                </select>
-                <button class="btn small" style="padding:6px 12px;" onclick="updateTxStatus('${tx.id}')">Update</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join("");
-    }
-  </script>
-</body>
+        const { data: profile, error: pError } = await sb.from("profiles")  
+          .select("role")  
+          .eq("id", data.user.id)  
+          .single();  
+            
+        if (pError) throw pError;  
+        if (profile.role !== 'admin') {  
+          await sb.auth.signOut();  
+          throw new Error("Access Denied: You do not have administrator privileges.");  
+        }  
+  
+        await boot(data.user);  
+      } catch (error) {  
+        showLoginError(error.message || "Invalid email or password.");  
+      } finally {   
+        btn.disabled = false;   
+        btn.textContent = "Sign in";   
+      }  
+    }  
+  
+    async function boot(user) {  
+      $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");  
+      showLoginError(""); showPageError("");  
+      try {  
+        if (!user) { const { data } = await sb.auth.getUser(); user = data.user; }  
+        if (!user) throw new Error("Please sign in.");  
+          
+        const { data: profile, error: pError } = await sb.from("profiles").select("id, name, email, role, status").eq("id", user.id).single();  
+        if (pError) throw pError;  
+  
+        if (profile.role !== 'admin') {  
+          await sb.auth.signOut();  
+          throw new Error("Access Denied: Administrator privileges required.");  
+        }  
+  
+        $("adminIdentity").textContent = (profile && profile.name) || "Administrator";  
+        await loadAll();  
+        $("loginScreen").classList.add("hidden"); $("app").classList.remove("hidden");  
+        renderOverview(); renderCustomers(); renderApprovals();  
+      } catch (error) {  
+        $("app").classList.add("hidden"); $("loginScreen").classList.remove("hidden");  
+        showLoginError(error.message);  
+      }  
+    }  
+  
+    async function loadAll() {  
+      const { data, error } = await sb.from("profiles").select("id, name, email, status, role, balance, created_at").order("created_at", { ascending: false });  
+      if (error) throw error;  
+      customers = data || [];  
+    }  
+  
+    async function requestPasswordReset() {  
+      const email = $("aEmail").value.trim();  
+      if (!email) return showLoginMessage("Enter your email first.");  
+      const btn = $("forgotPasswordBtn"); btn.disabled = true;  
+      try {  
+        await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });  
+        showLoginMessage("✅ Password reset link sent to your email address", true);  
+      } catch (e) {   
+        showLoginMessage(e.message);   
+      } finally {   
+        btn.disabled = false;   
+      }  
+    }  
+      
+    async function saveNewPassword(e) {  
+      e.preventDefault();  
+      const pw = $("newPassword").value, cpw = $("confirmNewPassword").value;  
+      const errEl = $("passwordResetErr");  
+      const btn = $("saveNewPasswordBtn");  
+  
+      if (pw.length < 8) return errEl.textContent = "Use 8+ characters.";  
+      if (pw !== cpw) return errEl.textContent = "Passwords don't match.";  
+  
+      btn.disabled = true;  
+      btn.textContent = "Updating password...";  
+      errEl.textContent = "";  
+  
+      try {  
+        const { error: updateError } = await sb.auth.updateUser({ password: pw });  
+        if (updateError) throw updateError;  
+  
+        await sb.auth.signOut({ scope: 'global' });  
+          
+        $("newPassword").value = "";  
+        $("confirmNewPassword").value = "";  
+        showSignInForm("Password updated successfully. Please sign in with your new password.", true);  
+      } catch (error) {   
+        errEl.textContent = error.message;   
+      } finally {  
+        btn.disabled = false;  
+        btn.textContent = "Save new password";  
+      }  
+    }  
+  
+    function renderOverview() {  
+      $("kCustomers").textContent = customers.length;  
+      $("kAppr").textContent = customers.filter(c => isPending(c.status)).length;  
+      $("recentBody").innerHTML = customers.slice(0, 5).map(c => `  
+        <tr>  
+          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>  
+          <td>${statusBadge(c.status)}</td>  
+          <td>${escapeHtml(c.role)}</td>  
+        </tr>`).join("") || '<tr><td colspan="3" class="empty">No profiles.</td></tr>';  
+    }  
+  
+    function renderCustomers() {  
+      $("custBody").innerHTML = customers.map((c, i) => {  
+        const isLocked = c.status === 'locked';  
+        return `  
+        <tr>  
+          <td>${escapeHtml(c.name)}<small>${escapeHtml(c.email)}</small></td>  
+          <td>${statusBadge(c.status)}</td>  
+          <td>${escapeHtml(c.role)}</td>  
+          <td style="font-weight:bold; color:var(--ok);">${eur(c.balance || 0)}</td>  
+          <td>  
+            ${isPending(c.status) ? `<button class="btn ghost approve-btn small" type="button" data-index="${i}">Approve</button>` : ""}  
+            <button class="btn small" style="background:var(--accent); color:#fff;" onclick="openDepositModal('${c.id}')">+ Deposit</button>  
+            <button class="btn ghost small" onclick="openCustomerDetails('${c.id}')">View</button>  
+            <button class="btn small" style="background:${isLocked ? 'var(--ok)' : 'var(--bad)'}; color:#fff;" onclick="toggleLockCustomer('${c.id}', '${c.status}')">${isLocked ? 'Unlock' : 'Lock'}</button>  
+            <button class="btn ghost small" onclick="sendPasswordResetLink('${c.email}')">Reset PW</button>  
+          </td>  
+        </tr>`;  
+      }).join("") || '<tr><td colspan="5" class="empty">No profiles.</td></tr>';  
+    }  
+  
+    function renderApprovals() {  
+      const pending = customers.map((customer, index) => ({ customer, index })).filter(item => isPending(item.customer.status));  
+      $("apprList").innerHTML = pending.map(({ customer, index }) => {  
+        const has2FA = customer.role && customer.role.startsWith("2FA-");  
+        const codeVal = has2FA ? customer.role.replace("2FA-", "") : "";  
+        const codeDisplay = has2FA   
+          ? `<div style="color:var(--gold); font-size:14px; margin-top:8px; display:flex; align-items:center; gap:10px;">  
+               <span>2FA Code: <b>${codeVal}</b></span>  
+               <button class="btn small" style="background:rgba(255,255,255,0.1); color:#fff; padding:4px 10px; font-size:0.75rem;" onclick="navigator.clipboard.writeText('${codeVal}'); toast('2FA Code copied!')">Copy</button>  
+             </div>`   
+          : '';  
+  
+        return `  
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)">  
+          <div style="min-width:0">  
+            <strong>${escapeHtml(customer.name || "Unnamed")}</strong>  
+            <div style="color:var(--mut);font-size:12px">${escapeHtml(customer.email || "")}</div>  
+            ${codeDisplay}  
+          </div>  
+          <div style="display:flex; gap:8px;">  
+            <button class="btn ghost approve-btn small" type="button" data-index="${index}">Approve</button>  
+            <button class="btn small" style="background:var(--accent2); color:#111827;" onclick="generate2FA('${customer.id}', '${customer.name}')">Generate 2FA</button>  
+          </div>  
+        </div>`;  
+      }).join("") || '<div class="empty">No pending applications.</div>';  
+    }  
+  
+    async function generate2FA(userId, userName) {  
+      const code = Math.floor(100000 + Math.random() * 900000).toString();  
+      const { error } = await sb.from("profiles").update({ role: `2FA-${code}` }).eq("id", userId);  
+      if (error) {  
+        toast("Error generating code: " + error.message);  
+      } else {  
+        toast(`🔑 2FA Code for ${userName} is: ${code}`);  
+        await loadAll();  
+        renderApprovals();  
+      }  
+    }  
+  
+    async function sendPasswordResetLink(email) {  
+      if(!confirm(`Send a secure password reset link to ${email}?`)) return;  
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: PASSWORD_RESET_REDIRECT });  
+      if (error) {  
+        toast("Error: " + error.message);  
+      } else {  
+        toast(`✅ Reset link sent to ${email}`);  
+      }  
+    }  
+  
+    async function loadPendingTransfers() {  
+      const tbody = $("pendingTransfersBody");  
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">Loading transfers…</td></tr>';  
+  
+      const { data: txData, error: txError } = await sb  
+        .from("transactions")  
+        .select("*")  
+        .order("created_at", { ascending: false });  
+  
+      if (txError) {  
+        tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--bad)">Error: ${txError.message}</td></tr>`;  
+        return;  
+      }  
+  
+      if (!txData || txData.length === 0) {  
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">No customer transfers found.</td></tr>';  
+        return;  
+      }  
+  
+      const userIds = [...new Set(txData.map(tx => tx.user_id))];  
+      const { data: profilesData } = await sb.from("profiles").select("id, name, email").in("id", userIds);  
+  
+      const profileMap = {};  
+      if (profilesData) {  
+        profilesData.forEach(p => profileMap[p.id] = p);  
+      }  
+  
+      tbody.innerHTML = txData.map(tx => {  
+        const profile = profileMap[tx.user_id] || {};  
+        const currentStatus = tx.status || 'pending';  
+        return `  
+          <tr>  
+            <td>${profile.name || "Unknown"}<br><small>${profile.email || ""}</small></td>  
+            <td>${escapeHtml(tx.description)}</td>  
+            <td style="font-weight:bold;">${eur(tx.amount)}</td>  
+            <td>${statusBadge(currentStatus)}</td>  
+            <td>  
+              <div style="display:flex; gap:8px; align-items:center;">  
+                <select id="status-select-${tx.id}" style="background:rgba(0,0,0,0.3); border:1px solid var(--line); color:#fff; padding:6px 10px; border-radius:8px; outline:none;">  
+                  <option value="pending" ${currentStatus==='pending'?'selected':''}>Pending</option>  
+                  <option value="processing" ${currentStatus==='processing'?'selected':''}>Processing</option>  
+                  <option value="on_hold" ${currentStatus==='on_hold'?'selected':''}>On Hold</option>  
+                  <option value="completed" ${currentStatus==='completed'?'selected':''}>Completed</option>  
+                </select>  
+                <button class="btn small" style="padding:6px 12px;" onclick="updateTxStatus('${tx.id}')">Update</button>  
+              </div>  
+            </td>  
+          </tr>  
+        `;  
+      }).join("");  
+    }  
+  </script>  </body>  
 </html>
