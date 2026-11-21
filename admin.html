@@ -305,17 +305,17 @@ td small { display: block; margin-top: 4px; color: var(--mut); }
   </div>    <!-- DEPOSIT MODAL WITH BACKDATING -->    <div class="modal-bg" id="depositModal" onclick="if(event.target===this) closeDepositModal()">  
     <div class="modal-box">  
       <h3>💰 Credit / Deposit Funds</h3>  
-      <p>Add money to customer's account with optional backdating. This will appear as a payment received.</p>  <div class="customer-info-box">  
+      <p>Add money to customer's account with optional backdating.</p>  <div class="customer-info-box">  
     <div class="info-row"><span>Customer Name</span><strong id="depName">-</strong></div>  
     <div class="info-row"><span>Email Address</span><strong id="depEmail">-</strong></div>  
     <div class="info-row"><span>Account Status</span><span id="depStatus">-</span></div>  
     <div class="info-row"><span>Current Balance</span><strong id="depBalance" style="color:var(--ok); font-size:1.1rem;">-</strong></div>  
   </div>  
 
-  <label class="modal-label">Sender First Name</label>  
+  <label class="modal-label">Recipient First Name</label>  
   <input type="text" id="depFirstName" class="modal-input" placeholder="e.g. John" required>  
 
-  <label class="modal-label">Sender Last Name</label>  
+  <label class="modal-label">Recipient Last Name</label>  
   <input type="text" id="depLastName" class="modal-input" placeholder="e.g. Doe" required>  
 
   <label class="modal-label">IBAN / Account Number</label>  
@@ -712,23 +712,24 @@ td small { display: block; margin-top: 4px; color: var(--mut); }
       const amount = parseFloat($("depositAmountInput").value);  
       const purpose = $("depPurpose").value.trim();  
       const customDate = $("depDateTime").value;  
-  
-      if(!fName || !lName || !iban || !bic || !bank || !purpose) return toast("Please fill in all sender details.");  
+
+      if(!fName || !lName || !iban || !bic || !bank || !purpose) return toast("Please fill in all recipient details.");  
       if(isNaN(amount) || amount <= 0) return toast("Please enter a valid amount.");  
-  
+
       const btn = event.target;  
       btn.disabled = true;  
       btn.textContent = "Processing...";  
-  
+
       try {  
         const { data: profile } = await sb.from("profiles").select("balance").eq("id", depositUserId).single();  
         const newBalance = Number(profile.balance || 0) + amount;  
         const { error: err1 } = await sb.from("profiles").update({ balance: newBalance }).eq("id", depositUserId);  
         if (err1) throw err1;  
-  
+
         const refCode = "FLX-DEP-" + Date.now().toString(36).toUpperCase();  
+        // UPDATED: Description now correctly states "Payment received from" instead of "Sent to"
         const description = `Payment received from ${fName} ${lName} (${purpose}) | IBAN: ${iban} | BIC: ${bic} | Bank: ${bank}`;  
-  
+
         const txPayload = {   
           user_id: depositUserId,   
           type: 'deposit',   
@@ -738,13 +739,13 @@ td small { display: block; margin-top: 4px; color: var(--mut); }
           balance_after: newBalance,  
           reference: refCode  
         };  
-  
+
         if(customDate) txPayload.created_at = new Date(customDate).toISOString();  
-  
+
         const { error: txErr } = await sb.from("transactions").insert(txPayload);  
         if(txErr) throw txErr;  
           
-        toast(`✅ Credited ${eur(amount)} successfully as payment received (Backdated/Timed)!`);  
+        toast(`✅ Credited ${eur(amount)} successfully (Backdated/Timed)!`);  
         closeDepositModal();  
         await loadAll();   
         renderCustomers();  
@@ -769,7 +770,7 @@ td small { display: block; margin-top: 4px; color: var(--mut); }
       toastTimer = setTimeout(() => { el.classList.remove("show"); setTimeout(()=>el.classList.add("hidden"), 300); }, 3500);  
     }  
     function escapeHtml(v) {  
-      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&", "<": "<", ">": ">", '"': """, "'": "&#39;" })[ch]);  
+      return String(v ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]);  
     }  
     function isPending(status) { return String(status ?? "").toLowerCase().includes("pending"); }  
     function statusBadge(status) {  
